@@ -1,0 +1,24 @@
+<use name="CommonTools/Utils"/>
+<use name="FWCore/Framework"/>
+<use name="FWCore/PluginManager"/>
+<use name="FWCore/ParameterSet"/>
+<use name="DataFormats/Common"/>
+<use name="DataFormats/Candidate"/>
+<use name="DataFormats/PatCandidates"/>
+<use name="PhysicsTools/Utilities"/>
+<use name="CommonTools/UtilAlgos"/>
+<use name="PhysicsTools/PatAlgos"/>
+<use name="CommonTools/CandUtils"/>
+<use name="rootcintex"/>
+<use name="AnalysisDataFormats/TopObjects"/>
+<use name="RecoEgamma/EgammaTools"/>
+
+<library name="MuonHLTNtuplesToolsPlugin" file="*.cc">
+   <use name="MuonHLTNtuples/Tools"/>
+   <use name="root"/>
+   <use name="rootminuit"/>
+   <use name="clhep"/>
+   <use name="rootrflx"/>
+   <use name="rootmath"/>
+   <Flags EDM_PLUGIN="1"/>
+</library>
