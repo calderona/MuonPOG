@@ -9,12 +9,9 @@
 <use name="CommonTools/UtilAlgos"/>
 <use name="PhysicsTools/PatAlgos"/>
 <use name="CommonTools/CandUtils"/>
-<use name="rootcintex"/>
-<use name="AnalysisDataFormats/TopObjects"/>
-<use name="RecoEgamma/EgammaTools"/>
 
-<library name="MuonHLTNtuplesToolsPlugin" file="*.cc">
-   <use name="MuonHLTNtuples/Tools"/>
+<library name="MuonPOGToolsPlugin" file="*.cc">
+   <use name="MuonPOG/Tools"/>
    <use name="root"/>
    <use name="rootminuit"/>
    <use name="clhep"/>
