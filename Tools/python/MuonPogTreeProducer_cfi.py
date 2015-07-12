@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-MuonHltTree = cms.EDAnalyzer("MuonPogTreeProducer",
+MuonPogTree = cms.EDAnalyzer("MuonPogTreeProducer",
                              TrigResultsTag = cms.untracked.InputTag("TriggerResults::HLT"),
                              TrigSummaryTag = cms.untracked.InputTag("hltTriggerSummaryAOD::HLT"),
 

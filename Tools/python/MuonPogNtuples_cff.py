@@ -7,15 +7,17 @@ def appendMuonPogNtuple(process, runOnMC, processTag="HLT", ntupleFileName="Muon
 
     if processTag != "HLT" :
         print "[MuonPogNtuples]: Customising process tag for TriggerResults / Summary to :", processTag
-        process.MuonHltTree.TrigResultsTag = "TriggerResults::"+processTag
-        process.MuonHltTree.TrigSummaryTag = "hltTriggerSummaryAOD::"+processTag
+        process.MuonPogTree.TrigResultsTag = "TriggerResults::"+processTag
+        process.MuonPogTree.TrigSummaryTag = "hltTriggerSummaryAOD::"+processTag
 
     if runOnMC :
         process.load("MuonPOG.Tools.PrunedGenParticles_cfi")
-        process.muonHltNtuple = cms.Sequence(process.prunedGenParticles + process.MuonPogTree)
+        process.muonPogNtuple = cms.Sequence(process.prunedGenParticles + process.MuonPogTree)
     else :
-        process.muonHltNtuple = cms.Sequence(process.MuonPogTree)
-
+        process.muonPogNtuple = cms.Sequence(process.MuonPogTree)
+        PileUpInfoTag = cms.untracked.InputTag("none")
+        GenTag = cms.untracked.InputTag("none")
+        
     process.TFileService = cms.Service('TFileService',
         fileName = cms.string(ntupleFileName)
     )

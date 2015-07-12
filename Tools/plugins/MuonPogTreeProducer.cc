@@ -1,5 +1,5 @@
 //////////////////////////////////////
-// Ntuplizer that fills muon_hlt trees
+// Ntuplizer that fills muon_pog trees
 //////////////////////////////////////
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
@@ -83,6 +83,7 @@ private:
   edm::InputTag pileUpInfoTag_;
 
   muon_pog::Event event_;
+  muon_pog::EventId eventId_;
   std::map<std::string,TTree*> tree_;
   
 };
@@ -112,6 +113,7 @@ void MuonPogTreeProducer::beginJob()
 
   int splitBranches = 2;
   tree_["muPogTree"]->Branch("event",&event_,64000,splitBranches);
+  tree_["muPogTree"]->Branch("eventId",&eventId_,64000,splitBranches);
 
 }
 
@@ -155,6 +157,9 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
   event_.luminosityBlockNumber = ev.id().luminosityBlock();
   event_.eventNumber = ev.id().event();
 
+  eventId_.runNumber = ev.id().run();
+  eventId_.luminosityBlockNumber = ev.id().luminosityBlock();
+  eventId_.eventNumber = ev.id().event();
 
   // Fill GEN pile up information
   if (!ev.isRealData()) 
@@ -408,30 +413,36 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & mu
     {
       
       const reco::Muon& mu = (*muonIt);
-      const reco::Vertex & vertex = vertexes->at(0); // CB for now vertex is always valid, but add a protection	    
 
       bool isGlobal      = mu.isGlobalMuon();
       bool isTracker     = mu.isTrackerMuon();
       bool isStandAlone  = mu.isStandAloneMuon();
 
       bool hasInnerTrack = !mu.innerTrack().isNull();
-
-      double dxy = isGlobal ? mu.globalTrack()->dxy(vertex.position()) :
-	hasInnerTrack ? mu.innerTrack()->dxy(vertex.position()) : -1000;
-      double dz  = isGlobal ? mu.globalTrack()->dz(vertex.position()) :
-	hasInnerTrack ? mu.innerTrack()->dz(vertex.position()) : -1000;
-      
-      double dxybs = isGlobal ? mu.globalTrack()->dxy(beamSpot->position()) :
-	hasInnerTrack ? mu.innerTrack()->dxy(beamSpot->position()) : -1000;
-      double dzbs  = isGlobal ? mu.globalTrack()->dz(beamSpot->position()) :
-	hasInnerTrack ? mu.innerTrack()->dz(beamSpot->position()) : -1000;
+      bool hasTunePTrack = !mu.tunePMuonBestTrack().isNull();
       
       muon_pog::Muon ntupleMu;
       
-      ntupleMu.pt  = mu.pt();
-      ntupleMu.eta = mu.eta();
-      ntupleMu.phi = mu.phi();
-      
+      ntupleMu.pt     = mu.pt();
+      ntupleMu.eta    = mu.eta();
+      ntupleMu.phi    = mu.phi();
+      ntupleMu.charge = mu.charge();
+
+      ntupleMu.pt_global     = isGlobal ? mu.globalTrack()->pt()  : -1000.;
+      ntupleMu.eta_global    = isGlobal ? mu.globalTrack()->eta() : -1000.;
+      ntupleMu.phi_global    = isGlobal ? mu.globalTrack()->phi() : -1000.;
+      ntupleMu.charge_global = isGlobal ? mu.globalTrack()->charge() : -1000.;
+
+      ntupleMu.pt_tuneP     = hasTunePTrack ? mu.tunePMuonBestTrack()->pt()  : -1000.;
+      ntupleMu.eta_tuneP    = hasTunePTrack ? mu.tunePMuonBestTrack()->eta() : -1000.;
+      ntupleMu.phi_tuneP    = hasTunePTrack ? mu.tunePMuonBestTrack()->phi() : -1000.;
+      ntupleMu.charge_tuneP = hasTunePTrack ? mu.tunePMuonBestTrack()->charge() : -1000.;
+
+      ntupleMu.pt_tracker     = hasInnerTrack ? mu.innerTrack()->pt()  : -1000.;
+      ntupleMu.eta_tracker    = hasInnerTrack ? mu.innerTrack()->eta() : -1000.;
+      ntupleMu.phi_tracker    = hasInnerTrack ? mu.innerTrack()->phi() : -1000.;
+      ntupleMu.charge_tracker = hasInnerTrack ? mu.innerTrack()->charge() : -1000.;
+
       reco::MuonPFIsolation iso04 = mu.pfIsolationR04();
       reco::MuonPFIsolation iso03 = mu.pfIsolationR03();
 
@@ -439,32 +450,57 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & mu
       ntupleMu.neutralHadronIso = iso04.sumNeutralHadronEt;
       ntupleMu.photonIso        = iso04.sumPhotonEt;
 
-      ntupleMu.isGlobal     = isGlobal ? 1: 0;	
-      ntupleMu.isTracker    = isTracker ? 1: 0;	
-      ntupleMu.isStandAlone = isStandAlone ? 1: 0;
+      ntupleMu.isGlobal     = isGlobal ? 1 : 0;	
+      ntupleMu.isTracker    = isTracker ? 1 : 0;	
+      ntupleMu.isStandAlone = isStandAlone ? 1 : 0;
 
       ntupleMu.nHitsGlobal     = isGlobal     ? mu.globalTrack()->numberOfValidHits() : -999;	
       ntupleMu.nHitsTracker    = isTracker    ? mu.innerTrack()->numberOfValidHits()  : -999;	
       ntupleMu.nHitsStandAlone = isStandAlone ? mu.outerTrack()->numberOfValidHits()  : -999;
-	
-      ntupleMu.isLoose  = muon::isLooseMuon(mu)         ? 1 : 0;	  
-      ntupleMu.isSoft   = muon::isSoftMuon(mu,vertex)   ? 1 : 0;	  
-      ntupleMu.isTight  = muon::isTightMuon(mu,vertex)  ? 1 : 0;	  
-      ntupleMu.isHighPt = muon::isHighPtMuon(mu,vertex) ? 1 : 0;	  
+	    
+      ntupleMu.isoPflow04 = (iso04.sumChargedHadronPt+ std::max(0.,iso04.sumPhotonEt+iso04.sumNeutralHadronEt - 0.5*iso04.sumPUPt)) / mu.pt();
     
-      ntupleMu.charge = mu.charge();
+      ntupleMu.isoPflow03 = (iso03.sumChargedHadronPt+ std::max(0.,iso03.sumPhotonEt+iso03.sumNeutralHadronEt - 0.5*iso03.sumPUPt)) / mu.pt();
+
+      const reco::Vertex & vertex = vertexes->at(0); // CB for now vertex is always valid, but add a protection	    
+      
+      double dxybs = isGlobal ? mu.globalTrack()->dxy(beamSpot->position()) :
+	hasInnerTrack ? mu.innerTrack()->dxy(beamSpot->position()) : -1000;
+      double dzbs  = isGlobal ? mu.globalTrack()->dz(beamSpot->position()) :
+	hasInnerTrack ? mu.innerTrack()->dz(beamSpot->position()) : -1000;
+
+      double dxy = -1000.;
+      double dz  = -1000.;
+
+      ntupleMu.isSoft    = 0;	  
+      ntupleMu.isTight   = 0;	  
+      ntupleMu.isHighPt  = 0;
+      ntupleMu.isLoose   = muon::isLooseMuon(mu)  ? 1 : 0;	  
+      ntupleMu.isMedium  = muon::isMediumMuon(mu) ? 1 : 0;	  
+
+      if (vertexes->size() > 0)
+	{
+	  const reco::Vertex & vertex = vertexes->at(0);
+
+	  dxy = isGlobal ? mu.globalTrack()->dxy(vertex.position()) :
+	    hasInnerTrack ? mu.innerTrack()->dxy(vertex.position()) : -1000;
+	  dz =isGlobal ? mu.globalTrack()->dz(vertex.position()) :
+	    hasInnerTrack ? mu.innerTrack()->dz(vertex.position()) : -1000;
+ 
+	  ntupleMu.isSoft    = muon::isSoftMuon(mu,vertex)   ? 1 : 0;	  
+	  ntupleMu.isTight   = muon::isTightMuon(mu,vertex)  ? 1 : 0;	  
+	  ntupleMu.isHighPt  = muon::isHighPtMuon(mu,vertex) ? 1 : 0;
+
+	}
 
       ntupleMu.dxy    = dxy;
       ntupleMu.dz     = dz;
       ntupleMu.edxy   = isGlobal ? mu.globalTrack()->dxyError() : hasInnerTrack ? mu.innerTrack()->dxyError() : -1000;
       ntupleMu.edz    = isGlobal ? mu.globalTrack()->dzError()  : hasInnerTrack ? mu.innerTrack()->dzError() : -1000;
+
       ntupleMu.dxybs  = dxybs;
       ntupleMu.dzbs   = dzbs;
-    
-      ntupleMu.isoPflow04 = (iso04.sumChargedHadronPt+ std::max(0.,iso04.sumPhotonEt+iso04.sumNeutralHadronEt - 0.5*iso04.sumPUPt)) / mu.pt();
-    
-      ntupleMu.isoPflow03 = (iso03.sumChargedHadronPt+ std::max(0.,iso03.sumPhotonEt+iso03.sumNeutralHadronEt - 0.5*iso03.sumPUPt)) / mu.pt();
-      
+
       event_.muons.push_back(ntupleMu);
 
     }

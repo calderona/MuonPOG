@@ -41,11 +41,30 @@ namespace muon_pog {
 
   class Muon {
   public:
-    Float_t pt;  // pt [GeV]
+
+    Float_t pt;  // pt [GeV]   
     Float_t eta; // eta
     Float_t phi; // phi
 
     Int_t   charge;    // charge
+
+    Float_t pt_tuneP;  // pt [GeV]
+    Float_t eta_tuneP; // eta
+    Float_t phi_tuneP; // phi
+
+    Int_t   charge_tuneP;    // charge
+
+    Float_t pt_global;  // pt [GeV]
+    Float_t eta_global; // eta
+    Float_t phi_global; // phi
+
+    Int_t   charge_global;    // charge
+
+    Float_t pt_tracker;  // pt [GeV]
+    Float_t eta_tracker; // eta
+    Float_t phi_tracker; // phi
+
+    Int_t   charge_tracker;    // charge
 
     Int_t   isGlobal;
     Int_t   isTracker;
@@ -54,6 +73,7 @@ namespace muon_pog {
     Int_t   isSoft;
     Int_t   isLoose;
     Int_t   isTight;
+    Int_t   isMedium;
     Int_t   isHighPt;
     
     Float_t chargedHadronIso;
@@ -78,9 +98,6 @@ namespace muon_pog {
 
     Muon(){};
     virtual ~Muon(){};
-
-    bool isTightIso() const { return fabs(eta)<2.1 && isTight && fabs(isoPflow04) < 0.125; };
-    bool isLooseIso() const { return fabs(eta)<2.1 && isLoose && fabs(isoPflow04) < 0.2;   };
 
     ClassDef(Muon,1)
   };
@@ -123,6 +140,19 @@ namespace muon_pog {
 
     ClassDef(HLT,1)
 
+  };
+
+  class EventId {
+  public:
+
+    Int_t runNumber;             // run number
+    Int_t luminosityBlockNumber; // luminosity block number
+    Int_t eventNumber;           // event number
+
+    EventId(){};
+    virtual ~EventId(){};
+
+    ClassDef(EventId,1)
   };
 
   class Event {
