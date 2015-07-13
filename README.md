@@ -24,6 +24,19 @@ cd MuonPOG/Tools/test/
 
 cmsRun muonPogNtuples_cfg.py # modify files according to your needs
 
+The ntuple gets loaded by :
+
+from MuonPOG.Tools.MuonPogNtuples_cff import appendMuonPogNtuple
+
+appendMuonPogNtuple(process,False,"HLT","ntuple_DoubleMuon_251244_251252.root")
+
+Where arguments are :
+
+1. The CMS configuration process
+2. A bool to say whether you are running on MC
+3. The label of the process giving HLT results
+4. The name of the output ntuple
+
 ## Invariant mass macro 
 
 To run the invariant masses macro on ntuples :
