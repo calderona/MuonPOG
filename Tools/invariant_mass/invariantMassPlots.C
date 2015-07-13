@@ -408,7 +408,7 @@ bool muon_pog::Plotter::hasGoodId(const muon_pog::Muon & muon)
   else if (muId == "MEDIUM") return muon.isMedium == 1;
   else if (muId == "LOOSE")  return muon.isLoose == 1;
   else if (muId == "HIGHPT") return muon.isHighPt == 1;
-
+  else if (muId == "SOFT")   return muon.isSoft == 1;
   else
     {
       std::cout << "[Plotter::hasGoodId]: Invalid muon id : "
