@@ -91,6 +91,9 @@ private:
   bool isIsolatedMuon(const reco::Muon& muon) const ;
   bool isGlobalTightMuon( const reco::Muon& muon ) const ; 
   bool isTrackerTightMuon( const reco::Muon& muon ) const ;
+
+  void printIsolation( const reco::MuonIsolation & iso, const std::string & cone) const;
+  void printPFIsolation( const reco::MuonPFIsolation & iso, const std::string & cone) const;
   
   edm::InputTag trigResultsTag_;
   edm::InputTag trigSummaryTag_;
@@ -332,7 +335,7 @@ void MuonEventDumper::printPV(const edm::Handle<std::vector<reco::Vertex> > & ve
 	  std::cout << "Coordinates (x, y, z) : ("
 		    << vertex.x() << ", "
 		    << vertex.y() << ", "
-		    << vertex.x() << " )"
+		    << vertex.z() << " )"
 		    <<  std::endl;
 	}
     }
@@ -392,13 +395,6 @@ void MuonEventDumper::printMuons(const edm::Handle<reco::MuonCollection> & muons
 
       const reco::Muon& mu = (*muonIt);
       const reco::Vertex & vertex = vertexes->at(0); // CB for now vertex is always valid, but add a protection	    
-
-      if (!(mu.isStandAloneMuon() && 
-	    mu.outerTrack().get()->pt()>2000. && 
-	    (mu.isTrackerMuon() || mu.isGlobalMuon() )
-	    )
-	  )
-	continue;
 
       std::cout << "[MUON DETAILS]: " << std::endl;
       
@@ -476,37 +472,51 @@ void MuonEventDumper::printMuons(const edm::Handle<reco::MuonCollection> & muons
 		<< " IDs." << std::endl;      
 
       reco::MuonIsolation iso03 = mu.isolationR03();
-      double sumPt   = iso03.sumPt;
-      double emEt    = iso03.emEt;
-      double hadEt   = iso03.hadEt;
-      int nTracks = iso03.nTracks;
-      int nJets   = iso03.nJets;
-
-      std::cout << "Detector Based Isolation variables are (R=0.3) : "
-		<< "\nsumPt: " << sumPt 
-		<< "\nemEt : " << emEt
-		<< "\nhadEt : " << hadEt
-		<< "\nnTracks : " << nTracks
-		<< "\nnJets: " << nJets
-		<< std::endl;
+      printIsolation(iso03,"0.3");
       
-      reco::MuonPFIsolation iso04 = mu.pfIsolationR04();
-      double chargedHadronIso = iso04.sumChargedHadronPt;
-      double neutralHadronIso = iso04.sumNeutralHadronEt;
-      double photonIso        = iso04.sumPhotonEt;
-      double pu               = iso04.sumPUPt;
-      
-      double relIsodBeta = (iso04.sumChargedHadronPt+ std::max(0.,iso04.sumPhotonEt+iso04.sumNeutralHadronEt - 0.5*iso04.sumPUPt)) / mu.pt();
+      reco::MuonPFIsolation isoPF03 = mu.pfIsolationR04();
+      reco::MuonPFIsolation isoPF04 = mu.pfIsolationR04();
 
-      std::cout << "PF Isolation variables are (R=0.4) : "
-		<< "\nCh. Had (from vtx) : " << chargedHadronIso
-		<< "\nNeu. Had : " << neutralHadronIso
-		<< "\nPhot. : " << photonIso
-		<< "\nPU. : " << pu
-		<< "\nRelative isolation (combined, dBeta) : " << relIsodBeta
-		<< std::endl;
+      printPFIsolation(isoPF03,"0.3");
+      printPFIsolation(isoPF04,"0.4");
 
     }
+
+}
+
+void MuonEventDumper::printIsolation( const reco::MuonIsolation & iso, const std::string & cone) const
+{
+
+  double sumPt   = iso.sumPt;
+  double emEt    = iso.emEt;
+  double hadEt   = iso.hadEt;
+  int nTracks = iso.nTracks;
+  int nJets   = iso.nJets;
+
+  std::cout << "Detector Based Isolation variables are (R=" << cone << ") : "
+	    << "\nsumPt: " << sumPt 
+	    << "\nemEt : " << emEt
+	    << "\nhadEt : " << hadEt
+	    << "\nnTracks : " << nTracks
+	    << "\nnJets: " << nJets
+	    << std::endl;
+
+}
+
+void MuonEventDumper::printPFIsolation( const reco::MuonPFIsolation & iso, const std::string & cone) const
+{
+
+  double chargedHadronIso = iso.sumChargedHadronPt;
+  double neutralHadronIso = iso.sumNeutralHadronEt;
+  double photonIso        = iso.sumPhotonEt;
+  double pu               = iso.sumPUPt;
+      
+  std::cout << "PF Isolation variables are (R=" << cone << ") : "
+	    << "\nCh. Had (from vtx) : " << chargedHadronIso
+	    << "\nNeu. Had : " << neutralHadronIso
+	    << "\nPhot. : " << photonIso
+	    << "\nPU. : " << pu
+	    << std::endl;
 
 }
 
