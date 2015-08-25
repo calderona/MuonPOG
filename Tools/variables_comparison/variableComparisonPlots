@@ -1,0 +1,21 @@
+#!/bin/sh
+
+file=$0
+fileC=${file}.C
+fileEXE=${file}.exe
+
+ROOTLIBS="-L/usr/lib64 `$ROOTSYS/bin/root-config --glibs` -lMathCore -lMinuit"
+ROOTINCDIR=`$ROOTSYS/bin/root-config --incdir`
+
+BASETREEDIR="../src"
+
+echo "[variableComparisonPlots]: Compiling"
+rootcling -f MuonPogTreeDict.C -c ${BASETREEDIR}/MuonPogTree.h ${BASETREEDIR}/MuonPogTreeLinkDef.h
+
+g++ -std=gnu++11 -I${ROOTINCDIR} ${fileC} MuonPogTreeDict.C ${ROOTLIBS} -lX11 -o ${fileEXE}
+
+echo "[invariantMassPlots]: Running with parameters $@" 
+${fileEXE} $@
+
+rm -f MuonPogTreeDict.C MuonPogTreeDict.h MuonPogTreeDict_rdict.pcm
+rm -f ${fileEXE}
