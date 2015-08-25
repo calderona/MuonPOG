@@ -46,7 +46,7 @@ namespace muon_pog {
     SampleConfig() {};
     
 #ifndef __MAKECINT__ // CB CINT doesn't like boost :'-(    
-    SampleConfig(boost::property_tree::value_type vt); 
+    SampleConfig(boost::property_tree::ptree::value_type & vt); 
 #endif
 
     ~SampleConfig() {};
@@ -78,7 +78,7 @@ namespace muon_pog {
     TagAndProbeConfig() {};
     
 #ifndef __MAKECINT__ // CB CINT doesn't like boost :'-(    
-    TagAndProbeConfig(boost::property_tree::value_type vt); 
+    TagAndProbeConfig(boost::property_tree::ptree::value_type & vt); 
 #endif
 
     ~TagAndProbeConfig() {};
@@ -92,7 +92,7 @@ namespace muon_pog {
 
   public :
     
-    Plotter(std::string tnpConfig, std::string sampleConfig) :
+    Plotter(muon_pog::TagAndProbeConfig tnpConfig, muon_pog::SampleConfig & sampleConfig) :
       m_tnpConfig(tnpConfig) , m_sampleConfig(sampleConfig) {};
     ~Plotter() {};
     
@@ -100,16 +100,16 @@ namespace muon_pog {
     void fill(const std::vector<muon_pog::Muon> & muons, const muon_pog::HLT & hlt);
 
     std::map<TString,TH1 *> m_plots;
+    TagAndProbeConfig m_tnpConfig;
+    SampleConfig m_sampleConfig;
 
   private :
 
     bool hasGoodId(const muon_pog::Muon & muon);
-    bool hasFilterMatch(const muon_pog::Muon & muon);
+    bool hasFilterMatch(const muon_pog::Muon & muon,
+			const muon_pog::HLT  & hlt);
     Int_t chargeFromTrk(const muon_pog::Muon & muon);
-    TLorentzVector muonTk(const muon_pog::Muon & muon);
-    
-    TagAndProbeConfig m_tnpConfig;
-    SampleConfig m_sampleConfig;
+    TLorentzVector muonTk(const muon_pog::Muon & muon);    
     
   };
 
@@ -120,8 +120,8 @@ namespace muon_pog {
 // ******************************
 
 namespace muon_pog {
-  void parseConfig(const std::string & configFile, TagAndProbeConfig & tpConfig,
-		   std::vector<SampleConfig> sampleConfigs);
+  void parseConfig(const std::string configFile, TagAndProbeConfig & tpConfig,
+		   std::vector<SampleConfig> & sampleConfigs);
 }
 
 
@@ -143,7 +143,9 @@ int main(int argc, char* argv[]){
       exit(100);
     }
 
-  std::cout << "[" << argv[0] << "] Using config file " << argv[1] << std::endl;
+  std::string configFile(argv[1]);
+  
+  std::cout << "[" << argv[0] << "] Using config file " << configFile << std::endl;
 
   // Output directory
   TString dirName = argv[2];
@@ -161,20 +163,20 @@ int main(int argc, char* argv[]){
   TagAndProbeConfig tnpConfig;
   std::vector<SampleConfig> sampleConfigs;
 
-  parseConfig(std::string(argv[1]),tnpConfig,sampleConfigs);
+  parseConfig(configFile,tnpConfig,sampleConfigs);
 
-  std::vector<Plotter> Plotters;
+  std::vector<Plotter> plotters;
 
   for (auto sampleConfig : sampleConfigs)
     {
 
-      Plotter plotter(tnpConfig,sampleConfig);
+      Plotter plotter(tnpConfig, sampleConfig);
       plotter.book(outputFile);
       
       plotters.push_back(plotter);
     }
  
-  for ( plotter : plotters )
+  for (auto plotter : plotters)
     {
 
       TString fileName = plotter.m_sampleConfig.fileName;
@@ -227,7 +229,7 @@ int main(int argc, char* argv[]){
 }
 
 
-muon_pog::TagAndProbeConfig::TagAndProbeConfig ( boost::property_tree::value_type vt )
+muon_pog::TagAndProbeConfig::TagAndProbeConfig(boost::property_tree::ptree::value_type & vt)
 {
 
   try
@@ -253,22 +255,22 @@ muon_pog::TagAndProbeConfig::TagAndProbeConfig ( boost::property_tree::value_typ
 
   catch (boost::property_tree::ptree_bad_data bd)
     {
-      std::cout << "[TagAndProbeConfig] Cant'g get data : has error : "
+      std::cout << "[TagAndProbeConfig] Can' t get data : has error : "
 		<< bd.what() << std::endl;
       throw std::runtime_error("Bad INI variables");
     }
 
 }
 
-muon_pog::SampleConfig::TagAndProbeConfig ( boost::property_tree::value_type vt )
+muon_pog::SampleConfig::SampleConfig(boost::property_tree::ptree::value_type & vt)
 {
 
   try
     {
 
-      fileName     = TString(vt.first.c_str());
-      sampleName   = TString(pt.get<std::string>("sampleName").c_str());
-      cSection = pt.get<Float_t>("cSection");
+      fileName     = TString(vt.second.get<std::string>("fileName").c_str());
+      sampleName   = TString(vt.first.c_str());
+      cSection = vt.second.get<Float_t>("cSection");
       
     }
   
@@ -300,24 +302,26 @@ void muon_pog::Plotter::book(TFile *outFile)
   outFile->mkdir(sampleTag);
   outFile->cd(sampleTag);
 
-  std::vector<TString>::const_iterator fEtaMinIt  = m_config.muon_fEtaMin.begin();
-  std::vector<TString>::const_iterator fEtaMinEnd = m_config.muon_fEtaMin.end();
+  std::vector<TString>::const_iterator fEtaMinIt  = m_tnpConfig.probe_fEtaMin.begin();
+  std::vector<TString>::const_iterator fEtaMinEnd = m_tnpConfig.probe_fEtaMin.end();
 
-  std::vector<TString>::const_iterator fEtaMaxIt  = m_config.muon_fEtaMax.begin();
-  std::vector<TString>::const_iterator fEtaMaxEnd = m_config.muon_fEtaMax.end();
+  std::vector<TString>::const_iterator fEtaMaxIt  = m_tnpConfig.probe_fEtaMax.begin();
+  std::vector<TString>::const_iterator fEtaMaxEnd = m_tnpConfig.probe_fEtaMax.end();
   
   for (; fEtaMinIt != fEtaMinEnd || fEtaMaxIt != fEtaMaxEnd; ++fEtaMinIt, ++fEtaMaxIt)
     {
          
       TString etaTag = "_fEtaMin" + (*fEtaMinIt) + "_fEtaMax" + (*fEtaMaxIt);
-      m_plots["probePt" + etaTag]  = new TH1F("probePt" + "_" + sampleTag + etaTag," ; # entries; muon p_[T] ", 150,0.,150.);
-      m_plots["probeEta" + etaTag] = new TH1F("probeEta" + "_" + sampleTag + etaTag," ; # entries; muon #eta ", 100,-2.5,2.5);
-      m_plots["probePhi" + etaTag] = new TH1F("probePhi" + "_" + sampleTag + etaTag," ; # entries; muon #phi ", 100,-TMath::Pi(),TMath::Pi());
+      m_plots["probePt" + etaTag]  = new TH1F("probePt_" + sampleTag + etaTag," ; # entries; muon p_[T] ", 150,0.,150.);
+      m_plots["probeEta" + etaTag] = new TH1F("probeEta_" + sampleTag + etaTag," ; # entries; muon #eta ", 100,-2.5,2.5);
+      m_plots["probePhi" + etaTag] = new TH1F("probePhi_" + sampleTag + etaTag," ; # entries; muon #phi ", 100,-TMath::Pi(),TMath::Pi());
 
     }
 
-  m_plots["invMass"] = new TH1F("invMass_" + "_" + sampleTag ,"invMass",150,50.,200.);
-  m_plots["dilepPt"] = new TH1F("dilepPt_" + "_" + sampleTag ,"dilepPt",200, 0.,200.);
+  m_plots["invMass"] = new TH1F("invMass_" + sampleTag ,"invMass",200, 0.,200.);
+  m_plots["dilepPt"] = new TH1F("dilepPt_" + sampleTag ,"dilepPt",200, 0.,200.);
+
+  m_plots["nProbesVsnTags"] = new TH2F("nProbesVsnTags_" + sampleTag ,"invMass", 10, -0.5, 9., 10, -0.5,9.);
 
 }
 
@@ -329,7 +333,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 
   for (auto path : hlt.triggers)
     {
-      if (path.find(m_config.hlt_path) != std::string::npos)
+      if (path.find(m_tnpConfig.hlt_path) != std::string::npos)
 	{
 	  pathHasFired = true;
 	  break;
@@ -342,9 +346,9 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 
   for (auto & muon : muons)
     {
-      if (hasGoodId(muon) && hasFilterMatch(muon) &&
-	  muonTk(muon).Pt() > m_config.muon_minPt &&
-	  muon.isoPflow04 < m_config.muon_isoCut)
+      if (hasGoodId(muon) && hasFilterMatch(muon,hlt) &&
+	  muonTk(muon).Pt() > m_tnpConfig.tag_minPt   &&
+	  muon.isoPflow04 < m_tnpConfig.tag_isoCut)
 	tagMuons.push_back(muon);
     }
 
@@ -354,7 +358,10 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
     {
       for (auto & tagMuon : tagMuons)
 	{
-	  if ( tagMuon != probeMuon && chargeFromTrk(tagMuon) * chargeFromTrk(muon) != -1 &&    
+	  if ( tagMuon.eta != muon.eta &&
+	       tagMuon.phi != muon.phi &&
+	       tagMuon.pt  != muon.pt  &&
+	       chargeFromTrk(tagMuon) * chargeFromTrk(muon) == -1 &&    
 	       (muon.isGlobal || muon.isTracker) ) // CB minimal cuts on potental probe 
 	    {
 	      
@@ -365,8 +372,8 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 
 	      // CB Fill control plots
 	      m_plots["invMass"]->Fill(mass);
-	      if ( mass > m_config.plot_minInvMass &&
-		   mass < m_config.plot_maxInvMass )
+	      if ( mass > m_tnpConfig.pair_minInvMass &&
+		   mass < m_tnpConfig.pair_maxInvMass )
 		{
 		  Float_t dilepPt = (tagMuTk+muTk).Pt();
 		  m_plots["dilepPt"]->Fill(dilepPt);
@@ -376,17 +383,19 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	    }
 	}
     }
+
+  m_plots["nProbesVsnTags"]->Fill(tagMuons.size(),probeMuons.size());
   
   for (auto & probeMuon : probeMuons)
     {
 
       TLorentzVector probeMuTk = muonTk(probeMuon);
 
-      std::vector<TString>::const_iterator fEtaMinIt  = m_config.muon_fEtaMin.begin();
-      std::vector<TString>::const_iterator fEtaMinEnd = m_config.muon_fEtaMin.end();
+      std::vector<TString>::const_iterator fEtaMinIt  = m_tnpConfig.probe_fEtaMin.begin();
+      std::vector<TString>::const_iterator fEtaMinEnd = m_tnpConfig.probe_fEtaMin.end();
 
-      std::vector<TString>::const_iterator fEtaMaxIt  = m_config.muon_fEtaMax.begin();
-      std::vector<TString>::const_iterator fEtaMaxEnd = m_config.muon_fEtaMax.end();
+      std::vector<TString>::const_iterator fEtaMaxIt  = m_tnpConfig.probe_fEtaMax.begin();
+      std::vector<TString>::const_iterator fEtaMaxEnd = m_tnpConfig.probe_fEtaMax.end();
   
       for (; fEtaMinIt != fEtaMinEnd || fEtaMaxIt != fEtaMaxEnd; ++fEtaMinIt, ++fEtaMaxIt)
 	{
@@ -408,7 +417,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 
 bool muon_pog::Plotter::hasGoodId(const muon_pog::Muon & muon)
 {
-  std::string & muId = m_config.muon_ID;
+  std::string & muId = m_tnpConfig.tag_ID;
 
   if (muId == "GLOBAL")      return muon.isGlobal == 1 ;
   else if (muId == "TIGHT")  return muon.isTight  == 1;
@@ -428,14 +437,14 @@ bool muon_pog::Plotter::hasGoodId(const muon_pog::Muon & muon)
 bool muon_pog::Plotter::hasFilterMatch(const muon_pog::Muon & muon,
 				       const muon_pog::HLT  & hlt )
 {
-  std::string & filter = m_config.tag_hltFilter;
-  TLorentzVector muonTk(muon);
+  std::string & filter = m_tnpConfig.tag_hltFilter;
+  TLorentzVector muTk = muonTk(muon);
 
   for (auto object : hlt.objects)
     {
-      if (object.filterTag.find(filter) != string::npos &&
-	  sqrt( (muonTk.eta - object.eta) * (muonTk.eta - object.eta) +
-		(muonTk.phi - object.phi) * (muonTk.phi - object.phi) < 0.3 )) // CB cut from cfg?
+      if (object.filterTag.find(filter) != std::string::npos &&
+	  sqrt((muTk.Eta() - object.eta) * (muTk.Eta() - object.eta) +
+	       (muTk.Phi() - object.phi) * (muTk.Phi() - object.phi)) < 0.15 ) // CB cut from cfg?
 	return true;
     }
 
@@ -446,7 +455,7 @@ bool muon_pog::Plotter::hasFilterMatch(const muon_pog::Muon & muon,
 
 Int_t muon_pog::Plotter::chargeFromTrk(const muon_pog::Muon & muon)
 {
-  std::string & trackType = m_config.muon_trackType;
+  std::string & trackType = m_tnpConfig.muon_trackType;
 
   if (trackType == "PF")         return muon.charge;
   else if (trackType == "TUNEP") return muon.charge_tuneP;
@@ -463,7 +472,7 @@ Int_t muon_pog::Plotter::chargeFromTrk(const muon_pog::Muon & muon)
 
 TLorentzVector muon_pog::Plotter::muonTk(const muon_pog::Muon & muon)
 {
-  std::string & trackType = m_config.muon_trackType;
+  std::string & trackType = m_tnpConfig.muon_trackType;
 
   TLorentzVector result; 
   if (trackType == "PF")
@@ -485,9 +494,10 @@ TLorentzVector muon_pog::Plotter::muonTk(const muon_pog::Muon & muon)
   
 }
 
-void parseConfig(const std::string & configFile, TagAndProbeConfig & tpConfig,
-		 std::vector<SampleConfig> sampleConfigs)
+void muon_pog::parseConfig(const std::string configFile, muon_pog::TagAndProbeConfig & tpConfig,
+			   std::vector<muon_pog::SampleConfig> & sampleConfigs)
 {
+
   boost::property_tree::ptree pt;
   
   try
@@ -506,9 +516,9 @@ void parseConfig(const std::string & configFile, TagAndProbeConfig & tpConfig,
   for( auto vt : pt )
     {
       if (vt.first.find("TagAndProbe") != std::string::npos)
-	tpConfig(vt);
+	tpConfig = muon_pog::TagAndProbeConfig(vt);
       else
-	sampleConfigs.push_back(SampleConfig(vt));
+	sampleConfigs.push_back(muon_pog::SampleConfig(vt));
     }
 
 }
