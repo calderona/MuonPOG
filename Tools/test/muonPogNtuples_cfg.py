@@ -1,29 +1,39 @@
 import FWCore.ParameterSet.Config as cms
 
+import subprocess
+
+runOnMC = False
+
 process = cms.Process("NTUPLES")
 
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
+
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
+
+
+
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 
 process.source = cms.Source("PoolSource",
                             
-        fileNames = cms.untracked.vstring(
-            '/store/data/Run2015B/DoubleMuon/AOD/PromptReco-v1/000/251/244/00000/1A55C9D8-5327-E511-BA1A-02163E0133D1.root',
-            '/store/data/Run2015B/DoubleMuon/AOD/PromptReco-v1/000/251/244/00000/5C0D9766-6727-E511-A61F-02163E014729.root',
-            '/store/data/Run2015B/DoubleMuon/AOD/PromptReco-v1/000/251/244/00000/BE92D76E-6E27-E511-96D2-02163E0133A7.root',
-            '/store/data/Run2015B/DoubleMuon/AOD/PromptReco-v1/000/251/251/00000/3004473B-8B27-E511-AD12-02163E0120B3.root',
-            '/store/data/Run2015B/DoubleMuon/AOD/PromptReco-v1/000/251/252/00000/283B8530-8D27-E511-8310-02163E014289.root',
-            '/store/data/Run2015B/DoubleMuon/AOD/PromptReco-v1/000/251/252/00000/70B9C1B4-9227-E511-ACC2-02163E01413E.root',
-            '/store/data/Run2015B/DoubleMuon/AOD/PromptReco-v1/000/251/252/00000/7859893B-9C27-E511-BE3A-02163E01414A.root'
-        ),
+        fileNames = cms.untracked.vstring(),
         secondaryFileNames = cms.untracked.vstring()
 
 )
 
-process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
-process.GlobalTag.globaltag = "74X_dataRun2_Prompt_v0"
+if runOnMC :
+    process.GlobalTag.globaltag = cms.string('MCRUN2_74_V9A')
+    sourcefilesfolder = " /store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/AODSIM/Asympt50ns_MCRUN2_74_V9A-v2/60000"
+    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
+    process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]    
+else :
+    process.GlobalTag.globaltag = cms.string('74X_dataRun2_Prompt_v0')
+    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/643/00000"
+    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
+    process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]
 
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
 process.load("Configuration.StandardSequences.MagneticField_38T_cff")
@@ -31,6 +41,10 @@ process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 #process.load("RecoMuon.DetLayers.muonDetLayerGeometry_cfi")
 
 from MuonPOG.Tools.MuonPogNtuples_cff import appendMuonPogNtuple
-appendMuonPogNtuple(process,False,"HLT","ntuple_DoubleMuon_251244_251252.root")
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
+if runOnMC :
+    ntupleName = "ntuples_DY_NLO.root"
+else :
+    ntupleName = "ntuples_SingleMu.root"
+    
+appendMuonPogNtuple(process,runOnMC,"HLT",ntupleName)

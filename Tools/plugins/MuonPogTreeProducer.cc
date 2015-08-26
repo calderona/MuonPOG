@@ -58,7 +58,8 @@ public:
   
 private:
   
-  void fillGenInfo(const edm::Handle<std::vector<PileupSummaryInfo> > &);
+  void fillGenInfo(const edm::Handle<std::vector<PileupSummaryInfo> > &,
+		   const  edm::Handle<GenEventInfoProduct> &);
 
   void fillGenParticles(const edm::Handle<reco::GenParticleCollection> &);
 
@@ -81,6 +82,7 @@ private:
 
   edm::InputTag genTag_;
   edm::InputTag pileUpInfoTag_;
+  edm::InputTag genInfoTag_;
 
   muon_pog::Event event_;
   muon_pog::EventId eventId_;
@@ -99,7 +101,9 @@ MuonPogTreeProducer::MuonPogTreeProducer( const edm::ParameterSet & cfg ) :
   beamSpotTag_(cfg.getUntrackedParameter<edm::InputTag>("BeamSpotTag", edm::InputTag("offlineBeamSpot"))),
 
   genTag_(cfg.getUntrackedParameter<edm::InputTag>("GenTag", edm::InputTag("prunedGenParticles"))),
-  pileUpInfoTag_(cfg.getUntrackedParameter<edm::InputTag>("PileUpInfoTag", edm::InputTag("pileupInfo")))
+  pileUpInfoTag_(cfg.getUntrackedParameter<edm::InputTag>("PileUpInfoTag", edm::InputTag("pileupInfo"))),
+  genInfoTag_(cfg.getUntrackedParameter<edm::InputTag>("GenInfoTag", edm::InputTag("generator")))
+  
 {
 
 }
@@ -164,11 +168,15 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
   // Fill GEN pile up information
   if (!ev.isRealData()) 
     {
-      if (pileUpInfoTag_.label() != "none") 
+      if (pileUpInfoTag_.label() != "none" &&
+	  genInfoTag_.label() != "none") 
 	{
 	  edm::Handle<std::vector<PileupSummaryInfo> > puInfo;
-	  if (ev.getByLabel(pileUpInfoTag_, puInfo)) 
-	    fillGenInfo(puInfo);
+	  edm::Handle<GenEventInfoProduct> genInfo;
+
+	  if (ev.getByLabel(pileUpInfoTag_, puInfo) &&
+	      ev.getByLabel(genInfoTag_, genInfo) ) 
+	    fillGenInfo(puInfo,genInfo);
 	  else 
 	    edm::LogError("") << "[MuonPogTreeProducer]: Pile-Up Info collection does not exist !!!";
 	}      
@@ -246,20 +254,21 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
 }
 
 
-void MuonPogTreeProducer::fillGenInfo(const edm::Handle<std::vector<PileupSummaryInfo> > & puInfo)
+void MuonPogTreeProducer::fillGenInfo(const edm::Handle<std::vector<PileupSummaryInfo> > & puInfo,
+				      const edm::Handle<GenEventInfoProduct> & gen)
 {
 
   muon_pog::GenInfo genInfo;
   
-  genInfo.trueNumberOfInteractions   = -1.;
-  genInfo.actualNumberOfInteractions = -1 ;    
-  
+  genInfo.trueNumberOfInteractions     = -1.;
+  genInfo.actualNumberOfInteractions   = -1.;
+  genInfo.genWeight = gen->weight() ;
+	
   std::vector<PileupSummaryInfo>::const_iterator puInfoIt  = puInfo->begin();
   std::vector<PileupSummaryInfo>::const_iterator puInfoEnd = puInfo->end();
 
   for(; puInfoIt != puInfoEnd; ++puInfoIt) 
     {
-    
       int bx = puInfoIt->getBunchCrossing();
 	  
       if(bx == 0) 

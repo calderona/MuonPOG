@@ -12,8 +12,8 @@ namespace muon_pog {
   class GenInfo {
   public:
     Float_t trueNumberOfInteractions;   // Number of simultaneous interactions generated (before poissonian ev by ev smearing)
-    Int_t   actualNumberOfInteractions; // Number of simultaneous interactions generated (before poissonian ev by ev smearing)
-    
+    Int_t   actualNumberOfInteractions; // Number of simultaneous interactions generated (after poissonian ev by ev smearing)
+    Float_t genWeight;
     GenInfo(){};
     virtual ~GenInfo(){};
     

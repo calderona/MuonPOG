@@ -5,6 +5,7 @@
 #include "TCanvas.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "THStack.h"
 #include "TTree.h"
 #include "TBranch.h"
 #include "TLorentzVector.h"
@@ -97,7 +98,7 @@ namespace muon_pog {
     ~Plotter() {};
     
     void book(TFile *outFile);
-    void fill(const std::vector<muon_pog::Muon> & muons, const muon_pog::HLT & hlt);
+    void fill(const std::vector<muon_pog::Muon> & muons, const muon_pog::HLT & hlt, float weight);
 
     std::map<TString,TH1 *> m_plots;
     TagAndProbeConfig m_tnpConfig;
@@ -117,11 +118,16 @@ namespace muon_pog {
 
 // Helper classes defintion *****
 // 1. parseConfig : parse the full cfg file
+// 1. comparisonPlot : make a plot overlayng data and MC for a given plot
 // ******************************
 
 namespace muon_pog {
   void parseConfig(const std::string configFile, TagAndProbeConfig & tpConfig,
 		   std::vector<SampleConfig> & sampleConfigs);
+  
+  void comparisonPlot(TFile *outFile, TString plotName,
+		      std::vector<Plotter> & plotters);
+
 }
 
 
@@ -209,7 +215,10 @@ int main(int argc, char* argv[]){
 	  if (tree->LoadTree(iEvent)<0) break;
 	  
 	  evBranch->GetEntry(iEvent);
-	  plotter.fill(ev->muons, ev->hlt);
+	  float weight = ev->genInfos.size() > 0 ?
+	    ev->genInfos[0].genWeight/fabs(ev->genInfos[0].genWeight) : 1.;
+
+	  plotter.fill(ev->muons, ev->hlt, weight);
 	  
 	}
       
@@ -218,6 +227,28 @@ int main(int argc, char* argv[]){
       
       inputFile->Close();
       
+    }
+
+  outputFile->cd("/");
+  outputFile->mkdir("comparison");
+  outputFile->cd("comparison");
+
+  muon_pog::comparisonPlot(outputFile,"invMass",plotters);
+  muon_pog::comparisonPlot(outputFile,"dilepPt",plotters);
+
+  std::vector<TString>::const_iterator fEtaMinIt  = tnpConfig.probe_fEtaMin.begin();
+  std::vector<TString>::const_iterator fEtaMinEnd = tnpConfig.probe_fEtaMin.end();
+
+  std::vector<TString>::const_iterator fEtaMaxIt  = tnpConfig.probe_fEtaMax.begin();
+  std::vector<TString>::const_iterator fEtaMaxEnd = tnpConfig.probe_fEtaMax.end();
+  
+  for (; fEtaMinIt != fEtaMinEnd || fEtaMaxIt != fEtaMaxEnd; ++fEtaMinIt, ++fEtaMaxIt)
+    {
+      TString etaTag = "_fEtaMin" + (*fEtaMinIt) + "_fEtaMax" + (*fEtaMaxIt);
+      muon_pog::comparisonPlot(outputFile,"probePt" + etaTag,plotters);
+      muon_pog::comparisonPlot(outputFile,"probeEta" + etaTag,plotters);
+      muon_pog::comparisonPlot(outputFile,"probePhi" + etaTag,plotters);
+      muon_pog::comparisonPlot(outputFile,"dBetaRelIso" + etaTag,plotters);
     }
   
   outputFile->Write();
@@ -315,18 +346,22 @@ void muon_pog::Plotter::book(TFile *outFile)
       m_plots["probePt" + etaTag]  = new TH1F("probePt_" + sampleTag + etaTag," ; # entries; muon p_[T] ", 150,0.,150.);
       m_plots["probeEta" + etaTag] = new TH1F("probeEta_" + sampleTag + etaTag," ; # entries; muon #eta ", 100,-2.5,2.5);
       m_plots["probePhi" + etaTag] = new TH1F("probePhi_" + sampleTag + etaTag," ; # entries; muon #phi ", 100,-TMath::Pi(),TMath::Pi());
+      m_plots["dBetaRelIso" + etaTag] = new TH1F("dBetaRelIso_" + sampleTag + etaTag," ; # entries; muon relative isolation", 100,0.,2.);
 
     }
 
-  m_plots["invMass"] = new TH1F("invMass_" + sampleTag ,"invMass",200, 0.,200.);
-  m_plots["dilepPt"] = new TH1F("dilepPt_" + sampleTag ,"dilepPt",200, 0.,200.);
+  outFile->mkdir(sampleTag+"/control");
+  outFile->cd(sampleTag+"/control");
 
-  m_plots["nProbesVsnTags"] = new TH2F("nProbesVsnTags_" + sampleTag ,"invMass", 10, -0.5, 9., 10, -0.5,9.);
+  m_plots["invMass"] = new TH1F("invMass_" + sampleTag ,"invMass", 200,0.,200.);
+  m_plots["dilepPt"] = new TH1F("dilepPt_" + sampleTag ,"dilepPt", 200,0.,200.);
+
+  m_plots["nProbesVsnTags"] = new TH2F("nProbesVsnTags_" + sampleTag ,"invMass", 10,-0.5,9.,10,-0.5,9.);
 
 }
 
 void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
-			    const muon_pog::HLT & hlt)
+			     const muon_pog::HLT & hlt, float weight)
 {
 
   bool pathHasFired = false;
@@ -351,7 +386,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	  muon.isoPflow04 < m_tnpConfig.tag_isoCut)
 	tagMuons.push_back(muon);
     }
-
+  
   std::vector<muon_pog::Muon> probeMuons;
 
   for (auto & muon : muons)
@@ -371,12 +406,12 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	      Float_t mass = (tagMuTk+muTk).M();
 
 	      // CB Fill control plots
-	      m_plots["invMass"]->Fill(mass);
+	      m_plots["invMass"]->Fill(mass,weight);
 	      if ( mass > m_tnpConfig.pair_minInvMass &&
 		   mass < m_tnpConfig.pair_maxInvMass )
 		{
 		  Float_t dilepPt = (tagMuTk+muTk).Pt();
-		  m_plots["dilepPt"]->Fill(dilepPt);
+		  m_plots["dilepPt"]->Fill(dilepPt,weight);
 	      	  probeMuons.push_back(muon);
 		  continue; // CB If a muon is already a probe don't loo on other tags
 		}
@@ -404,15 +439,16 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	      fabs(probeMuTk.Eta()) < fEtaMaxIt->Atof() )
 	    {
 	      
-	      TString etaTag = "_fEtaMin" + TString((*fEtaMinIt)) + "_fEtaMax" + TString((*fEtaMaxIt));  
-	      m_plots["probePt" + etaTag]->Fill(probeMuTk.Pt());
-	      m_plots["probeEta" + etaTag]->Fill(probeMuTk.Eta());
-	      m_plots["probePhi" + etaTag]->Fill(probeMuTk.Phi());
-
+	      TString etaTag = "_fEtaMin" + TString((*fEtaMinIt)) + "_fEtaMax" + TString((*fEtaMaxIt));
+	      m_plots["probePt" + etaTag]->Fill(probeMuTk.Pt(),weight);
+	      m_plots["probeEta" + etaTag]->Fill(probeMuTk.Eta(),weight);
+	      m_plots["probePhi" + etaTag]->Fill(probeMuTk.Phi(),weight);
+	      m_plots["dBetaRelIso" + etaTag]->Fill(probeMuon.isoPflow04,weight);
+								    
 	    }
 	}
     }
-  
+
 }
 
 bool muon_pog::Plotter::hasGoodId(const muon_pog::Muon & muon)
@@ -522,6 +558,63 @@ void muon_pog::parseConfig(const std::string configFile, muon_pog::TagAndProbeCo
     }
 
 }
-  
-  
 
+void muon_pog::comparisonPlot(TFile *outFile,TString plotName,
+			      std::vector<muon_pog::Plotter> & plotters)
+{
+
+  THStack hMc(plotName,"");
+  TH1 * hData = 0;
+
+  int iColor = 2;
+
+  float integral  = 0;
+  float totalXSec = 0;
+  
+  for (auto plotter : plotters)
+    {
+      
+      if(std::string(plotter.m_sampleConfig.sampleName.Data()).find("Data") != std::string::npos)
+	{
+	  integral = plotter.m_plots[plotName]->Integral();
+	}
+      else
+	{
+	  totalXSec += plotter.m_sampleConfig.cSection;
+	}
+
+    }
+
+  for (auto plotter : plotters)
+    {
+
+      if(std::string(plotter.m_sampleConfig.sampleName.Data()).find("Data") != std::string::npos)
+	{
+	  hData = plotter.m_plots[plotName];
+	  hData->Sumw2();
+	}
+      else
+	{
+	  plotter.m_plots[plotName]->SetFillColor(iColor);
+	  plotter.m_plots[plotName]->SetMarkerColor(iColor);
+	  plotter.m_plots[plotName]->SetLineColor(iColor);
+	  TH1* plot = plotter.m_plots[plotName];
+	  float scale = plotter.m_sampleConfig.cSection / totalXSec *
+	    integral / plot->Integral();
+	  plot->Scale(scale);
+	  hMc.Add(plot);
+	  iColor++;
+	}
+
+    }
+
+  TCanvas *canvas = new TCanvas("c"+plotName, "c"+plotName, 500, 500);
+
+  canvas->cd();
+
+  hData->Draw();
+  hMc.Draw("same");
+
+  canvas->Write();
+
+}

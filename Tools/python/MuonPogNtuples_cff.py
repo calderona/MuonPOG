@@ -15,8 +15,9 @@ def appendMuonPogNtuple(process, runOnMC, processTag="HLT", ntupleFileName="Muon
         process.muonPogNtuple = cms.Sequence(process.prunedGenParticles + process.MuonPogTree)
     else :
         process.muonPogNtuple = cms.Sequence(process.MuonPogTree)
-        PileUpInfoTag = cms.untracked.InputTag("none")
-        GenTag = cms.untracked.InputTag("none")
+        process.MuonPogTree.PileUpInfoTag = cms.untracked.InputTag("none")
+        process.MuonPogTree.GenInfoTag = cms.untracked.InputTag("none")
+        process.MuonPogTree.GenTag = cms.untracked.InputTag("none")
         
     process.TFileService = cms.Service('TFileService',
         fileName = cms.string(ntupleFileName)
