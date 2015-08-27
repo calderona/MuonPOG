@@ -372,6 +372,8 @@ void muon_pog::Plotter::book(TFile *outFile)
   m_plots["invMass"] = new TH1F("invMass_" + sampleTag ,"invMass", 100,0.,200.);
   m_plots["dilepPt"] = new TH1F("dilepPt_" + sampleTag ,"dilepPt", 100,0.,200.);
 
+  m_plots["invMassInRange"] = new TH1F("invMassInRange_" + sampleTag ,"invMass", 100,0.,200.);
+  
   m_plots["nProbesVsnTags"] = new TH2F("nProbesVsnTags_" + sampleTag ,"invMass", 10,-0.5,9.,10,-0.5,9.);
 
 }
@@ -426,9 +428,11 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	      if ( mass > m_tnpConfig.pair_minInvMass &&
 		   mass < m_tnpConfig.pair_maxInvMass )
 		{
+		  m_plots["invMassInRange"]->Fill(mass,weight);
+	      
 		  Float_t dilepPt = (tagMuTk+muTk).Pt();
 		  m_plots["dilepPt"]->Fill(dilepPt,weight);
-	      	  probeMuons.push_back(muon);
+		  probeMuons.push_back(muon);
 		  continue; // CB If a muon is already a probe don't loo on other tags
 		}
 	    }
@@ -466,9 +470,9 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	      if(hasGoodId(probeMuon,"probe")) 
 		{
 		  // Fill isolation plots for muons passign a given identification (programmable from cfg)
-		  m_plots["chHadIso" + etaTag]->Fill(probeMuon.isoPflow04,weight);
-		  m_plots["photonIso" + etaTag]->Fill(probeMuon.isoPflow04,weight);
-		  m_plots["neutralIso" + etaTag]->Fill(probeMuon.isoPflow04,weight);
+		  m_plots["photonIso" + etaTag]->Fill(probeMuon.photonIso,weight);
+		  m_plots["chHadIso" + etaTag]->Fill(probeMuon.chargedHadronIso,weight);
+		  m_plots["neutralIso" + etaTag]->Fill(probeMuon.neutralHadronIso,weight);
 		  m_plots["dBetaRelIso" + etaTag]->Fill(probeMuon.isoPflow04,weight);
 		}
 								    
@@ -598,7 +602,8 @@ void muon_pog::comparisonPlot(TFile *outFile,TString plotName,
 
   int iColor = 0;
 
-  float integral  = 0;
+  float integralData = 0;
+  float integralMC   = 0;
   float totalXSec = 0;
   
   for (auto plotter : plotters)
@@ -606,10 +611,11 @@ void muon_pog::comparisonPlot(TFile *outFile,TString plotName,
       
       if(std::string(plotter.m_sampleConfig.sampleName.Data()).find("Data") != std::string::npos)
 	{
-	  integral = plotter.m_plots[plotName]->Integral();
+	  integralData = plotter.m_plots["invMassInRange"]->Integral(); // CB Now scales using the inv mass in range integral
 	}
       else
 	{
+	  integralMC = plotter.m_plots["invMassInRange"]->Integral(); // CB Now scales using the inv mass in range integral
 	  totalXSec += plotter.m_sampleConfig.cSection;
 	}
 
@@ -629,7 +635,7 @@ void muon_pog::comparisonPlot(TFile *outFile,TString plotName,
 	  plotter.m_plots[plotName]->SetMarkerStyle(0);
 	  TH1* plot = plotter.m_plots[plotName];
 	  float scale = plotter.m_sampleConfig.cSection / totalXSec *
-	    integral / plot->Integral();
+	    integralData / integralMC;
 	  plot->Scale(scale);
 	  hMc.Add(plot);
 	  iColor++;
