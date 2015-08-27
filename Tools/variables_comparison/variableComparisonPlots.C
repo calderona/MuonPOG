@@ -67,10 +67,12 @@ namespace muon_pog {
 
     std::string tag_ID;  
     Float_t     tag_isoCut;
+    Float_t     tag_hltDrCut;
     std::string tag_hltFilter;
     
     std::string muon_trackType; // applies to both, tag and probe     
   
+    std::string probe_ID;  
     std::vector<TString> probe_fEtaMin;
     std::vector<TString> probe_fEtaMax;
     
@@ -106,7 +108,8 @@ namespace muon_pog {
 
   private :
 
-    bool hasGoodId(const muon_pog::Muon & muon);
+    bool hasGoodId(const muon_pog::Muon & muon,
+		   std::string leg);
     bool hasFilterMatch(const muon_pog::Muon & muon,
 			const muon_pog::HLT  & hlt);
     Int_t chargeFromTrk(const muon_pog::Muon & muon);
@@ -165,7 +168,7 @@ int main(int argc, char* argv[]){
   TRint* app = new TRint("CMS Root Application", &argc, argv);
 
   setTDRStyle();
-
+ 
   TagAndProbeConfig tnpConfig;
   std::vector<SampleConfig> sampleConfigs;
 
@@ -248,6 +251,11 @@ int main(int argc, char* argv[]){
       muon_pog::comparisonPlot(outputFile,"probePt" + etaTag,plotters);
       muon_pog::comparisonPlot(outputFile,"probeEta" + etaTag,plotters);
       muon_pog::comparisonPlot(outputFile,"probePhi" + etaTag,plotters);
+      muon_pog::comparisonPlot(outputFile,"probeDxy" + etaTag,plotters);
+      muon_pog::comparisonPlot(outputFile,"probeDz" + etaTag,plotters);
+      muon_pog::comparisonPlot(outputFile,"chHadIso" + etaTag,plotters);
+      muon_pog::comparisonPlot(outputFile,"photonIso" + etaTag,plotters);
+      muon_pog::comparisonPlot(outputFile,"neutralIso" + etaTag,plotters);
       muon_pog::comparisonPlot(outputFile,"dBetaRelIso" + etaTag,plotters);
     }
   
@@ -276,11 +284,14 @@ muon_pog::TagAndProbeConfig::TagAndProbeConfig(boost::property_tree::ptree::valu
       tag_isoCut = vt.second.get<Float_t>("tag_isoCut"); // CB for now just comb reliso dBeta R04
 
       tag_hltFilter = vt.second.get<std::string>("tag_hltFilter");
+      tag_hltDrCut  = vt.second.get<Float_t>("tag_hltDrCut");
       
       muon_trackType = vt.second.get<std::string>("muon_trackType");
-      
+
+      probe_ID     = vt.second.get<std::string>("probe_muonID");
       probe_fEtaMin = toArray(vt.second.get<std::string>("probe_fEtaMin"));
       probe_fEtaMax = toArray(vt.second.get<std::string>("probe_fEtaMax"));
+      
 
     }
 
@@ -343,18 +354,23 @@ void muon_pog::Plotter::book(TFile *outFile)
     {
          
       TString etaTag = "_fEtaMin" + (*fEtaMinIt) + "_fEtaMax" + (*fEtaMaxIt);
-      m_plots["probePt" + etaTag]  = new TH1F("probePt_" + sampleTag + etaTag," ; # entries; muon p_[T] ", 150,0.,150.);
-      m_plots["probeEta" + etaTag] = new TH1F("probeEta_" + sampleTag + etaTag," ; # entries; muon #eta ", 100,-2.5,2.5);
-      m_plots["probePhi" + etaTag] = new TH1F("probePhi_" + sampleTag + etaTag," ; # entries; muon #phi ", 100,-TMath::Pi(),TMath::Pi());
-      m_plots["dBetaRelIso" + etaTag] = new TH1F("dBetaRelIso_" + sampleTag + etaTag," ; # entries; muon relative isolation", 100,0.,2.);
+      m_plots["probePt" + etaTag]  = new TH1F("probePt_" + sampleTag + etaTag," ; # entries; muon p_[T] ", 75,0.,150.);
+      m_plots["probeEta" + etaTag] = new TH1F("probeEta_" + sampleTag + etaTag," ; # entries; muon #eta ", 50,-2.5,2.5);
+      m_plots["probePhi" + etaTag] = new TH1F("probePhi_" + sampleTag + etaTag," ; # entries; muon #phi ", 50,-TMath::Pi(),TMath::Pi());
+      m_plots["probeDxy" + etaTag] = new TH1F("probeDxy_" + sampleTag + etaTag," ; # entries; muon #phi ", 100,-0.5,0.5);
+      m_plots["probeDz" + etaTag]  = new TH1F("probeDz_" + sampleTag + etaTag," ; # entries; muon #phi ", 200,-2.5,2.5);
+      m_plots["chHadIso" + etaTag]    = new TH1F("chHadIso_" + sampleTag + etaTag," ; # entries; muon relative isolation", 50,0.,5.);
+      m_plots["photonIso" + etaTag]   = new TH1F("photonIso_" + sampleTag + etaTag," ; # entries; muon relative isolation", 50,0.,5.);
+      m_plots["neutralIso" + etaTag]  = new TH1F("neutralIso_" + sampleTag + etaTag," ; # entries; muon relative isolation", 50,0.,5.);
+      m_plots["dBetaRelIso" + etaTag] = new TH1F("dBetaRelIso_" + sampleTag + etaTag," ; # entries; muon relative isolation", 50,0.,2.);
 
     }
 
   outFile->mkdir(sampleTag+"/control");
   outFile->cd(sampleTag+"/control");
 
-  m_plots["invMass"] = new TH1F("invMass_" + sampleTag ,"invMass", 200,0.,200.);
-  m_plots["dilepPt"] = new TH1F("dilepPt_" + sampleTag ,"dilepPt", 200,0.,200.);
+  m_plots["invMass"] = new TH1F("invMass_" + sampleTag ,"invMass", 100,0.,200.);
+  m_plots["dilepPt"] = new TH1F("dilepPt_" + sampleTag ,"dilepPt", 100,0.,200.);
 
   m_plots["nProbesVsnTags"] = new TH2F("nProbesVsnTags_" + sampleTag ,"invMass", 10,-0.5,9.,10,-0.5,9.);
 
@@ -381,7 +397,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 
   for (auto & muon : muons)
     {
-      if (hasGoodId(muon) && hasFilterMatch(muon,hlt) &&
+      if (hasGoodId(muon,"tag") && hasFilterMatch(muon,hlt) &&
 	  muonTk(muon).Pt() > m_tnpConfig.tag_minPt   &&
 	  muon.isoPflow04 < m_tnpConfig.tag_isoCut)
 	tagMuons.push_back(muon);
@@ -443,7 +459,18 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	      m_plots["probePt" + etaTag]->Fill(probeMuTk.Pt(),weight);
 	      m_plots["probeEta" + etaTag]->Fill(probeMuTk.Eta(),weight);
 	      m_plots["probePhi" + etaTag]->Fill(probeMuTk.Phi(),weight);
-	      m_plots["dBetaRelIso" + etaTag]->Fill(probeMuon.isoPflow04,weight);
+	      
+	      m_plots["probeDxy" + etaTag]->Fill(probeMuon.dxy,weight);
+	      m_plots["probeDz" + etaTag]->Fill(probeMuon.dz,weight);
+	      
+	      if(hasGoodId(probeMuon,"probe")) 
+		{
+		  // Fill isolation plots for muons passign a given identification (programmable from cfg)
+		  m_plots["chHadIso" + etaTag]->Fill(probeMuon.isoPflow04,weight);
+		  m_plots["photonIso" + etaTag]->Fill(probeMuon.isoPflow04,weight);
+		  m_plots["neutralIso" + etaTag]->Fill(probeMuon.isoPflow04,weight);
+		  m_plots["dBetaRelIso" + etaTag]->Fill(probeMuon.isoPflow04,weight);
+		}
 								    
 	    }
 	}
@@ -451,9 +478,9 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 
 }
 
-bool muon_pog::Plotter::hasGoodId(const muon_pog::Muon & muon)
+bool muon_pog::Plotter::hasGoodId(const muon_pog::Muon & muon, std::string leg)
 {
-  std::string & muId = m_tnpConfig.tag_ID;
+  std::string & muId = leg == "tag" ? m_tnpConfig.tag_ID : m_tnpConfig.probe_ID ;
 
   if (muId == "GLOBAL")      return muon.isGlobal == 1 ;
   else if (muId == "TIGHT")  return muon.isTight  == 1;
@@ -480,7 +507,8 @@ bool muon_pog::Plotter::hasFilterMatch(const muon_pog::Muon & muon,
     {
       if (object.filterTag.find(filter) != std::string::npos &&
 	  sqrt((muTk.Eta() - object.eta) * (muTk.Eta() - object.eta) +
-	       (muTk.Phi() - object.phi) * (muTk.Phi() - object.phi)) < 0.15 ) // CB cut from cfg?
+	       (muTk.Phi() - object.phi) * (muTk.Phi() - object.phi))
+	  < m_tnpConfig.tag_hltDrCut )
 	return true;
     }
 
@@ -566,7 +594,9 @@ void muon_pog::comparisonPlot(TFile *outFile,TString plotName,
   THStack hMc(plotName,"");
   TH1 * hData = 0;
 
-  int iColor = 2;
+  int colorMap[5] { kOrange+7, kAzure+7, kGreen+1, kOrange, kGray+1};
+
+  int iColor = 0;
 
   float integral  = 0;
   float totalXSec = 0;
@@ -595,9 +625,8 @@ void muon_pog::comparisonPlot(TFile *outFile,TString plotName,
 	}
       else
 	{
-	  plotter.m_plots[plotName]->SetFillColor(iColor);
-	  plotter.m_plots[plotName]->SetMarkerColor(iColor);
-	  plotter.m_plots[plotName]->SetLineColor(iColor);
+	  plotter.m_plots[plotName]->SetFillColor(colorMap[iColor]);
+	  plotter.m_plots[plotName]->SetMarkerStyle(0);
 	  TH1* plot = plotter.m_plots[plotName];
 	  float scale = plotter.m_sampleConfig.cSection / totalXSec *
 	    integral / plot->Integral();
@@ -613,7 +642,8 @@ void muon_pog::comparisonPlot(TFile *outFile,TString plotName,
   canvas->cd();
 
   hData->Draw();
-  hMc.Draw("same");
+  hMc.Draw("samehist");
+  hData->Draw("same");
 
   canvas->Write();
 
