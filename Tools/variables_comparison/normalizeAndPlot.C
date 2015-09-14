@@ -114,7 +114,7 @@ void normalizeAndPlot() {
     ht->Rebin(Int_t(plotnumb[3])); 
   } 
 
-  hr->GetYaxis()->SetRangeUser(0.05,20000.); 
+  //hr->GetYaxis()->SetRangeUser(0.05,20000.); 
   hr->Draw("hist"); 
   ht->Draw("e1same"); 
 
