@@ -89,6 +89,11 @@ void normalizeAndPlot() {
   //ht->SetLineColor(kBlack); 
   //ht->SetLineStyle(7); 
   if(Int_t(plotnumb[4])==1) {
+    ht->SetBinContent(1, ht->GetBinContent(1)+ht->GetBinContent(0)) ; 
+    ht->SetBinError(1, sqrt(ht->GetBinError(1)*ht->GetBinError(1) + ht->GetBinError(0)*ht->GetBinError(0))); 
+    ht->SetBinContent(0, 0) ; 
+    ht->SetBinError(0, 0) ; 
+
     unsigned int lastb = ht->GetNbinsX(); 
     ht->SetBinContent(lastb, ht->GetBinContent(lastb)+ht->GetBinContent(lastb+1)) ; 
     ht->SetBinError(lastb, sqrt(ht->GetBinError(lastb)*ht->GetBinError(lastb) + ht->GetBinError(lastb+1)*ht->GetBinError(lastb+1))); 
