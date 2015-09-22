@@ -27,6 +27,11 @@
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
 
+#include "DataFormats/METReco/interface/CaloMET.h"
+#include "DataFormats/METReco/interface/CaloMETFwd.h"
+#include "DataFormats/METReco/interface/PFMET.h"
+#include "DataFormats/METReco/interface/PFMETFwd.h"
+
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
@@ -80,6 +85,10 @@ private:
   edm::InputTag primaryVertexTag_;
   edm::InputTag beamSpotTag_;
 
+  edm::InputTag pfMetTag_;
+  edm::InputTag pfChMetTag_;
+  edm::InputTag caloMetTag_;
+
   edm::InputTag genTag_;
   edm::InputTag pileUpInfoTag_;
   edm::InputTag genInfoTag_;
@@ -99,6 +108,10 @@ MuonPogTreeProducer::MuonPogTreeProducer( const edm::ParameterSet & cfg ) :
   muonTag_(cfg.getUntrackedParameter<edm::InputTag>("MuonTag", edm::InputTag("muons"))),
   primaryVertexTag_(cfg.getUntrackedParameter<edm::InputTag>("PrimaryVertexTag", edm::InputTag("offlinePrimaryVertices"))),
   beamSpotTag_(cfg.getUntrackedParameter<edm::InputTag>("BeamSpotTag", edm::InputTag("offlineBeamSpot"))),
+
+  pfMetTag_(cfg.getUntrackedParameter<edm::InputTag>("PFMetTag", edm::InputTag("pfMet"))), 
+  pfChMetTag_(cfg.getUntrackedParameter<edm::InputTag>("PFChMetTag", edm::InputTag("pfChMet"))), 
+  caloMetTag_(cfg.getUntrackedParameter<edm::InputTag>("CaloMetTag", edm::InputTag("caloMet"))), 
 
   genTag_(cfg.getUntrackedParameter<edm::InputTag>("GenTag", edm::InputTag("prunedGenParticles"))),
   pileUpInfoTag_(cfg.getUntrackedParameter<edm::InputTag>("PileUpInfoTag", edm::InputTag("pileupInfo"))),
@@ -146,6 +159,10 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
   event_.genInfos.clear();
   event_.muons.clear();
   
+  event_.mets.pfMet   = -999; 
+  event_.mets.pfChMet = -999; 
+  event_.mets.caloMet = -999; 
+
   for (unsigned int ix=0; ix<3; ++ix) {
     event_.primaryVertex[ix] = 0.;
     for (unsigned int iy=0; iy<3; ++iy) {
@@ -223,7 +240,6 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
       else 
 	edm::LogError("") << "[MuonPogTreeProducer]: Vertex collection does not exist !!!";
     }
-  
 
   // Get beam spot for muons
   edm::Handle<reco::BeamSpot> beamSpot;
@@ -233,6 +249,39 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
 	edm::LogError("") << "[MuonPogTreeProducer]: Beam spot collection not found !!!";
     }
 
+  // Fill (raw) MET information: PF, PF charged, Calo    
+  edm::Handle<reco::PFMETCollection> pfMet; 
+  if(pfMetTag_.label() != "none") 
+    { 
+      if (!ev.getByLabel(pfMetTag_, pfMet)) 
+	edm::LogError("") << "[MuonPogTreeProducer] PFMet collection does not exist !!!"; 
+      else { 
+	const reco::PFMET &iPfMet = (*pfMet)[0]; 
+	event_.mets.pfMet = iPfMet.et(); 
+      } 
+    } 
+
+  edm::Handle<reco::PFMETCollection> pfChMet; 
+  if(pfChMetTag_.label() != "none") 
+    { 
+      if (!ev.getByLabel(pfChMetTag_, pfChMet)) 
+	edm::LogError("") << "[MuonPogTreeProducer] PFChMet collection does not exist !!!"; 
+      else { 
+	const reco::PFMET &iPfChMet = (*pfChMet)[0]; 
+	event_.mets.pfChMet = iPfChMet.et(); 
+      } 
+    } 
+
+  edm::Handle<reco::CaloMETCollection> caloMet; 
+  if(caloMetTag_.label() != "none") 
+    { 
+      if (!ev.getByLabel(caloMetTag_, caloMet)) 
+	edm::LogError("") << "[MuonPogTreeProducer] CaloMet collection does not exist !!!"; 
+      else { 
+	const reco::CaloMET &iCaloMet = (*caloMet)[0]; 
+	event_.mets.caloMet = iCaloMet.et(); 
+      } 
+    } 
 
   // Get muons  
   edm::Handle<reco::MuonCollection> muons;
@@ -425,7 +474,10 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & mu
 
       bool isGlobal      = mu.isGlobalMuon();
       bool isTracker     = mu.isTrackerMuon();
+      bool isTrackerArb  = muon::isGoodMuon(mu, muon::TrackerMuonArbitrated); 
+      bool isRPC         = mu.isRPCMuon();
       bool isStandAlone  = mu.isStandAloneMuon();
+      bool isPF          = mu.isPFMuon();
 
       bool hasInnerTrack = !mu.innerTrack().isNull();
       bool hasTunePTrack = !mu.tunePMuonBestTrack().isNull();
@@ -455,18 +507,45 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & mu
       reco::MuonPFIsolation iso04 = mu.pfIsolationR04();
       reco::MuonPFIsolation iso03 = mu.pfIsolationR03();
 
-      ntupleMu.chargedHadronIso = iso04.sumChargedHadronPt;
-      ntupleMu.neutralHadronIso = iso04.sumNeutralHadronEt;
-      ntupleMu.photonIso        = iso04.sumPhotonEt;
+      ntupleMu.chargedHadronIso   = iso04.sumChargedHadronPt;
+      ntupleMu.chargedHadronIsoPU = iso04.sumPUPt; 
+      ntupleMu.neutralHadronIso   = iso04.sumNeutralHadronEt;
+      ntupleMu.photonIso          = iso04.sumPhotonEt;
 
       ntupleMu.isGlobal     = isGlobal ? 1 : 0;	
       ntupleMu.isTracker    = isTracker ? 1 : 0;	
+      ntupleMu.isTrackerArb = isTrackerArb ? 1 : 0;	
+      ntupleMu.isRPC        = isRPC ? 1 : 0;
       ntupleMu.isStandAlone = isStandAlone ? 1 : 0;
+      ntupleMu.isPF         = isPF ? 1 : 0;
 
       ntupleMu.nHitsGlobal     = isGlobal     ? mu.globalTrack()->numberOfValidHits() : -999;	
       ntupleMu.nHitsTracker    = isTracker    ? mu.innerTrack()->numberOfValidHits()  : -999;	
       ntupleMu.nHitsStandAlone = isStandAlone ? mu.outerTrack()->numberOfValidHits()  : -999;
-	    
+
+      ntupleMu.glbNormChi2              = isGlobal      ? mu.globalTrack()->normalizedChi2() : -999; 
+      ntupleMu.trkNormChi2	        = hasInnerTrack ? mu.innerTrack()->normalizedChi2()  : -999; 
+      ntupleMu.trkMuonMatchedStations   = isTracker     ? mu.numberOfMatchedStations()       : -999; 
+      ntupleMu.glbMuonValidHits	        = isGlobal      ? mu.globalTrack()->hitPattern().numberOfValidMuonHits()       : -999; 
+      ntupleMu.trkPixelValidHits	= hasInnerTrack ? mu.innerTrack()->hitPattern().numberOfValidPixelHits()       : -999; 
+      ntupleMu.trkPixelLayersWithMeas   = hasInnerTrack ? mu.innerTrack()->hitPattern().pixelLayersWithMeasurement()   : -999; 
+      ntupleMu.trkTrackerLayersWithMeas = hasInnerTrack ? mu.innerTrack()->hitPattern().trackerLayersWithMeasurement() : -999; 
+
+      ntupleMu.bestMuPtErr              = mu.muonBestTrack()->ptError(); 
+
+      ntupleMu.trkValidHitFrac = hasInnerTrack           ? mu.innerTrack()->validFraction()       : -999; 
+      ntupleMu.trkStaChi2      = isGlobal                ? mu.combinedQuality().chi2LocalPosition : -999; 
+      ntupleMu.trkKink         = isGlobal                ? mu.combinedQuality().trkKink           : -999; 
+      ntupleMu.muSegmComp      = (isGlobal || isTracker) ? muon::segmentCompatibility(mu)         : -999; 
+
+      ntupleMu.isTrkMuOST               = muon::isGoodMuon(mu, muon::TMOneStationTight) ? 1 : 0; 
+      ntupleMu.isTrkHP                  = hasInnerTrack && mu.innerTrack()->quality(reco::TrackBase::highPurity) ? 1 : 0; 
+
+      ntupleMu.dxyBest  = -999; 
+      ntupleMu.dzBest   = -999; 
+      ntupleMu.dxyInner = -999; 
+      ntupleMu.dzInner  = -999; 
+
       ntupleMu.isoPflow04 = (iso04.sumChargedHadronPt+ std::max(0.,iso04.sumPhotonEt+iso04.sumNeutralHadronEt - 0.5*iso04.sumPUPt)) / mu.pt();
     
       ntupleMu.isoPflow03 = (iso03.sumChargedHadronPt+ std::max(0.,iso03.sumPhotonEt+iso03.sumNeutralHadronEt - 0.5*iso03.sumPUPt)) / mu.pt();
@@ -493,9 +572,16 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & mu
 
 	  dxy = isGlobal ? mu.globalTrack()->dxy(vertex.position()) :
 	    hasInnerTrack ? mu.innerTrack()->dxy(vertex.position()) : -1000;
-	  dz =isGlobal ? mu.globalTrack()->dz(vertex.position()) :
+	  dz = isGlobal ? mu.globalTrack()->dz(vertex.position()) :
 	    hasInnerTrack ? mu.innerTrack()->dz(vertex.position()) : -1000;
  
+	  ntupleMu.dxyBest  = mu.muonBestTrack()->dxy(vertex.position()); 
+	  ntupleMu.dzBest   = mu.muonBestTrack()->dz(vertex.position()); 
+	  if(hasInnerTrack) { 
+	    ntupleMu.dxyInner = mu.innerTrack()->dxy(vertex.position()); 
+	    ntupleMu.dzInner  = mu.innerTrack()->dz(vertex.position()); 
+	  } 
+
 	  ntupleMu.isSoft    = muon::isSoftMuon(mu,vertex)   ? 1 : 0;	  
 	  ntupleMu.isTight   = muon::isTightMuon(mu,vertex)  ? 1 : 0;	  
 	  ntupleMu.isHighPt  = muon::isHighPtMuon(mu,vertex) ? 1 : 0;
@@ -509,6 +595,17 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & mu
 
       ntupleMu.dxybs  = dxybs;
       ntupleMu.dzbs   = dzbs;
+
+      if(mu.isTimeValid()) { 
+	ntupleMu.muonTimeDof = mu.time().nDof; 
+	ntupleMu.muonTime    = mu.time().timeAtIpInOut; 
+	ntupleMu.muonTimeErr = mu.time().timeAtIpInOutErr; 
+      } 
+      else { 
+	ntupleMu.muonTimeDof = -999; 
+	ntupleMu.muonTime    = -999; 
+	ntupleMu.muonTimeErr = -999; 
+      } 
 
       event_.muons.push_back(ntupleMu);
 

@@ -39,6 +39,18 @@ namespace muon_pog {
     ClassDef(GenParticle,1)
   };
 
+  class METs {
+  public:
+    Float_t pfMet;   // raw PF MET [GeV]
+    Float_t pfChMet; // raw PF charged MET [GeV]
+    Float_t caloMet; // raw Calo MET [GeV]
+
+    METs(){};
+    virtual ~METs(){};
+    
+    ClassDef(METs,1)
+  };
+
   class Muon {
   public:
 
@@ -68,7 +80,10 @@ namespace muon_pog {
 
     Int_t   isGlobal;
     Int_t   isTracker;
+    Int_t   isTrackerArb;
+    Int_t   isRPC;
     Int_t   isStandAlone;
+    Int_t   isPF;
 
     Int_t   isSoft;
     Int_t   isLoose;
@@ -77,6 +92,7 @@ namespace muon_pog {
     Int_t   isHighPt;
     
     Float_t chargedHadronIso;
+    Float_t chargedHadronIsoPU;
     Float_t photonIso;
     Float_t neutralHadronIso;
 
@@ -93,8 +109,40 @@ namespace muon_pog {
 
     Int_t   nHitsGlobal;
     Int_t   nHitsTracker;
-    Int_t   nHitsStandAlone;
+    Int_t   nHitsStandAlone; 
 
+    // Variables for ID 
+    //  - General (Tight, HighPt, Soft) 
+    Float_t glbNormChi2; 
+    Float_t trkNormChi2; 
+    Int_t   trkMuonMatchedStations; 
+    Int_t   glbMuonValidHits; 
+    Int_t   trkPixelValidHits; 
+    Int_t   trkPixelLayersWithMeas; 
+    Int_t   trkTrackerLayersWithMeas; 
+
+    //  - HighPt 
+    Float_t bestMuPtErr; 
+
+    //  - Medium 
+    Float_t trkValidHitFrac; 
+    Float_t trkStaChi2; 
+    Float_t trkKink; 
+    Float_t muSegmComp; 
+
+    //  - Soft 
+    Int_t   isTrkMuOST; 
+    Int_t   isTrkHP; 
+
+    Float_t dxyBest; 
+    Float_t dzBest; 
+    Float_t dxyInner; 
+    Float_t dzInner; 
+
+    // Muon time 
+    Float_t muonTimeDof; 
+    Float_t muonTime; 
+    Float_t muonTimeErr; 
 
     Muon(){};
     virtual ~Muon(){};
@@ -169,6 +217,7 @@ namespace muon_pog {
     std::vector <muon_pog::GenInfo> genInfos;        // venctor of genInfos; size=0 in data
     std::vector<muon_pog::GenParticle> genParticles; // venctor of genParticles size=0 in data
     std::vector<muon_pog::Muon> muons; // vector of muons
+    muon_pog::METs mets;  // vector of different MET definitions 
     muon_pog::HLT hlt;                 // HLT objects
 
     Event(){};
