@@ -5,13 +5,15 @@ process = cms.Process("PRINT")
 process.source = cms.Source("PoolSource",
                             
         fileNames = cms.untracked.vstring(
-        "file:///afs/cern.ch/work/e/escalant/public/EvDisplaysPromptReco/EvDisplaysPromptRecoMu.root"
+        #"file:///afs/cern.ch/user/j/jhgoh/public/MuonPOG/20150922_poorQualityMuon/reco__254790__75X_dataRun2_v5.root"
+        "/store/user/isildak/JetHT/CMSSW_7_4_X_RECO_run_254790_lumi_129_event_148424615.root"
+        #"file://step3_prompt.root"
              ),
         secondaryFileNames = cms.untracked.vstring()
 )
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
-process.GlobalTag.globaltag = "74X_dataRun2_Prompt_v0"
+process.GlobalTag.globaltag = "74X_dataRun2_Prompt_v3"
 
 process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 process.load("Configuration.StandardSequences.GeometryDB_cff")

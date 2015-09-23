@@ -356,8 +356,8 @@ void MuonEventDumper::printTrack(const reco::Track * track, const std::string & 
 	    << " , chi2/n.d.o.f. :" << track->normalizedChi2()
 	    << " , # pixel hits :" << track->hitPattern().numberOfValidPixelHits()
 	    << " , # trk layers :" << track->hitPattern().trackerLayersWithMeasurement()
-	    << " , # muon hits :" << track->hitPattern().numberOfValidMuonHits()
-	    << " , # muon valid hits :" << track->hitPattern().numberOfMuonHits()
+	    << " , # muon hits :" << track->hitPattern().numberOfMuonHits()
+	    << " , # muon valid hits :" << track->hitPattern().numberOfValidMuonHits()
 	    << " , # DT valid hits :" << track->hitPattern().numberOfValidMuonDTHits()
 	    << " , # CSC valid hits :" << track->hitPattern().numberOfValidMuonCSCHits()
 	    << " , # RPC valid hits :" << track->hitPattern().numberOfValidMuonRPCHits()
@@ -385,7 +385,7 @@ void MuonEventDumper::printMuons(const edm::Handle<reco::MuonCollection> & muons
 {
 
   std::cout << "[MuonEventDumper::printMuons]: " << std::endl;
-
+  std::cout << "[MUON COLLECTION SIZE]: " << muons->size() << std::endl;
 
   reco::MuonCollection::const_iterator muonIt  = muons->begin();
   reco::MuonCollection::const_iterator muonEnd = muons->end();
@@ -409,6 +409,9 @@ void MuonEventDumper::printMuons(const edm::Handle<reco::MuonCollection> & muons
 		<< " , phi : " << mu.phi()
 		<< " , charge : " << mu.charge()
 		<< std::endl ;
+
+      std::cout << "With  " << mu.numberOfMatchedStations()
+		<< " matched stations" << std::endl ; 
 
       if (mu.isGlobalMuon())
 	std::cout << "With (dYX, dZ) for global track : ("
