@@ -47,6 +47,7 @@ namespace muon_pog {
     TString sampleName;  
     Float_t cSection;
     Float_t nEvents;
+    Int_t applyReweighting;
 
     SampleConfig() {};
     
@@ -234,76 +235,141 @@ int main(int argc, char* argv[]){
 	  evBranch->GetEntry(iEvent);
 	  float weight = ev->genInfos.size() > 0 ?
 	    ev->genInfos[0].genWeight/fabs(ev->genInfos[0].genWeight) : 1.;
-		  
-	  //weight for Data to MC(DY_8 + TTbar_1 + tWtop + tWantitop) comparison 
-	  float PUweight[60] = {0.,
-				6.13641,
-				3.96095,
-				1.069,
-				0.947777,
-				0.856153,
-				0.880403,
-				0.991013,
-				1.14579,
-				1.29139,
-				1.17103,
-				1.25331,
-				1.16784,
-				1.3081,
-				1.1052,
-				1.09359,
-				0.955982,
-				0.875554,
-				0.833031,
-				0.611113,
-				0.677309,
-				0.496612,
-				0.407461,
-				0.357879,
-				0.485327,
-				0.282095,
-				0.293168,
-				0.203256,
-				0.168494,
-				0.0594542,
-				0.417589,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.,
-				0.};	  
+	 
+	  //weight for Data-Mc comparison config4.ini 2015D vs All MC  
+	  float PUweight[60] = {0,
+				6.68472,
+				4.41435,
+				3.49289,
+				3.14212,
+				3.173,
+				2.94319,
+				2.71174,
+				2.44124,
+				2.0717,
+				1.7103,
+				1.39812,
+				1.11666,
+				0.855547,
+				0.618711,
+				0.453196,
+				0.328689,
+				0.228592,
+				0.166069,
+				0.100075,
+				0.070327,
+				0.0567964,
+				0.0405713,
+				0.0308903,
+				0.0186064,
+				0.0208503,
+				0.00264836,
+				0.00779018,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0};
+	  
+
+	  //weight for Data-Mc comparison config3.ini 2015C_Trocino vs All MC  
+	  // float PUweight[60] = {0,
+	  // 			2.59946,
+	  // 			1.97202,
+	  // 			0.879335,
+	  // 			0.976222,
+	  // 			1.18325,
+	  // 			1.18647,
+	  // 			1.17652,
+	  // 			1.39881,
+	  // 			1.40331,
+	  // 			1.35794,
+	  // 			1.35981,
+	  // 			1.24513,
+	  // 			1.25133,
+	  // 			1.02661,
+	  // 			0.990347,
+	  // 			0.861541,
+	  // 			0.720651,
+	  // 			0.661865,
+	  // 			0.504051,
+	  // 			0.523631,
+	  // 			0.37145,
+	  // 			0.311188,
+	  // 			0.308495,
+	  // 			0.273079,
+	  // 			0.174498,
+	  // 			0.131307,
+	  // 			0.12496,
+	  // 			0.149624,
+	  // 			0,
+	  // 			0.194291,
+	  // 			0.102388,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0,
+	  // 			0};
+	 
 				 
-	  //weight for Data to DY comparison 
+	  //weight for Data to DY comparison obsoleto
 	  //float PUweight[60] = {0, 6.23938, 3.93412, 1.0139, 0.92968, 0.852813, 0.86357, 0.991675, 1.13882, 1.29982, 1.17863, 1.25089, 1.17501, 1.29242, 1.11248, 1.08851, 0.952472, 0.873848, 0.842575, 0.620411, 0.6636, 0.50119, 0.404807, 0.369032, 0.483837, 0.266346, 0.308719, 0.207252, 0.175888, 0.0609816, 0.423387, 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};
 	  
-	  //weight for Data to Data comparison
+	  //weight for Data to Data comparison 2015C 25ns "old" vs 50 ns
 	  //float PUweight[60] = {0, 2.59252, 7.0705, 6.74054, 7.77755, 3.26155, 3.42985, 2.89984, 2.28284, 2.13837, 1.70971, 1.50287, 1.20367, 1.17027, 0.956894, 0.881644, 0.7398, 0.635878, 0.595542, 0.494059, 0.499049, 0.408914, 0.344204, 0.286958, 0.388219, 0.244787, 0.265499, 0.216043, 0.172834, 0.0540108, 0.360072, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	  
-	  if(!plotter.m_sampleConfig.sampleName.Contains("Data"))
+	  // if(!plotter.m_sampleConfig.sampleName.Contains("Data"))
+	  if(plotter.m_sampleConfig.applyReweighting==1)
 	    weight *= ev->nVtx < 60 ? PUweight[ev->nVtx] : 0;
 	  
 	  plotter.fill(ev->muons, ev->hlt, ev->nVtx, weight);
@@ -370,6 +436,7 @@ muon_pog::SampleConfig::SampleConfig(boost::property_tree::ptree::value_type & v
       sampleName   = TString(vt.first.c_str());
       cSection = vt.second.get<Float_t>("cSection");
       nEvents = vt.second.get<Float_t>("nEvents"); //CB do we really need this? can't we take nEvents from the file itself?
+      applyReweighting = vt.second.get<Int_t>("applyReweighting");
     }
   
   catch (boost::property_tree::ptree_bad_data bd)
@@ -589,7 +656,8 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 		      
 		      Float_t dilepPt = (tagMuTk+muTk).Pt();
 		      m_plots[CONT]["02_dilepPt"]->Fill(dilepPt,weight);
-
+		      m_plots[CONT]["03_nVertices"]->Fill(nVtx,weight);
+ 
 		      for (auto & fEtaBin : m_tnpConfig.probe_fEtaBins)
 			{
 			  TString etaTag = "_fEtaMin" + fEtaBin.first + "_fEtaMax" + fEtaBin.second;
@@ -604,8 +672,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
     }
   
   m_plots[CONT]["04_nProbesVsnTags"]->Fill(tagMuons.size(),probeMuons.size());
-  m_plots[CONT]["03_nVertices"]->Fill(nVtx,weight);
-
+ 
   
   for (auto probeMuonPointer : probeMuons)
     {
@@ -867,6 +934,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 		{
 		  integralMC += (plotter.m_plots[Plotter::CONT]["99_invMassInRange"]->Integral() *
 				 plotter.m_sampleConfig.cSection/plotter.m_sampleConfig.nEvents);
+				
 		}
 	    }
 	}
@@ -938,7 +1006,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
       hRatio->Divide((TH1*)hMc.GetStack()->Last());
       hRatio->Draw();
       
-      if(plotName == "nVertices")
+      if(plotName == "03_nVertices")
 	{
 	  Int_t nbins = hRatio->GetNbinsX();
 	  
