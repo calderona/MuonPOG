@@ -5,6 +5,7 @@
 #include "TCanvas.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TProfile.h"
 #include "THStack.h"
 #include "TLegend.h"
 #include "TTree.h"
@@ -98,6 +99,27 @@ namespace muon_pog {
   
   };
 
+  class Observable {
+
+  public :
+    
+    Observable() {};
+
+    Observable(TString hName, TString sampleTag, TString xTitle, TString yTitle,
+	       Int_t nBins, Float_t min, Float_t max, bool kinPlots);
+    
+    ~Observable() { m_plots.clear(); };
+
+    void fill(Float_t value, TLorentzVector & muonTk, Float_t weight);
+    
+    std::vector<TH1 *> & plots() { return m_plots; }
+    
+  private :
+    
+    std::vector<TH1 *> m_plots;
+
+  };
+
   class Plotter {
 
   public :
@@ -111,7 +133,7 @@ namespace muon_pog {
     void book(TFile *outFile);
     void fill(const std::vector<muon_pog::Muon> & muons, const muon_pog::HLT & hlt, int nVtx, float weight);
 
-    std::map<Plotter::HistoType, std::map<TString, TH1 *> > m_plots;
+    std::map<Plotter::HistoType, std::map<TString, muon_pog::Observable> > m_plots;
     TagAndProbeConfig m_tnpConfig;
     SampleConfig m_sampleConfig;
 
@@ -482,6 +504,29 @@ std::vector<std::pair<TString,TString> > muon_pog::TagAndProbeConfig::toPairArra
 
 }
 
+muon_pog::Observable::Observable(TString hName, TString sampleTag, TString xTitle, TString yTitle,
+				 Int_t nBins, Float_t min, Float_t max, bool kinPlots)
+{
+  
+  m_plots.push_back(new TH1F("h" + hName + "_" + sampleTag, hName + " ;" + xTitle + ";" + yTitle, nBins, min, max));
+  if (kinPlots)
+    { // CB book here for other plots vs kin variables
+      m_plots.push_back(new TProfile("h" + hName + "VsEta_" + sampleTag, hName + " vs #eta; #eta;" + xTitle, 50, -2.5, 2.5));
+    }
+  
+}
+
+void muon_pog::Observable::fill(Float_t value, TLorentzVector & muonTk, Float_t weight)
+{
+  
+  m_plots.at(0)->Fill(value, weight);
+  if (m_plots.size() > 1)
+    { // CB fillhere for other plots vs kin variables
+      ((TProfile*)m_plots.at(1))->Fill(muonTk.Eta(), value, weight);
+    }
+      
+}
+
 void muon_pog::Plotter::book(TFile *outFile)
 {
 
@@ -499,13 +544,13 @@ void muon_pog::Plotter::book(TFile *outFile)
       
   outFile->cd(sampleTag+"/timing");
 
-  m_plots[TIME]["STAmuonTime"]        = new TH1F("hSTAmuonTime_" + sampleTag ,"STAmuonTime; time (ns) ; # entries", 400, -200., 200.);
-  m_plots[TIME]["STAmuonTimeBarrel"]  = new TH1F("hSTAmuonTimeBarrel_" + sampleTag ,"STAmuonTimeBarrel; time (ns) ; # entries", 400, -200., 200.);
-  m_plots[TIME]["STAmuonTimeEndcap"]  = new TH1F("hSTAmuonTimeEndcap_" + sampleTag ,"STAmuonTimeEndcap; time (ns) ; # entries", 400, -200., 200.);
+  m_plots[TIME]["STAmuonTime"]       = muon_pog::Observable("STAmuonTime", sampleTag, "time (ns)", "# entries", 400, -200., 200., false);
+  m_plots[TIME]["STAmuonTimeBarrel"] = muon_pog::Observable("STAmuonTimeBarrel", sampleTag, "time (ns)", "# entries", 400, -200., 200., false);
+  m_plots[TIME]["STAmuonTimeEndcap"] = muon_pog::Observable("STAmuonTimeEndcap", sampleTag, "time (ns)", "# entries", 400, -200., 200., false);
 
-  m_plots[TIME]["UnbSTAmuonTime"]        = new TH1F("hUnbSTAmuonTime_" + sampleTag ,"UnbSTAmuonTime; time (ns) ; # entries", 400, -200., 200.);
-  m_plots[TIME]["UnbSTAmuonTimeBarrel"]  = new TH1F("hUnbSTAmuonTimeBarrel_" + sampleTag ,"UnbSTAmuonTimeBarrel; time (ns) ; # entries", 400, -200., 200.);
-  m_plots[TIME]["UnbSTAmuonTimeEndcap"]  = new TH1F("hUnbSTAmuonTimeEndcap_" + sampleTag ,"UnbSTAmuonTimeEndcap; time (ns) ; # entries", 400, -200., 200.);
+  m_plots[TIME]["UnbSTAmuonTime"] = muon_pog::Observable("UnbSTAmuonTime", sampleTag, "time (ns)", "# entries", 400, -200., 200., false);
+  m_plots[TIME]["UnbSTAmuonTimeBarrel"] = muon_pog::Observable("UnbSTAmuonTimeBarrel", sampleTag, "time (ns)", "# entries", 400, -200., 200., false);
+  m_plots[TIME]["UnbSTAmuonTimeEndcap"] = muon_pog::Observable("UnbSTAmuonTimeEndcap", sampleTag, "time (ns)", "# entries", 400, -200., 200., false);
 
   for (auto fEtaBin : m_tnpConfig.probe_fEtaBins)
     {
@@ -515,26 +560,26 @@ void muon_pog::Plotter::book(TFile *outFile)
       outFile->cd(sampleTag+"/id_variables");
 
       //Id var
-      m_plots[ID]["NHitsGLB" + etaTag]        = new TH1F("hNHitsGLB_" + sampleTag + etaTag,"nHitsGLB; # hits ; # entries", 80, 0., 80.);
-      m_plots[ID]["NHitsTRK" + etaTag]        = new TH1F("hNHitsTRK_" + sampleTag + etaTag,"nHitsTRK; # hits ; # entries", 40, 0., 40.);
-      m_plots[ID]["NHitsSTA" + etaTag]        = new TH1F("hNHitsSTA_" + sampleTag + etaTag,"nHitsSTA; # hits ; # entries", 60, 0., 60.);
+      m_plots[ID]["NHitsGLB" + etaTag] = muon_pog::Observable("NHitsGLB" + etaTag, sampleTag, "# hits", "# entries", 80, 0., 80., true);
+      m_plots[ID]["NHitsTRK" + etaTag] = muon_pog::Observable("NHitsTRK" + etaTag, sampleTag, "# hits", "# entries", 40, 0., 40., true);
+      m_plots[ID]["NHitsSTA" + etaTag] = muon_pog::Observable("NHitsSTA" + etaTag, sampleTag, "# hits", "# entries", 60, 0., 60., true);
       
-      m_plots[ID]["Chi2GLB" + etaTag]        = new TH1F("hChi2GLB_" + sampleTag + etaTag,"Chi2GLB; chi2/ndof ; # entries", 50, 0., 100.);
-      m_plots[ID]["Chi2TRK" + etaTag]        = new TH1F("hChi2TRK_" + sampleTag + etaTag,"Chi2TRK; chi2/ndof ; # entries", 100, 0., 50.);
+      m_plots[ID]["Chi2GLB" + etaTag]  = muon_pog::Observable("Chi2GLB_" + etaTag, sampleTag, "chi2/ndof", "# entries", 50, 0., 100., true);
+      m_plots[ID]["Chi2TRK" + etaTag]  = muon_pog::Observable("Chi2TRK_" + etaTag, sampleTag, "chi2/ndof", "# entries", 100, 0., 50., true);
       
-      m_plots[ID]["NMatchedStation" + etaTag]  = new TH1F("hNatchedStation_" + sampleTag + etaTag,"matchedStation; # stations ; # entries", 10, 0., 10.);
-      m_plots[ID]["NMuonValidHitsGLB" + etaTag]= new TH1F("hNMuonValidHitsGLB_" + sampleTag + etaTag,"muonValidHitsGLB; # hits ; # entries", 60, 0., 60.);
-      m_plots[ID]["PixelHitsTRK" + etaTag]    = new TH1F("hPixelHitsTRK_" + sampleTag + etaTag,"PixelHitsTRK; # hits ; # entries", 10, 0., 10.);
-      m_plots[ID]["PixelLayersTRK" + etaTag]  = new TH1F("hPixelLayersTRK_" + sampleTag + etaTag,"PixelLayersTRK; # layers ; # entries", 10, 0., 10.);
-      m_plots[ID]["TrackerLayersTRK" + etaTag]= new TH1F("hTrackerLayersTRK_" + sampleTag + etaTag,"TrackerLayersTRK; # layers ; # entries", 30, 0., 30.);
+      m_plots[ID]["NMatchedStation" + etaTag]  = muon_pog::Observable("NatchedStation_" + etaTag, sampleTag,"# stations", "# entries", 10, 0., 10., true);
+      m_plots[ID]["NMuonValidHitsGLB" + etaTag]= muon_pog::Observable("NMuonValidHitsGLB_" + etaTag, sampleTag,"# hits", "# entries", 60, 0., 60., true);
+      m_plots[ID]["PixelHitsTRK" + etaTag]    = muon_pog::Observable("PixelHitsTRK" + etaTag, sampleTag,"# hits", "# entries", 10, 0., 10., true);
+      m_plots[ID]["PixelLayersTRK" + etaTag]  = muon_pog::Observable("PixelLayersTRK" + etaTag, sampleTag,"# layers", "# entries", 10, 0., 10., true);
+      m_plots[ID]["TrackerLayersTRK" + etaTag]= muon_pog::Observable("TrackerLayersTRK" + etaTag, sampleTag,"# layers"," # entries", 30, 0., 30., true);
       
-      m_plots[ID]["HitFractionTRK" + etaTag]  = new TH1F("hHitFractionTRK_" + sampleTag + etaTag,"HitFractionTRK; fraction ; # entries", 20, 0., 1.);
-      m_plots[ID]["TrkStaChi2" + etaTag]      = new TH1F("hTrkStaChi2_" + sampleTag + etaTag,"TrkStaChi2; chi2 ; # entries", 50, 0., 100.);
-      m_plots[ID]["TrkKink" + etaTag]         = new TH1F("hTrkKink_" + sampleTag + etaTag,"TrkKink; ; # entries", 48, 0., 1200.);
-      m_plots[ID]["SegmentComp" + etaTag]     = new TH1F("hSegmentComp_" + sampleTag + etaTag,"segmentComp", 100, 0., 1.);
+      m_plots[ID]["HitFractionTRK" + etaTag]  = muon_pog::Observable("HitFractionTRK" + etaTag, sampleTag, "fraction", " # entries", 20, 0., 1., true);
+      m_plots[ID]["TrkStaChi2" + etaTag]      = muon_pog::Observable("TrkStaChi2" + etaTag, sampleTag, "chi2", "# entries", 50, 0., 100., true);
+      m_plots[ID]["TrkKink" + etaTag]         = muon_pog::Observable("TrkKink" + etaTag, sampleTag, "", "# entries", 48, 0., 1200., true);
+      m_plots[ID]["SegmentComp" + etaTag]     = muon_pog::Observable("SegmentComp" + etaTag, sampleTag,"", "segmentComp", 100, 0., 1., true);
       
-      m_plots[ID]["Dxy" + etaTag]             = new TH1F("Dxy_" + sampleTag + etaTag,"Transverse IP; dxy (cm); # entries", 100,-0.5,0.5);
-      m_plots[ID]["Dz" + etaTag]              = new TH1F("Dz_" + sampleTag + etaTag,"Longitudinal IP; dz (cm); # entries", 200,-2.5,2.5);    
+      m_plots[ID]["Dxy" + etaTag]             = muon_pog::Observable("Dxy" + etaTag, sampleTag, "d_{xy} (cm)", "# entries", 100,-0.5,0.5, true);
+      m_plots[ID]["Dz" + etaTag]              = muon_pog::Observable("Dz" + etaTag, sampleTag, "d_{z} (cm)", "# entries", 200,-2.5,2.5, true);    
 
       outFile->cd(sampleTag+"/kinematical_variables");
 
@@ -542,9 +587,9 @@ void muon_pog::Plotter::book(TFile *outFile)
 	{
 	  TString IDTag = "_" + probe_ID;
 	  
-	  m_plots[KIN]["ProbePt" + etaTag + IDTag]  = new TH1F("hProbePt_" + sampleTag + etaTag + IDTag, IDTag+" muons: p_{T} ; p_{T} (GeV) ; # entries", 75,0.,150.);
-	  m_plots[KIN]["ProbeEta" + etaTag + IDTag] = new TH1F("hProbeEta_" + sampleTag + etaTag + IDTag, IDTag+" muons: #eta ; #eta ; # entries", 50,-2.5,2.5);
-	  m_plots[KIN]["ProbePhi" + etaTag + IDTag] = new TH1F("hProbePhi_" + sampleTag + etaTag + IDTag, IDTag+" muons: #phi ; #phi ; # entries", 50,-TMath::Pi(),TMath::Pi());      
+	  m_plots[KIN]["ProbePt" + etaTag + IDTag]  = muon_pog::Observable("ProbePt" + etaTag + IDTag, sampleTag, "p_{T} (GeV)", "# entries", 75,0.,150., false);
+	  m_plots[KIN]["ProbeEta" + etaTag + IDTag] = muon_pog::Observable("hProbeEta_" + etaTag + IDTag, sampleTag, "#eta", "# entries", 50,-2.5,2.5, false);
+	  m_plots[KIN]["ProbePhi" + etaTag + IDTag] = muon_pog::Observable("hProbePhi_" + etaTag + IDTag, sampleTag, "#phi", "# entries", 50,-TMath::Pi(),TMath::Pi(), false);      
 	}
   
       outFile->cd(sampleTag+"/isolation");
@@ -553,22 +598,21 @@ void muon_pog::Plotter::book(TFile *outFile)
 	{
 	  TString IDTag = "_" + probe_ID;
 	  
-	  m_plots[ISO]["ChHadIso" + etaTag + IDTag]    = new TH1F("hChHadIso_" + sampleTag + etaTag + IDTag, IDTag+" muons: charged had. iso 0.4; muon relative isolation; # entries", 50,0.,5.);
-	  m_plots[ISO]["ChHadIsoPU" + etaTag + IDTag]  = new TH1F("hChHadIsoPU_" + sampleTag + etaTag + IDTag, IDTag+" muons: PU Charged had. iso 0.4; muon relative isolation;# entries", 50,0.,5.);
-	  m_plots[ISO]["PhotonIso" + etaTag + IDTag]   = new TH1F("hPhotonIso_" + sampleTag + etaTag + IDTag, IDTag+" muons: photon iso 0.4; muon relative isolation; # entries", 50,0.,5.);
-	  m_plots[ISO]["NeutralIso" + etaTag + IDTag]  = new TH1F("hNeutralIso_" + sampleTag + etaTag + IDTag, IDTag+" muons: neutral had. iso 0.4; muon relative isolation; # entries", 50,0.,5.);
-	  m_plots[ISO]["DBetaRelIso" + etaTag + IDTag] = new TH1F("hDBetaRelIso_" + sampleTag + etaTag + IDTag, IDTag+" muons: PFIso 0.4; muon relative isolation; # entries", 50,0.,2.);
+	  m_plots[ISO]["ChHadIso" + etaTag + IDTag]    = muon_pog::Observable("ChHadIso"    + etaTag + IDTag, sampleTag, "charged had. iso 0.4", "# entries", 50,0.,10., true);
+	  m_plots[ISO]["ChHadIsoPU" + etaTag + IDTag]  = muon_pog::Observable("ChHadIsoPU"  + etaTag + IDTag, sampleTag, "PU Charged had. iso 0.4", "# entries", 50,0.,10., true);
+	  m_plots[ISO]["PhotonIso" + etaTag + IDTag]   = muon_pog::Observable("PhotonIso"   + etaTag + IDTag, sampleTag, "photon iso 0.4", " # entries", 50,0.,10., true);
+	  m_plots[ISO]["NeutralIso" + etaTag + IDTag]  = muon_pog::Observable("NeutralIso"  + etaTag + IDTag, sampleTag, "neutral had. iso 0.4", "# entries", 50,0.,10., true);
+	  m_plots[ISO]["DBetaRelIso" + etaTag + IDTag] = muon_pog::Observable("DBetaRelIs_" + etaTag + IDTag, sampleTag, "PFIso 0.4 (dBeta)", "# entries", 50,0.,2., true);
 	}
     }
 
   outFile->cd(sampleTag+"/control");
   
-  m_plots[CONT]["01_invMass"] = new TH1F("invMass_" + sampleTag ,"Dimuon mass; mass (GeV); # entries", 100,0.,200.);
-  m_plots[CONT]["02_dilepPt"] = new TH1F("dilepPt_" + sampleTag ,"Dilepton p_{T}; p_{T} (GeV); # entries", 100,0.,200.);
-  m_plots[CONT]["03_nVertices"] = new TH1F("nVertices_" + sampleTag ,"Vertices; # vertices; # entries", 60,0.,60.);
-  m_plots[CONT]["04_nProbesVsnTags"] = new TH2F("nProbesVsnTags_" + sampleTag ,"Probes vs Tags; # probes; # tags", 10,-0.5,9.,10,-0.5,9.);
+  m_plots[CONT]["01_invMass"] = muon_pog::Observable("invMass", sampleTag ,"mass (GeV)", "# entries", 100,0.,200., false);
+  m_plots[CONT]["02_dilepPt"] = muon_pog::Observable("dilepPt", sampleTag ,"p_{T} (GeV)", "# entries", 100,0.,200., false);
+  m_plots[CONT]["03_nVertices"] = muon_pog::Observable("nVertices", sampleTag ,"# vertices", "# entries", 60,0.,60., false);
   
-  m_plots[CONT]["99_invMassInRange"] = new TH1F("invMassInRange_" + sampleTag ,"Dimuon mass; mass (GeV); # entries", 100,0.,200.);
+  m_plots[CONT]["99_invMassInRange"] = muon_pog::Observable("invMassInRange", sampleTag ,"mass (GeV)", "# entries", 100,0.,200., false);
   
 
 }
@@ -577,20 +621,20 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 			     const muon_pog::HLT & hlt, int nVtx, float weight)
 {
 
-  //  TString sampleTag = m_sampleConfig.sampleName;
-
+  TLorentzVector emptyTk;
+  
   //muon timing only
   for (auto & muon : muons)
     {
       if (muon.isStandAlone && ((fabs(muon.eta) < 1.2  && muon.nHitsStandAlone > 20) ||
 				(fabs(muon.eta) >= 1.2 && muon.nHitsStandAlone > 11)))
-	m_plots[TIME]["STAmuonTime"]->Fill(muon.muonTime,weight);
+	m_plots[TIME]["STAmuonTime"].fill(muon.muonTime,emptyTk,weight);
       
       if (muon.isStandAlone && fabs(muon.eta) < 0.9  && muon.nHitsStandAlone > 20)
-	m_plots[TIME]["STAmuonTimeBarrel"]->Fill(muon.muonTime,weight);
+	m_plots[TIME]["STAmuonTimeBarrel"].fill(muon.muonTime,emptyTk,weight);
       
       if (muon.isStandAlone && fabs(muon.eta) > 1.2  && muon.nHitsStandAlone > 11)
-	m_plots[TIME]["STAmuonTimeEndcap"]->Fill(muon.muonTime,weight);
+	m_plots[TIME]["STAmuonTimeEndcap"].fill(muon.muonTime,emptyTk,weight);
     }
   
   bool pathHasFired = false;
@@ -630,13 +674,13 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	    {
 	      if(muon.isStandAlone) {
 		if((fabs(muon.eta) < 1.2  && muon.nHitsStandAlone > 20) || (fabs(muon.eta) >= 1.2 && muon.nHitsStandAlone > 11)) 
-		  m_plots[TIME]["UnbSTAmuonTime"]->Fill(muon.muonTime,weight);
+		  m_plots[TIME]["UnbSTAmuonTime"].fill(muon.muonTime,emptyTk,weight);
 		
 		if(fabs(muon.eta) < 0.9  && muon.nHitsStandAlone > 20) 
-		  m_plots[TIME]["UnbSTAmuonTimeBarrel"]->Fill(muon.muonTime,weight);
+		  m_plots[TIME]["UnbSTAmuonTimeBarrel"].fill(muon.muonTime,emptyTk,weight);
 		
 		if(fabs(muon.eta) > 1.2  && muon.nHitsStandAlone > 11) 
-		  m_plots[TIME]["UnbSTAmuonTimeEndcap"]->Fill(muon.muonTime,weight);
+		  m_plots[TIME]["UnbSTAmuonTimeEndcap"].fill(muon.muonTime,emptyTk,weight);
 	      }
 	          
 	      if((muon.isGlobal || muon.isTracker) &&  // CB minimal cuts on potental probe 
@@ -648,21 +692,16 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 		  Float_t mass = (tagMuTk+muTk).M();
 		  
 		  // CB Fill control plots
-		  m_plots[CONT]["01_invMass"]->Fill(mass,weight);
+		  m_plots[CONT]["01_invMass"].fill(mass,emptyTk,weight);
 		  if ( mass > m_tnpConfig.pair_minInvMass &&
 		       mass < m_tnpConfig.pair_maxInvMass )
 		    {
-		      m_plots[CONT]["99_invMassInRange"]->Fill(mass,weight);
+		      m_plots[CONT]["99_invMassInRange"].fill(mass,emptyTk,weight);
 		      
 		      Float_t dilepPt = (tagMuTk+muTk).Pt();
-		      m_plots[CONT]["02_dilepPt"]->Fill(dilepPt,weight);
-		      m_plots[CONT]["03_nVertices"]->Fill(nVtx,weight);
+		      m_plots[CONT]["02_dilepPt"].fill(dilepPt,emptyTk,weight);
+		      m_plots[CONT]["03_nVertices"].fill(nVtx,emptyTk,weight);
  
-		      for (auto & fEtaBin : m_tnpConfig.probe_fEtaBins)
-			{
-			  TString etaTag = "_fEtaMin" + fEtaBin.first + "_fEtaMax" + fEtaBin.second;
-			}
-		      
 		      probeMuons.push_back(&muon);
 		      continue; // CB If a muon is already a probe don't loo on other tags
 		    }
@@ -671,7 +710,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	}
     }
   
-  m_plots[CONT]["04_nProbesVsnTags"]->Fill(tagMuons.size(),probeMuons.size());
+  // m_plots[CONT]["04_nProbesVsnTags"]->Fill(tagMuons.size(),probeMuons.size());
  
   
   for (auto probeMuonPointer : probeMuons)
@@ -690,26 +729,27 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	      TString etaTag = "_fEtaMin" + fEtaBin.first + "_fEtaMax" + fEtaBin.second;
 
 	      //id var
-	      m_plots[ID]["NHitsGLB"  + etaTag]->Fill(probeMuon.nHitsGlobal ,weight);
-	      m_plots[ID]["NHitsTRK"  + etaTag]->Fill(probeMuon.nHitsTracker,weight);
-	      m_plots[ID]["NHitsSTA"  + etaTag]->Fill(probeMuon.nHitsStandAlone,weight);
+	      m_plots[ID]["NHitsGLB"  + etaTag].fill(probeMuon.nHitsGlobal, probeMuTk ,weight);
+	      m_plots[ID]["NHitsTRK"  + etaTag].fill(probeMuon.nHitsTracker, probeMuTk, weight);
+	      m_plots[ID]["NHitsSTA"  + etaTag].fill(probeMuon.nHitsStandAlone, probeMuTk, weight);
 
-	      m_plots[ID]["Chi2GLB"  + etaTag]->Fill(probeMuon.glbNormChi2, weight);
-	      m_plots[ID]["Chi2TRK"  + etaTag]->Fill(probeMuon.trkNormChi2, weight);
+	      m_plots[ID]["Chi2GLB"  + etaTag].fill(probeMuon.glbNormChi2, probeMuTk, weight);
+	      m_plots[ID]["Chi2TRK"  + etaTag].fill(probeMuon.trkNormChi2, probeMuTk, weight);
 
-	      m_plots[ID]["NMatchedStation"  + etaTag]->Fill(probeMuon.trkMuonMatchedStations, weight);
-	      m_plots[ID]["NMuonValidHitsGLB"  + etaTag]->Fill(probeMuon.glbMuonValidHits, weight);
-	      m_plots[ID]["PixelHitsTRK"  + etaTag]->Fill(probeMuon.trkPixelValidHits, weight);
-	      m_plots[ID]["PixelLayersTRK"  + etaTag]->Fill(probeMuon.trkPixelLayersWithMeas, weight); 
-	      m_plots[ID]["TrackerLayersTRK"  + etaTag]->Fill(probeMuon.trkTrackerLayersWithMeas, weight); 
+	      m_plots[ID]["PixelHitsTRK"  + etaTag].fill(probeMuon.trkPixelValidHits, probeMuTk, weight);
+	      m_plots[ID]["PixelLayersTRK"  + etaTag].fill(probeMuon.trkPixelLayersWithMeas, probeMuTk, weight); 
+	      m_plots[ID]["TrackerLayersTRK"  + etaTag].fill(probeMuon.trkTrackerLayersWithMeas, probeMuTk, weight); 
 
-	      m_plots[ID]["HitFractionTRK"  + etaTag]->Fill(probeMuon.trkValidHitFrac, weight);   
-	      m_plots[ID]["TrkStaChi2"  + etaTag]->Fill(probeMuon.trkStaChi2, weight);       
-	      m_plots[ID]["TrkKink"  + etaTag]->Fill(probeMuon.trkKink, weight);          
-	      m_plots[ID]["SegmentComp"  + etaTag]->Fill(probeMuon.muSegmComp, weight);      
+	      m_plots[ID]["NMatchedStation"  + etaTag].fill(probeMuon.trkMuonMatchedStations, probeMuTk, weight);
+	      m_plots[ID]["NMuonValidHitsGLB"  + etaTag].fill(probeMuon.glbMuonValidHits, probeMuTk, weight);
 
-	      m_plots[ID]["Dxy"  + etaTag]->Fill(probeMuon.dxy,weight);
-	      m_plots[ID]["Dz"  + etaTag]->Fill(probeMuon.dz,weight);			
+	      m_plots[ID]["HitFractionTRK"  + etaTag].fill(probeMuon.trkValidHitFrac, probeMuTk, weight);   
+	      m_plots[ID]["SegmentComp"  + etaTag].fill(probeMuon.muSegmComp, probeMuTk, weight);      
+	      m_plots[ID]["TrkStaChi2"  + etaTag].fill(probeMuon.trkStaChi2, probeMuTk, weight);       
+	      m_plots[ID]["TrkKink"  + etaTag].fill(probeMuon.trkKink, probeMuTk, weight);          
+	      
+	      m_plots[ID]["Dxy"  + etaTag].fill(probeMuon.dxy, probeMuTk, weight);
+	      m_plots[ID]["Dz"  + etaTag].fill(probeMuon.dz, probeMuTk, weight);			
 
 	      for (auto & probe_ID : m_tnpConfig.probe_IDs)
 	      	{
@@ -717,16 +757,16 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 		  
 	      	  if(hasGoodId(probeMuon,probe_ID)) 
 	      	    {	 
-	      	      m_plots[KIN]["ProbePt" + etaTag + IDTag]->Fill(probeMuTk.Pt(),weight);
-	      	      m_plots[KIN]["ProbeEta" + etaTag + IDTag]->Fill(probeMuTk.Eta(),weight);
-	      	      m_plots[KIN]["ProbePhi" + etaTag + IDTag]->Fill(probeMuTk.Phi(),weight);
+	      	      m_plots[KIN]["ProbePt" + etaTag + IDTag].fill(probeMuTk.Pt(), emptyTk, weight);
+	      	      m_plots[KIN]["ProbeEta" + etaTag + IDTag].fill(probeMuTk.Eta(), emptyTk, weight);
+	      	      m_plots[KIN]["ProbePhi" + etaTag + IDTag].fill(probeMuTk.Phi(), emptyTk, weight);
 		      
 	      	      // Fill isolation plots for muons passign a given identification (programmable from cfg)
-	      	      m_plots[ISO]["PhotonIso" + etaTag + IDTag]->Fill(probeMuon.photonIso,weight);
-	      	      m_plots[ISO]["ChHadIso" + etaTag + IDTag]->Fill(probeMuon.chargedHadronIso,weight);
-	      	      m_plots[ISO]["ChHadIsoPU" + etaTag + IDTag]->Fill(probeMuon.chargedHadronIsoPU,weight);
-	      	      m_plots[ISO]["NeutralIso" + etaTag + IDTag]->Fill(probeMuon.neutralHadronIso,weight);
-	      	      m_plots[ISO]["DBetaRelIso" + etaTag + IDTag]->Fill(probeMuon.isoPflow04,weight);
+	      	      m_plots[ISO]["PhotonIso" + etaTag + IDTag].fill(probeMuon.photonIso, probeMuTk, weight);
+	      	      m_plots[ISO]["ChHadIso" + etaTag + IDTag].fill(probeMuon.chargedHadronIso, probeMuTk, weight);
+	      	      m_plots[ISO]["ChHadIsoPU" + etaTag + IDTag].fill(probeMuon.chargedHadronIsoPU, probeMuTk, weight);
+	      	      m_plots[ISO]["NeutralIso" + etaTag + IDTag].fill(probeMuon.neutralHadronIso, probeMuTk, weight);
+	      	      m_plots[ISO]["DBetaRelIso" + etaTag + IDTag].fill(probeMuon.isoPflow04, probeMuTk, weight);
 	      	    }
 	      	}
 	    }
@@ -895,132 +935,165 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
       TString plotName = plotTypeAndName.second;
       outFile->cd(outputDirMap[plotType]);
 
-      TLegend *leg = new TLegend(0.73,0.74,0.93,0.90);
-      leg->SetBorderSize(0);
-      leg->SetLineWidth(0);
-      leg->SetFillColor(0);
-      leg->SetFillStyle(0);
-      
-      THStack hMc(plotName,"");
-      TH1 * hData = 0;
+      std::vector<TH1 *>::size_type nPlots = plotters.at(0).m_plots[plotType][plotName].plots().size();
 
-      int colorMap[5] {kGray+1, kRed, kAzure+7, kGreen+1, kOrange};
-      int iColor = 0;
-  
-      float integralData = 0;
-      float integralMC   = 0;
-
-      for (auto & plotter : plotters)
-	{        
-	  if(plotter.m_sampleConfig.sampleName.Contains("Data"))
-	    {
-	      if(plotName.Contains("muonTime"))
-		{
-		  TH1* plot = plotter.m_plots[plotType][plotName];
-		  integralData = plot->Integral(plot->FindBin(-2.5),plot->FindBin(2.5)); 
-		}
-	      else
-		integralData = plotter.m_plots[Plotter::CONT]["99_invMassInRange"]->Integral();
-	    }
-	  else
-	    {
-	      if(plotName.Contains("muonTime"))
-		{
-		  TH1* plot = plotter.m_plots[plotType][plotName];
-		  integralMC += (plot->Integral(plot->FindBin(-2.5),plot->FindBin(2.5)) *
-				 plotter.m_sampleConfig.cSection/plotter.m_sampleConfig.nEvents);
-		}
-	      else
-		{
-		  integralMC += (plotter.m_plots[Plotter::CONT]["99_invMassInRange"]->Integral() *
-				 plotter.m_sampleConfig.cSection/plotter.m_sampleConfig.nEvents);
-				
-		}
-	    }
-	}
-      
-      for (auto & plotter : plotters)
-	{        
-	  if(plotter.m_sampleConfig.sampleName.Contains("Data"))
-	    {
-	      hData = plotter.m_plots[plotType][plotName];
-	      hData->Sumw2();
-	      leg->AddEntry(hData, plotter.m_sampleConfig.sampleName, "LF"); 
-	    }
-	  else
-	    {
-	      plotter.m_plots[plotType][plotName]->SetFillColor(colorMap[iColor]);
-	      plotter.m_plots[plotType][plotName]->SetMarkerStyle(0);
-	      
-	      TH1* plot = plotter.m_plots[plotType][plotName];
-	      
-	      float scale = plotter.m_sampleConfig.cSection/plotter.m_sampleConfig.nEvents;
-	      plot->Scale(scale);
-	      
-	      float scaleToData = integralData/integralMC; 
-	      plot->Scale(scaleToData);
-	      
-	      hMc.Add(plot);
-	      leg->AddEntry(plot, plotter.m_sampleConfig.sampleName, "LF"); 
-	      iColor++;
-	    }
-	}
-      
-      TCanvas *canvas = new TCanvas("c"+plotName, "c"+plotName, 500, 500);
-      canvas->cd();
-      canvas->SetLogy(1);
-      
-      hData->Draw();
-      hMc.Draw("samehist");
-      hData->Draw("same");
-      
-      //leg->AddEntry(hData, "#splitline{SingleMuon}{2015C, 50 ns}", "LF"); 
-      //leg->AddEntry(hr, "#splitline{SingleMuon}{2015C, 25 ns}", "PE"); 
-      leg->Draw();
-      
-      canvas->Write();
-      canvas->SaveAs(outputDir + outputDirMap[plotType] + "/no_ratio/c" + plotName + ".png");
-      
-      //Canvas with ratio plots
-      TCanvas *ratioCanvas = new TCanvas("rc"+plotName, "rc"+plotName, 500, 700);
-      ratioCanvas->Divide(1,2);
-      ratioCanvas->cd(1);
-      TPad *plotPad = (TPad*)ratioCanvas->GetPad(1);
-      plotPad->SetLogy(1);
-      plotPad->SetPad(0.,0.2,1.,1.);
-      hData->Draw();
-      hMc.Draw("samehist");
-      hData->Draw("same");
-      leg->Draw();
-      
-      ratioCanvas->cd(2);
-      TPad *ratioPad = (TPad*)ratioCanvas->GetPad(2);
-      ratioPad->SetPad(0.,0.,1.,0.2);
-      
-      TH1 *hRatio = (TH1*)hData->Clone();
-      
-      hRatio->SetTitle(" ");
-      hRatio->GetYaxis()->SetTitle("Data/MC");
-      hRatio->GetYaxis()->SetRangeUser(0.5,2.);
-      
-      hRatio->Divide((TH1*)hMc.GetStack()->Last());
-      hRatio->Draw();
-      
-      if(plotName == "03_nVertices")
+      for (std::vector<TH1 *>::size_type iPlot=0; iPlot < nPlots; ++ iPlot)
 	{
-	  Int_t nbins = hRatio->GetNbinsX();
+	  TLegend *leg = new TLegend(0.73,0.74,0.93,0.90);
+	  leg->SetBorderSize(0);
+	  leg->SetLineWidth(0);
+	  leg->SetFillColor(0);
+	  leg->SetFillStyle(0);
 	  
-	  for (Int_t i=1;i<=nbins;i++)
+	  THStack hMc(plotName,"");
+	  TProfile * pMc = 0;
+	  TH1 * hData = 0;
+	  
+	  int colorMap[5] {kGray+1, kRed, kAzure+7, kGreen+1, kOrange};
+	  int iColor = 0;
+	  
+	  float integralData = 0;
+	  float integralMC   = 0;
+	  
+	  for (auto & plotter : plotters)
 	    {
-	      std::cout << " PUweight: " << hRatio->GetBinContent(i) << ", " << std::endl;
+	      if(plotter.m_sampleConfig.sampleName.Contains("Data"))
+		{
+		  if(plotName.Contains("muonTime"))
+		    {
+		      TH1* plot = plotter.m_plots[plotType][plotName].plots().at(0);
+		      integralData = plot->Integral(plot->FindBin(-2.5),plot->FindBin(2.5)); 
+		    }
+		  else
+		    integralData = plotter.m_plots[Plotter::CONT]["99_invMassInRange"].plots().at(0)->Integral();
+		}
+	      else
+		{
+		  if(plotName.Contains("muonTime"))
+		    {
+		      TH1* plot = plotter.m_plots[plotType][plotName].plots().at(0);
+		      integralMC += (plot->Integral(plot->FindBin(-2.5),plot->FindBin(2.5)) *
+				     plotter.m_sampleConfig.cSection/plotter.m_sampleConfig.nEvents);
+		    }
+		  else
+		    {
+		      integralMC += (plotter.m_plots[Plotter::CONT]["99_invMassInRange"].plots().at(0)->Integral() *
+				     plotter.m_sampleConfig.cSection/plotter.m_sampleConfig.nEvents);
+		      
+		    }
+		}
 	    }
+	  
+	  for (auto & plotter : plotters)
+	    {        
+	      TH1* plot = plotter.m_plots[plotType][plotName].plots().at(iPlot);
+	      if(plotter.m_sampleConfig.sampleName.Contains("Data"))
+		{
+		  hData = plot;
+		  hData->Sumw2();
+		  leg->AddEntry(hData, plotter.m_sampleConfig.sampleName, "LF"); 
+		}
+	      else
+		{
+		  plot->SetFillColor(colorMap[iColor]);
+		  plot->SetMarkerStyle(0);
+		  
+		  float scale = plotter.m_sampleConfig.cSection/plotter.m_sampleConfig.nEvents;
+		  
+		  if (!plot->IsA()->InheritsFrom("TProfile"))
+		    {
+		      float scaleToData = integralData/integralMC;
+		      plot->Scale(scale*scaleToData);
+		      hMc.Add(plot);
+		      leg->AddEntry(plot, plotter.m_sampleConfig.sampleName, "LF"); 
+		      iColor++;
+		    }
+		  else
+		    {
+		      if (!pMc)
+			{
+			  pMc = (TProfile*)(plot->Clone("_pClone"));
+			  pMc->Clear();
+			  pMc->Add(plot,scale);
+			  leg->AddEntry(plot, "Weighted sum of MCs", "LF"); 
+			}
+		      else
+			{
+			  pMc->Add(plot);
+			  
+			}
+		    }
+		}
+	    }
+	
+	  TString histoName = hData->GetName();
+	  
+	  TCanvas *canvas = new TCanvas("c"+histoName, "c"+histoName, 500, 500);
+	  canvas->cd();
+	  canvas->SetLogy(1);
+      
+ 	  hData->Draw();
+	  if(pMc)
+	    pMc->Draw("same");
+	  else
+	    hMc.Draw("samehist");
+	  hData->Draw("same");
+	  
+	  //leg->AddEntry(hData, "#splitline{SingleMuon}{2015C, 50 ns}", "LF"); 
+	  //leg->AddEntry(hr, "#splitline{SingleMuon}{2015C, 25 ns}", "PE"); 
+	  leg->Draw();
+	  
+	  canvas->Write();
+	  canvas->SaveAs(outputDir + outputDirMap[plotType] + "/no_ratio/c" + histoName + ".png");
+	  
+	  //Canvas with ratio plots
+	  TCanvas *ratioCanvas = new TCanvas("rc"+histoName, "rc"+histoName, 500, 700);
+	  ratioCanvas->Divide(1,2);
+	  ratioCanvas->cd(1);
+	  TPad *plotPad = (TPad*)ratioCanvas->GetPad(1);
+	  plotPad->SetLogy(1);
+	  plotPad->SetPad(0.,0.2,1.,1.);
+	  hData->Draw();
+	  if(pMc)
+	    pMc->Draw("same");
+	  else
+	    hMc.Draw("samehist");
+	  hData->Draw("same");
+	  leg->Draw();
+	  
+	  ratioCanvas->cd(2);
+	  TPad *ratioPad = (TPad*)ratioCanvas->GetPad(2);
+	  ratioPad->SetPad(0.,0.,1.,0.2);
+	  
+	  TH1 *hRatio = (TH1*)hData->Clone("_dataClone");
+	  
+	  hRatio->SetTitle(" ");
+	  hRatio->GetYaxis()->SetTitle("Data/MC");
+	  hRatio->GetYaxis()->SetRangeUser(0.5,2.);
+	  
+	  if(pMc)
+	    hRatio->Divide((TH1*)pMc);
+	  else
+	    hRatio->Divide((TH1*)hMc.GetStack()->Last());
+	    
+	  hRatio->Draw();
+      
+	  if(plotName == "03_nVertices" && !pMc)
+	    {
+	      Int_t nbins = hRatio->GetNbinsX();
+	      
+	      for (Int_t i=1;i<=nbins;i++)
+		{
+		  std::cout << " PUweight: " << hRatio->GetBinContent(i) << ", " << std::endl;
+		}
+	    }
+      
+	  ratioCanvas->Write();
+	  ratioCanvas->SaveAs(outputDir+ outputDirMap[plotType] + "/rc" + histoName + ".png");
+      
+	  delete canvas;
+	  delete ratioCanvas;
 	}
-      
-      ratioCanvas->Write();
-      ratioCanvas->SaveAs(outputDir+ outputDirMap[plotType] + "/rc" + plotName + ".png");
-      
-      delete canvas;
-      delete ratioCanvas;
     }
 
 }
