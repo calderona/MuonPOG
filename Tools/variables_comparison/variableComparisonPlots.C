@@ -252,8 +252,8 @@ int main(int argc, char* argv[]){
 
       int nFilteredEvents = 0;
 
-      for (Long64_t iEvent=0; iEvent<nEntries; ++iEvent) 
-	// for (Long64_t iEvent=0; iEvent<1000; ++iEvent) 
+      //for (Long64_t iEvent=0; iEvent<nEntries; ++iEvent) 
+      for (Long64_t iEvent=0; iEvent<1000; ++iEvent) 
 	{
 	  if (tree->LoadTree(iEvent)<0) break;
 	  
@@ -516,12 +516,12 @@ muon_pog::Observable::Observable(TString hName, TString sampleTag, TString xTitl
   m_plots.push_back(new TH1F("h" + hName + "_" + sampleTag, hName + " ;" + xTitle + ";" + yTitle, nBins, min, max));
   if (kinPlots)
     { // CB book here for other plots vs kin variables
-      if(sampleTag.Contains("Data")|| sampleTag.Contains("TWantitop")){
+      //if(sampleTag.Contains("Data")|| sampleTag.Contains("TWantitop")){
 	m_plots.push_back(new TProfile("h" + hName + "VsEta_" + sampleTag, hName + " vs #eta;  #eta;"        + xTitle, 24, -2.4, 2.4, min, max));
 	m_plots.push_back(new TProfile("h" + hName + "VsPhi_" + sampleTag, hName + " vs #phi;  #phi;"        + xTitle, 25, -TMath::Pi(),TMath::Pi(), min, max));
 	m_plots.push_back(new TProfile("h" + hName + "VsPt_"  + sampleTag, hName + " vs p_{T}; p_{T} (GeV);" + xTitle, 50,  0., 150., min, max));
 	m_plots.push_back(new TProfile("h" + hName + "VsPV_"  + sampleTag, hName + " vs PV;    # of PV;"     + xTitle, 60,  0., 60., min, max));
-      }
+	//}
            
     }
   
@@ -579,11 +579,11 @@ void muon_pog::Plotter::book(TFile *outFile)
       outFile->cd(sampleTag+"/id_variables");
 
       //Id var
-
+      
       bool pippo = false;
       if(sampleTag.Contains("Data")|| sampleTag.Contains("TWantitop"))
-	bool pippo = true;
-
+	pippo = true;
+      
       m_plots[ID]["NHitsGLB" + etaTag] = muon_pog::Observable("NHitsGLB" + etaTag, sampleTag, "# hits", "# entries", 80, 0., 80., pippo);
       m_plots[ID]["NHitsTRK" + etaTag] = muon_pog::Observable("NHitsTRK" + etaTag, sampleTag, "# hits", "# entries", 40, 0., 40., pippo);
       m_plots[ID]["NHitsSTA" + etaTag] = muon_pog::Observable("NHitsSTA" + etaTag, sampleTag, "# hits", "# entries", 60, 0., 60., pippo);
