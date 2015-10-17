@@ -265,70 +265,12 @@ int main(int argc, char* argv[]){
 	    ev->genInfos[0].genWeight/fabs(ev->genInfos[0].genWeight) : 1.;
 
 	  //weight for Data-Mc comparison config4.ini 2015D vs All MC 
-	  float PUweight[60] = {0,6.68472,4.41435,3.49289,3.14212,3.173,2.94319,2.71174,2.44124,2.0717,1.7103,1.39812,1.11666,0.855547,0.618711,0.453196,0.328689,0.228592,0.166069,0.100075,0.070327,0.0567964,0.0405713,0.0308903,0.0186064,0.0208503,0.00264836,0.00779018,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	  //float PUweight[60] = {0,6.68472,4.41435,3.49289,3.14212,3.173,2.94319,2.71174,2.44124,2.0717,1.7103,1.39812,1.11666,0.855547,0.618711,0.453196,0.328689,0.228592,0.166069,0.100075,0.070327,0.0567964,0.0405713,0.0308903,0.0186064,0.0208503,0.00264836,0.00779018,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
-	  //weight for Data-Mc comparison config4.ini 2015D vs All MC  
-	  // float PUweight[60] = {0,
-	  // 			6.68472,
-	  // 			4.41435,
-	  // 			3.49289,
-	  // 			3.14212,
-	  // 			3.173,
-	  // 			2.94319,
-	  // 			2.71174,
-	  // 			2.44124,
-	  // 			2.0717,
-	  // 			1.7103,
-	  // 			1.39812,
-	  // 			1.11666,
-	  // 			0.855547,
-	  // 			0.618711,
-	  // 			0.453196,
-	  // 			0.328689,
-	  // 			0.228592,
-	  // 			0.166069,
-	  // 			0.100075,
-	  // 			0.070327,
-	  // 			0.0567964,
-	  // 			0.0405713,
-	  // 			0.0308903,
-	  // 			0.0186064,
-	  // 			0.0208503,
-	  // 			0.00264836,
-	  // 			0.00779018,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0,
-	  // 			0};
-	  
+
+	  //weight for Data-Mc comparison config5.ini 2015D-v3 FullStat vs All MC 
+	  float PUweight[60] = {0, 2.83379, 1.78476, 1.68828, 1.68078, 1.89932, 1.94938, 1.98453, 1.95908, 1.85889, 1.67011, 1.50816, 1.29412,1.07878, 0.855702, 0.6922, 0.517513, 0.397616, 0.30073, 0.211495, 0.165432, 0.112824, 0.0852806, 0.0690589, 0.0472335, 0.0365517, 0.0262368, 0.0229718, 0.0228724, 0.00656045, 0.00546197,0.00366466, 0, 0.0131781, 0, 0, 0.0596201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 
 	  //weight for Data-Mc comparison config3.ini 2015C_Trocino vs All MC  
 	  // float PUweight[60] = {0,
@@ -1332,16 +1274,10 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  canvas->cd();
 	  
 	  if(pMc){
-	   
-	    Double_t max1 = hData->GetBinContent(hData->GetMaximumBin()) - hData->GetBinError(hData->GetMaximumBin());
-	    Double_t max2 = pMc->GetBinContent(pMc->GetMaximumBin()) - pMc->GetBinError(pMc->GetMaximumBin());
-	    Double_t min1 = hData->GetBinContent(hData->GetMinimumBin()) - hData->GetBinError(hData->GetMinimumBin());
-	    Double_t min2 = pMc->GetBinContent(pMc->GetMinimumBin()) - pMc->GetBinError(pMc->GetMinimumBin());
+	    Double_t max = hData->GetMaximum() > pMc->GetMaximum() ? hData->GetMaximum() : pMc->GetMaximum();
+	    Double_t min = hData->GetMinimum() < pMc->GetMinimum() ? hData->GetMinimum() : pMc->GetMinimum();
 	    
-	    Double_t max = max1 > max2 ? max1 : max2;
-	    Double_t min = min1 < min2 ? min1 : min2;
-	    
-	    hData->GetYaxis()->SetRangeUser(min, max);
+	    hData->GetYaxis()->SetRangeUser(0.8*min, 1.2*max);
 	    hData->Draw();
 	    
 	    proj = pMc->ProjectionX();
@@ -1376,17 +1312,12 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  hData->GetXaxis()->SetTitleSize(0.);
 	  
 	  if(pMc){
-	    Double_t max1 = hData->GetBinContent(hData->GetMaximumBin()) - hData->GetBinError(hData->GetMaximumBin());
-	    Double_t max2 = pMc->GetBinContent(pMc->GetMaximumBin()) - pMc->GetBinError(pMc->GetMaximumBin());
-	    Double_t min1 = hData->GetBinContent(hData->GetMinimumBin()) - hData->GetBinError(hData->GetMinimumBin());
-	    Double_t min2 = pMc->GetBinContent(pMc->GetMinimumBin()) - pMc->GetBinError(pMc->GetMinimumBin());
+	    Double_t max = hData->GetMaximum() > pMc->GetMaximum() ? hData->GetMaximum() : pMc->GetMaximum();
+	    Double_t min = hData->GetMinimum() < pMc->GetMinimum() ? hData->GetMinimum() : pMc->GetMinimum();
 	    
-	    Double_t max = max1 > max2 ? max1 : max2;
-	    Double_t min = min1 < min2 ? min1 : min2;
-	    
-	    hData->GetYaxis()->SetRangeUser(min, max);
+	    hData->GetYaxis()->SetRangeUser(0.8*min, 1.2*max);
 	    hData->Draw();
-   		
+	      		
 	    proj->Draw("same");
 	  }
 	  else{
