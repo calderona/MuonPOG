@@ -78,6 +78,12 @@ namespace muon_pog {
 
     Int_t   charge_tracker;    // charge
 
+    Float_t pt_standalone;  // pt [GeV]
+    Float_t eta_standalone; // eta
+    Float_t phi_standalone; // phi
+
+    Int_t   charge_standalone;    // charge
+
     Int_t   isGlobal;
     Int_t   isTracker;
     Int_t   isTrackerArb;
