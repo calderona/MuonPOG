@@ -81,6 +81,9 @@ private:
   edm::InputTag trigResultsTag_;
   edm::InputTag trigSummaryTag_;
 
+  edm::InputTag trigFilterCut_;
+  edm::InputTag trigPathCut_;
+
   edm::InputTag muonTag_;
   edm::InputTag primaryVertexTag_;
   edm::InputTag beamSpotTag_;
@@ -104,6 +107,9 @@ MuonPogTreeProducer::MuonPogTreeProducer( const edm::ParameterSet & cfg ) :
   // Input collections
   trigResultsTag_(cfg.getUntrackedParameter<edm::InputTag>("TrigResultsTag", edm::InputTag("TriggerResults::HLT"))),
   trigSummaryTag_(cfg.getUntrackedParameter<edm::InputTag>("TrigSummaryTag", edm::InputTag("hltTriggerSummaryAOD::HLT"))),
+
+  trigFilterCut_(cfg.getUntrackedParameter<std::string>("TrigFilterCut", std::string("all"))),
+  trigPathCut_(cfg.getUntrackedParameter<std::string>("TrigPathCut", std::string("all"))),
 
   muonTag_(cfg.getUntrackedParameter<edm::InputTag>("MuonTag", edm::InputTag("muons"))),
   primaryVertexTag_(cfg.getUntrackedParameter<edm::InputTag>("PrimaryVertexTag", edm::InputTag("offlinePrimaryVertices"))),
@@ -383,7 +389,8 @@ void MuonPogTreeProducer::fillHlt(const edm::Handle<edm::TriggerResults> & trigg
       if (triggerResults->accept(iTrig)) 
 	{
 	  std::string pathName = triggerNames.triggerName(iTrig);
-	  event_.hlt.triggers.push_back(pathName);
+	  if (trigPathCut_ == "all" || pathName.find(trigPathCut_) != std:string::npos)
+	    event_.hlt.triggers.push_back(pathName);
 	}
     }
       
@@ -393,30 +400,34 @@ void MuonPogTreeProducer::fillHlt(const edm::Handle<edm::TriggerResults> & trigg
     {
 	
       std::string filterTag = triggerEvent->filterTag(iFilter).encode();
+      
+      if (trigFilterCut_ == "all" || filterTag.find(trigFilterCut_) != std:string::npos)
+	{
 
-      trigger::Keys objectKeys = triggerEvent->filterKeys(iFilter);
-      const trigger::TriggerObjectCollection& triggerObjects(triggerEvent->getObjects());
+	  trigger::Keys objectKeys = triggerEvent->filterKeys(iFilter);
+	  const trigger::TriggerObjectCollection& triggerObjects(triggerEvent->getObjects());
 	
-      for (trigger::size_type iKey=0; iKey<objectKeys.size(); ++iKey) 
-	{  
-	  trigger::size_type objKey = objectKeys.at(iKey);
-	  const trigger::TriggerObject& triggerObj(triggerObjects[objKey]);
-	  
-	  muon_pog::HLTObject hltObj;
-	  
-	  float trigObjPt = triggerObj.pt();
-	  float trigObjEta = triggerObj.eta();
-	  float trigObjPhi = triggerObj.phi();
-	  
-	  hltObj.filterTag = filterTag;
-
-	  hltObj.pt  = trigObjPt;
-	  hltObj.eta = trigObjEta;
-	  hltObj.phi = trigObjPhi;
-	  
-	  event_.hlt.objects.push_back(hltObj);
-	  
-	}       
+	  for (trigger::size_type iKey=0; iKey<objectKeys.size(); ++iKey) 
+	    {  
+	      trigger::size_type objKey = objectKeys.at(iKey);
+	      const trigger::TriggerObject& triggerObj(triggerObjects[objKey]);
+	      
+	      muon_pog::HLTObject hltObj;
+	      
+	      float trigObjPt = triggerObj.pt();
+	      float trigObjEta = triggerObj.eta();
+	      float trigObjPhi = triggerObj.phi();
+	      
+	      hltObj.filterTag = filterTag;
+	      
+	      hltObj.pt  = trigObjPt;
+	      hltObj.eta = trigObjEta;
+	      hltObj.phi = trigObjPhi;
+	      
+	      event_.hlt.objects.push_back(hltObj);
+	      
+	    }
+	}
     }
 
 }
@@ -503,6 +514,11 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & mu
       ntupleMu.eta_tracker    = hasInnerTrack ? mu.innerTrack()->eta() : -1000.;
       ntupleMu.phi_tracker    = hasInnerTrack ? mu.innerTrack()->phi() : -1000.;
       ntupleMu.charge_tracker = hasInnerTrack ? mu.innerTrack()->charge() : -1000.;
+
+      ntupleMu.pt_standalone     = isStandAlone ? mu.outerTrack()->pt()  : -1000.;
+      ntupleMu.eta_standalone    = isStandAlone ? mu.outerTrack()->eta() : -1000.;
+      ntupleMu.phi_standalone    = isStandAlone ? mu.outerTrack()->phi() : -1000.;
+      ntupleMu.charge_standalone = isStandAlone ? mu.outerTrack()->charge() : -1000.;
 
       reco::MuonPFIsolation iso04 = mu.pfIsolationR04();
       reco::MuonPFIsolation iso03 = mu.pfIsolationR03();
