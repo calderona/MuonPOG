@@ -82,7 +82,7 @@ namespace muon_pog {
     Float_t eta_standalone; // eta
     Float_t phi_standalone; // phi
 
-    Int_t   charge_strandalone;    // charge
+    Int_t   charge_standalone;    // charge
 
     Int_t   isGlobal;
     Int_t   isTracker;

@@ -81,8 +81,8 @@ private:
   edm::InputTag trigResultsTag_;
   edm::InputTag trigSummaryTag_;
 
-  edm::InputTag trigFilterCut_;
-  edm::InputTag trigPathCut_;
+  std::string trigFilterCut_;
+  std::string trigPathCut_;
 
   edm::InputTag muonTag_;
   edm::InputTag primaryVertexTag_;
@@ -303,7 +303,7 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
     {
       fillMuons(muons,vertexes,beamSpot);
     }
-  
+
   tree_["muPogTree"]->Fill();
   
 }
@@ -389,7 +389,7 @@ void MuonPogTreeProducer::fillHlt(const edm::Handle<edm::TriggerResults> & trigg
       if (triggerResults->accept(iTrig)) 
 	{
 	  std::string pathName = triggerNames.triggerName(iTrig);
-	  if (trigPathCut_ == "all" || pathName.find(trigPathCut_) != std:string::npos)
+	  if (trigPathCut_ == "all" || pathName.find(trigPathCut_) != std::string::npos)
 	    event_.hlt.triggers.push_back(pathName);
 	}
     }
@@ -401,7 +401,7 @@ void MuonPogTreeProducer::fillHlt(const edm::Handle<edm::TriggerResults> & trigg
 	
       std::string filterTag = triggerEvent->filterTag(iFilter).encode();
       
-      if (trigFilterCut_ == "all" || filterTag.find(trigFilterCut_) != std:string::npos)
+      if (trigFilterCut_ == "all" || filterTag.find(trigFilterCut_) != std::string::npos)
 	{
 
 	  trigger::Keys objectKeys = triggerEvent->filterKeys(iFilter);
