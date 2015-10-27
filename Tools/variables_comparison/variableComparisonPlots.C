@@ -1081,7 +1081,8 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	      m_plots[ID]["Dxy"  + etaTag].fill(probeMuon.dxy, probeMuTk, weight, nVtx);
 	      m_plots[ID]["Dz"  + etaTag].fill(probeMuon.dz, probeMuTk, weight, nVtx);			
 
-	      m_plots[ID]["TrkStaPull" + etaTag].fill((probeMuon.pt_tracker - probeMuon.pt_standalone)/probeMuon.pt_tracker, probeMuTk, weight, nVtx);  
+	      if (muon.isStandAlone && muon.isTrackerArb)
+		m_plots[ID]["TrkStaPull" + etaTag].fill((probeMuon.pt_tracker - probeMuon.pt_standalone)/probeMuon.pt_tracker, probeMuTk, weight, nVtx);  
 
 	      for (auto & probe_ID : m_tnpConfig.probe_IDs)
 	      	{
