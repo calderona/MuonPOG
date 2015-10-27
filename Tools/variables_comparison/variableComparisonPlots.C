@@ -255,8 +255,8 @@ int main(int argc, char* argv[]){
 
       int nFilteredEvents = 0;
 
-      //for (Long64_t iEvent=0; iEvent<nEntries; ++iEvent) 
-      for (Long64_t iEvent=0; iEvent<10000; ++iEvent) 
+      for (Long64_t iEvent=0; iEvent<nEntries; ++iEvent) 
+	//for (Long64_t iEvent=0; iEvent<50000; ++iEvent) 
 	{
 	  if (tree->LoadTree(iEvent)<0) break;
 	  
@@ -602,19 +602,18 @@ void muon_pog::Observable::fill(Float_t value, TLorentzVector & muonTk, Float_t 
 {
   
   m_plots.at(0)->Fill(value, weight);
-  // CB fillhere for other plots vs kin variables  
-  if (m_plots.size() > 1)   
-    ((TProfile*)m_plots.at(1))->Fill(muonTk.Eta(), value, weight);
-  if (m_plots.size() > 2)
-    ((TProfile*)m_plots.at(2))->Fill(muonTk.Phi(), value, weight);
-  if (m_plots.size() > 3)
-    ((TProfile*)m_plots.at(3))->Fill(muonTk.Phi(), value, weight);
-  if (m_plots.size() > 4)
-    ((TProfile*)m_plots.at(4))->Fill(muonTk.Phi(), value, weight);
-  if (m_plots.size() > 5)
-    ((TProfile*)m_plots.at(5))->Fill(muonTk.Pt(),  value, weight);
-  if (m_plots.size() > 6)
-    ((TProfile*)m_plots.at(6))->Fill(PV,           value, weight);
+  // CB fill here other plots vs kin variables
+  if (m_plots.size() > 1)
+    {   
+      ((TProfile*)m_plots.at(1))->Fill(muonTk.Eta(), value, weight);
+      ((TProfile*)m_plots.at(2))->Fill(muonTk.Phi(), value, weight);
+      if (muonTk.Eta() > 0)
+	((TProfile*)m_plots.at(3))->Fill(muonTk.Phi(), value, weight);
+      else
+	((TProfile*)m_plots.at(4))->Fill(muonTk.Phi(), value, weight);
+      ((TProfile*)m_plots.at(5))->Fill(muonTk.Pt(),  value, weight);
+      ((TProfile*)m_plots.at(6))->Fill(PV,           value, weight);
+    }
 }
 
 void muon_pog::Plotter::book(TFile *outFile)
@@ -763,7 +762,16 @@ void muon_pog::Plotter::book(TFile *outFile)
       m_plots[ID]["Dxy" + etaTag]             = muon_pog::Observable("Dxy" + etaTag, sampleTag, "d_{xy} (cm)", "# entries", 50,-0.5,0.5, true);
       m_plots[ID]["Dz" + etaTag]              = muon_pog::Observable("Dz" + etaTag, sampleTag, "d_{z} (cm)", "# entries", 60,-1.5,1.5, true);    
 
-      m_plots[ID]["TrkStaPull" + etaTag]      = muon_pog::Observable("TrkStaPull" + etaTag, sampleTag, "(p_{T}^{trk} - p_{T}^{sta})/p_{T}^{trk}", "# entries", 50,-5.,5., true); 
+      m_plots[ID]["qOverPtTrkSta" + etaTag]      = muon_pog::Observable("qOverPtTrkSta" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
+      m_plots[ID]["qOverPtTrkStaOverPt" + etaTag]      = muon_pog::Observable("qOverPtTrkStaOverPt" + etaTag, sampleTag, "(q/p_{T}^{sta} - q/p_{T}^{trk})/q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
+      m_plots[ID]["qOverPtTrkStaPlus" + etaTag]      = muon_pog::Observable("qOverPtTrkStaPlus" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
+      m_plots[ID]["qOverPtTrkSta200" + etaTag]      = muon_pog::Observable("qOverPtTrkSta200" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
+      m_plots[ID]["qOverPtTrkSta200Plus" + etaTag]      = muon_pog::Observable("qOverPtTrkSta200Plus" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
+
+      m_plots[ID]["qOverPtTrkGlb" + etaTag]      = muon_pog::Observable("qOverPtTrkGlb" + etaTag, sampleTag, "q/p_{T}^{glb} - q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
+      m_plots[ID]["qOverPtTrkGlbPlus" + etaTag]      = muon_pog::Observable("qOverPtTrkGlbPlus" + etaTag, sampleTag, "q/p_{T}^{glb} - q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
+      m_plots[ID]["qOverPtTrkGlb200" + etaTag]      = muon_pog::Observable("qOverPtTrkGlb200" + etaTag, sampleTag, "q/p_{T}^{glb} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
+      m_plots[ID]["qOverPtTrkGlb200Plus" + etaTag]      = muon_pog::Observable("qOverPtTrkGlb200Plus" + etaTag, sampleTag, "q/p_{T}^{glb} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
 
       outFile->cd(sampleTag+"/kinematical_variables");
 
@@ -773,7 +781,11 @@ void muon_pog::Plotter::book(TFile *outFile)
 	  
 	  m_plots[KIN]["ProbePt" + etaTag + IDTag]  = muon_pog::Observable("ProbePt" + etaTag + IDTag, sampleTag, "p_{T} (GeV)", "# entries", 75,0.,150., true);
 	  m_plots[KIN]["ProbeEta" + etaTag + IDTag] = muon_pog::Observable("hProbeEta_" + etaTag + IDTag, sampleTag, "#eta", "# entries", 48,-2.4, 2.4, true);
-	  m_plots[KIN]["ProbePhi" + etaTag + IDTag] = muon_pog::Observable("hProbePhi_" + etaTag + IDTag, sampleTag, "#phi", "# entries", 48,-TMath::Pi(),TMath::Pi(), true);      
+	  m_plots[KIN]["ProbePhi" + etaTag + IDTag] = muon_pog::Observable("hProbePhi_" + etaTag + IDTag, sampleTag, "#phi", "# entries", 48,-TMath::Pi(),TMath::Pi(), true); 
+	  m_plots[KIN]["goodMuMass" + etaTag + IDTag]  = muon_pog::Observable("goodMuMass" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 55,60.,115., true);
+	  m_plots[KIN]["goodMuMassPlus" + etaTag + IDTag]  = muon_pog::Observable("goodMuMassPlus" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 20 ,86.5,96.5, true);
+	  m_plots[KIN]["goodMuMassMinus" + etaTag + IDTag]  = muon_pog::Observable("goodMuMassMinus" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 20,86.5,96.5, true);
+   
 	}
   
       outFile->cd(sampleTag+"/isolation");
@@ -890,6 +902,33 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 		      Float_t dilepPt = (tagMuTk+muTk).Pt();
 		      m_plots[CONT]["02_dilepPt"].fill(dilepPt,emptyTk,weight,nVtx);
 		      m_plots[CONT]["03_nVertices"].fill(nVtx,emptyTk,weight,nVtx);
+		      
+		      for (auto fEtaBin : m_tnpConfig.probe_fEtaBins)
+			{
+			  if (fabs(muTk.Eta()) > fEtaBin.first.Atof() &&
+			      fabs(muTk.Eta()) < fEtaBin.second.Atof() )
+			    {
+
+			      TString etaTag = "_fEtaMin" + fEtaBin.first + "_fEtaMax" + fEtaBin.second;
+	
+			      for (auto & probe_ID : m_tnpConfig.probe_IDs)
+				{
+				  TString IDTag = "_" + probe_ID;
+
+				  if(hasGoodId(muon,probe_ID) && muon.isoPflow04 < 0.25 && mass > 60 && mass < 115)
+				    {
+				    m_plots[KIN]["goodMuMass" + etaTag + IDTag].fill(mass, muTk, weight, nVtx);
+				    if (mass > 86.5 && mass < 96.5)
+				      {
+					if (chargeFromTrk(muon) > 0)
+					  m_plots[KIN]["goodMuMassPlus" + etaTag + IDTag].fill(mass, muTk, weight, nVtx);
+					else
+					  m_plots[KIN]["goodMuMassMinus" + etaTag + IDTag].fill(mass, muTk, weight, nVtx);
+				      }
+				    }
+				}
+			    }
+			}
 		      
 		      probeMuons.push_back(&muon);
 		      
@@ -1059,30 +1098,65 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	      TString etaTag = "_fEtaMin" + fEtaBin.first + "_fEtaMax" + fEtaBin.second;
 
 	      //id var
-	      m_plots[ID]["NHitsGLB"  + etaTag].fill(probeMuon.nHitsGlobal, probeMuTk ,weight,nVtx);
-	      m_plots[ID]["NHitsTRK"  + etaTag].fill(probeMuon.nHitsTracker, probeMuTk, weight, nVtx);
-	      m_plots[ID]["NHitsSTA"  + etaTag].fill(probeMuon.nHitsStandAlone, probeMuTk, weight, nVtx);
+	      if (probeMuon.isGlobal)
+		{
+		  m_plots[ID]["NHitsGLB"  + etaTag].fill(probeMuon.nHitsGlobal, probeMuTk ,weight,nVtx);
+		  m_plots[ID]["Chi2GLB"  + etaTag].fill(probeMuon.glbNormChi2, probeMuTk, weight, nVtx);
+		  m_plots[ID]["NMuonValidHitsGLB"  + etaTag].fill(probeMuon.glbMuonValidHits, probeMuTk, weight, nVtx);
+		  m_plots[ID]["TrkStaChi2"  + etaTag].fill(probeMuon.trkStaChi2, probeMuTk, weight, nVtx);       
+		  m_plots[ID]["TrkKink"  + etaTag].fill(probeMuon.trkKink, probeMuTk, weight, nVtx);          
+		}
 
-	      m_plots[ID]["Chi2GLB"  + etaTag].fill(probeMuon.glbNormChi2, probeMuTk, weight, nVtx);
-	      m_plots[ID]["Chi2TRK"  + etaTag].fill(probeMuon.trkNormChi2, probeMuTk, weight, nVtx);
+	      if (probeMuon.isTracker && probeMuon.isGlobal)    
+		{
+		  m_plots[ID]["SegmentComp"  + etaTag].fill(probeMuon.muSegmComp, probeMuTk, weight, nVtx);      
+		  m_plots[ID]["NHitsTRK"  + etaTag].fill(probeMuon.nHitsTracker, probeMuTk, weight, nVtx);
+		  m_plots[ID]["Chi2TRK"  + etaTag].fill(probeMuon.trkNormChi2, probeMuTk, weight, nVtx);
+		  m_plots[ID]["PixelHitsTRK"  + etaTag].fill(probeMuon.trkPixelValidHits, probeMuTk, weight, nVtx);
+		  m_plots[ID]["PixelLayersTRK"  + etaTag].fill(probeMuon.trkPixelLayersWithMeas, probeMuTk, weight, nVtx); 
+		  m_plots[ID]["TrackerLayersTRK"  + etaTag].fill(probeMuon.trkTrackerLayersWithMeas, probeMuTk, weight, nVtx); 
+		  m_plots[ID]["HitFractionTRK"  + etaTag].fill(probeMuon.trkValidHitFrac, probeMuTk, weight, nVtx);   
+		  m_plots[ID]["Dxy"  + etaTag].fill(probeMuon.dxy, probeMuTk, weight, nVtx);
+		  m_plots[ID]["Dz"  + etaTag].fill(probeMuon.dz, probeMuTk, weight, nVtx);			
+		}
 
-	      m_plots[ID]["PixelHitsTRK"  + etaTag].fill(probeMuon.trkPixelValidHits, probeMuTk, weight, nVtx);
-	      m_plots[ID]["PixelLayersTRK"  + etaTag].fill(probeMuon.trkPixelLayersWithMeas, probeMuTk, weight, nVtx); 
-	      m_plots[ID]["TrackerLayersTRK"  + etaTag].fill(probeMuon.trkTrackerLayersWithMeas, probeMuTk, weight, nVtx); 
+	      if (probeMuon.isStandAlone || probeMuon.isGlobal) 
+		{
+		  m_plots[ID]["NHitsSTA"  + etaTag].fill(probeMuon.nHitsStandAlone, probeMuTk, weight, nVtx);
+		}
 
-	      m_plots[ID]["NMatchedStation"  + etaTag].fill(probeMuon.trkMuonMatchedStations, probeMuTk, weight, nVtx);
-	      m_plots[ID]["NMuonValidHitsGLB"  + etaTag].fill(probeMuon.glbMuonValidHits, probeMuTk, weight, nVtx);
+	      if (probeMuon.isTracker)
+		{
+		  m_plots[ID]["NMatchedStation"  + etaTag].fill(probeMuon.trkMuonMatchedStations, probeMuTk, weight, nVtx);
+		}
 
-	      m_plots[ID]["HitFractionTRK"  + etaTag].fill(probeMuon.trkValidHitFrac, probeMuTk, weight, nVtx);   
-	      m_plots[ID]["SegmentComp"  + etaTag].fill(probeMuon.muSegmComp, probeMuTk, weight, nVtx);      
-	      m_plots[ID]["TrkStaChi2"  + etaTag].fill(probeMuon.trkStaChi2, probeMuTk, weight, nVtx);       
-	      m_plots[ID]["TrkKink"  + etaTag].fill(probeMuon.trkKink, probeMuTk, weight, nVtx);          
-	      
-	      m_plots[ID]["Dxy"  + etaTag].fill(probeMuon.dxy, probeMuTk, weight, nVtx);
-	      m_plots[ID]["Dz"  + etaTag].fill(probeMuon.dz, probeMuTk, weight, nVtx);			
 
-	      if (muon.isStandAlone && muon.isTrackerArb)
-		m_plots[ID]["TrkStaPull" + etaTag].fill((probeMuon.pt_tracker - probeMuon.pt_standalone)/probeMuon.pt_tracker, probeMuTk, weight, nVtx);  
+	      if (probeMuon.isGlobal)
+		{
+		  Float_t qOverPtTrk = probeMuon.charge_tracker / probeMuon.pt_tracker;
+		  Float_t qOverPtSta = probeMuon.charge_standalone / probeMuon.pt_standalone;
+		  Float_t qOverPtGlb = probeMuon.charge_global / probeMuon.pt_global;
+
+		  m_plots[ID]["qOverPtTrkSta" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
+		  m_plots[ID]["qOverPtTrkStaOverPt" + etaTag].fill((qOverPtSta - qOverPtTrk)/qOverPtTrk, probeMuTk, weight, nVtx);  
+		  m_plots[ID]["qOverPtTrkGlb" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
+
+		  if (probeMuon.charge_tracker > 0 )
+		    {
+		      m_plots[ID]["qOverPtTrkGlbPlus" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
+		      m_plots[ID]["qOverPtTrkStaPlus" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
+		    }
+		  if (probeMuon.pt_tracker > 200)
+		    {
+		      m_plots[ID]["qOverPtTrkSta200" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
+		      m_plots[ID]["qOverPtTrkGlb200" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
+		      if (probeMuon.charge_tracker > 0 )
+			{
+			  m_plots[ID]["qOverPtTrkSta200Plus" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
+			  m_plots[ID]["qOverPtTrkGlb200Plus" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
+			}
+		    }
+		}
 
 	      for (auto & probe_ID : m_tnpConfig.probe_IDs)
 	      	{
