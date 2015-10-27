@@ -158,6 +158,7 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
   event_.genParticles.clear();
   event_.genInfos.clear();
   event_.muons.clear();
+  event_.muons.clear();
   
   event_.mets.pfMet   = -999; 
   event_.mets.pfChMet = -999; 
@@ -503,6 +504,11 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & mu
       ntupleMu.eta_tracker    = hasInnerTrack ? mu.innerTrack()->eta() : -1000.;
       ntupleMu.phi_tracker    = hasInnerTrack ? mu.innerTrack()->phi() : -1000.;
       ntupleMu.charge_tracker = hasInnerTrack ? mu.innerTrack()->charge() : -1000.;
+
+      ntupleMu.pt_standalone     = isStandAlone ? mu.outerTrack()->pt()  : -1000.;
+      ntupleMu.eta_standalone    = isStandAlone ? mu.outerTrack()->eta() : -1000.;
+      ntupleMu.phi_standalone    = isStandAlone ? mu.outerTrack()->phi() : -1000.;
+      ntupleMu.charge_standalone = isStandAlone ? mu.outerTrack()->charge() : -1000.;
 
       reco::MuonPFIsolation iso04 = mu.pfIsolationR04();
       reco::MuonPFIsolation iso03 = mu.pfIsolationR03();
