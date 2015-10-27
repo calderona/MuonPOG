@@ -158,7 +158,6 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
   event_.genParticles.clear();
   event_.genInfos.clear();
   event_.muons.clear();
-  event_.muons.clear();
   
   event_.mets.pfMet   = -999; 
   event_.mets.pfChMet = -999; 
