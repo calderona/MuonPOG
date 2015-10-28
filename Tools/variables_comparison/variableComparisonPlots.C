@@ -591,8 +591,8 @@ muon_pog::Observable::Observable(TString hName, TString sampleTag, TString xTitl
     { // CB book here for other plots vs kin variables
       m_plots.push_back(new TProfile("h" + hName + "VsEta_"      + sampleTag, hName + " vs #eta;    #eta;"        + xTitle, 24, -2.4, 2.4, min, max));
       m_plots.push_back(new TProfile("h" + hName + "VsPhi_"      + sampleTag, hName + " vs #phi;    #phi;"        + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));
-      m_plots.push_back(new TProfile("h" + hName + "VsPhiPlus_"  + sampleTag, hName + " vs #phi +;  #phi;"        + xTitle, 24,  0,TMath::Pi(), min, max));
-      m_plots.push_back(new TProfile("h" + hName + "VsPhiMinus_" + sampleTag, hName + " vs #phi -;  #phi;"        + xTitle, 24, -TMath::Pi(),0, min, max));
+      m_plots.push_back(new TProfile("h" + hName + "VsPhiPlus_"  + sampleTag, hName + " vs #phi for #eta +;  #phi;"        + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));
+      m_plots.push_back(new TProfile("h" + hName + "VsPhiMinus_" + sampleTag, hName + " vs #phi for #eta -;  #phi;"        + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));
       m_plots.push_back(new TProfile("h" + hName + "VsPt_"       + sampleTag, hName + " vs p_{T};   p_{T} (GeV);" + xTitle, 50,  0., 150., min, max));
       m_plots.push_back(new TProfile("h" + hName + "VsPV_"       + sampleTag, hName + " vs PV;      # of PV;"     + xTitle, 60,  0., 60., min, max));
     }
@@ -782,7 +782,7 @@ void muon_pog::Plotter::book(TFile *outFile)
 	  m_plots[KIN]["ProbePt" + etaTag + IDTag]  = muon_pog::Observable("ProbePt" + etaTag + IDTag, sampleTag, "p_{T} (GeV)", "# entries", 75,0.,150., true);
 	  m_plots[KIN]["ProbeEta" + etaTag + IDTag] = muon_pog::Observable("hProbeEta_" + etaTag + IDTag, sampleTag, "#eta", "# entries", 48,-2.4, 2.4, true);
 	  m_plots[KIN]["ProbePhi" + etaTag + IDTag] = muon_pog::Observable("hProbePhi_" + etaTag + IDTag, sampleTag, "#phi", "# entries", 48,-TMath::Pi(),TMath::Pi(), true); 
-	  m_plots[KIN]["goodMuMass" + etaTag + IDTag]  = muon_pog::Observable("goodMuMass" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 55,60.,115., true);
+	  m_plots[KIN]["goodMuMass" + etaTag + IDTag]  = muon_pog::Observable("goodMuMass" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 30,85.,115., true);
 	  m_plots[KIN]["goodMuMassPlus" + etaTag + IDTag]  = muon_pog::Observable("goodMuMassPlus" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 20 ,86.5,96.5, true);
 	  m_plots[KIN]["goodMuMassMinus" + etaTag + IDTag]  = muon_pog::Observable("goodMuMassMinus" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 20,86.5,96.5, true);
    
