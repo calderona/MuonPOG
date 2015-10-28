@@ -763,7 +763,7 @@ void muon_pog::Plotter::book(TFile *outFile)
       m_plots[ID]["Dz" + etaTag]              = muon_pog::Observable("Dz" + etaTag, sampleTag, "d_{z} (cm)", "# entries", 60,-1.5,1.5, true);    
 
       m_plots[ID]["qOverPtTrkSta" + etaTag]      = muon_pog::Observable("qOverPtTrkSta" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
-      m_plots[ID]["qOverPtTrkStaOverPt" + etaTag]      = muon_pog::Observable("qOverPtTrkStaOverPt" + etaTag, sampleTag, "(q/p_{T}^{sta} - q/p_{T}^{trk})/q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
+      m_plots[ID]["qOverPtTrkStaOverPt" + etaTag]      = muon_pog::Observable("qOverPtTrkStaOverPt" + etaTag, sampleTag, "(q/p_{T}^{sta} - q/p_{T}^{trk})/q/p_{T}^{trk}", "# entries", 50,-5.,5., true); 
       m_plots[ID]["qOverPtTrkStaPlus" + etaTag]      = muon_pog::Observable("qOverPtTrkStaPlus" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
       m_plots[ID]["qOverPtTrkSta200" + etaTag]      = muon_pog::Observable("qOverPtTrkSta200" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
       m_plots[ID]["qOverPtTrkSta200Plus" + etaTag]      = muon_pog::Observable("qOverPtTrkSta200Plus" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
