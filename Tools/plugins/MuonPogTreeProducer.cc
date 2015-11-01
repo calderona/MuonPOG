@@ -26,6 +26,8 @@
 
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
+#include "DataFormats/MuonDetId/interface/DTChamberId.h"
+#include "DataFormats/MuonDetId/interface/CSCDetId.h"
 
 #include "DataFormats/METReco/interface/CaloMET.h"
 #include "DataFormats/METReco/interface/CaloMETFwd.h"
@@ -77,6 +79,9 @@ private:
   void fillMuons(const edm::Handle<reco::MuonCollection> &,
 		 const edm::Handle<std::vector<reco::Vertex> > &,
 		 const edm::Handle<reco::BeamSpot> &);
+
+  // returns false in case the match is for a RPC chamber
+  bool getMuonChamberId(DetId & id, muon_pog::MuonDetType & det, Int_t & r, Int_t & phi, Int_t & eta) const ;
   
   edm::InputTag trigResultsTag_;
   edm::InputTag trigSummaryTag_;
@@ -557,6 +562,30 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & mu
       ntupleMu.isTrkMuOST               = muon::isGoodMuon(mu, muon::TMOneStationTight) ? 1 : 0; 
       ntupleMu.isTrkHP                  = hasInnerTrack && mu.innerTrack()->quality(reco::TrackBase::highPurity) ? 1 : 0; 
 
+      if ( mu.isMatchesValid() )
+	{
+	  for ( reco::MuonChamberMatch match : mu.matches() )
+	    {
+	      muon_pog::ChambMatch ntupleMatch;
+	      
+	      if (getMuonChamberId(match.id,ntupleMatch.type,ntupleMatch.r,
+				   ntupleMatch.phi,ntupleMatch.eta))
+		{
+	      
+		  ntupleMatch.errxTk = match.xErr;
+		  ntupleMatch.erryTk = match.yErr;
+	      
+		  ntupleMatch.dx = mu.dX(match.station(),match.detector());
+		  ntupleMatch.dy = mu.dY(match.station(),match.detector());
+		  
+		  ntupleMatch.errxSeg = mu.segmentXErr(match.station(),match.detector());
+		  ntupleMatch.errySeg = mu.segmentYErr(match.station(),match.detector());
+		  
+		  ntupleMu.matches.push_back(ntupleMatch);
+		}
+	    }
+	}
+      
       ntupleMu.dxyBest  = -999; 
       ntupleMu.dzBest   = -999; 
       ntupleMu.dxyInner = -999; 
@@ -627,6 +656,38 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & mu
 
     }
 
+}
+
+bool MuonPogTreeProducer::getMuonChamberId(DetId & id, muon_pog::MuonDetType & det,
+					   Int_t & r, Int_t & phi, Int_t & eta) const
+{
+
+  if (id.det() == DetId::Muon && id.subdetId() == MuonSubdetId::DT)
+    {
+      DTChamberId dtId(id.rawId());  
+  
+      det = muon_pog::MuonDetType::DT;
+      r   = dtId.station();
+      phi = dtId.sector();
+      eta = dtId.wheel();
+
+      return true;
+    }
+
+  if (id.det() == DetId::Muon && id.subdetId() == MuonSubdetId::CSC)
+    {
+      CSCDetId cscId(id.rawId());
+    
+      det = muon_pog::MuonDetType::CSC;
+      r   = cscId.station();
+      phi = cscId.chamber();
+      eta = cscId.zendcap() * cscId.ring();
+
+      return true;
+    }
+
+  return false;
+      
 }
 
 

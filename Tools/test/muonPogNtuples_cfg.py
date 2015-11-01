@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 import subprocess
 
-runOnMC = True
+runOnMC = False
 #pathCut   = "all"
 #filterCut = "all"
 pathCut   = "HLT_IsoMu20_v"
@@ -15,7 +15,7 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(50000))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
 
 
 
@@ -34,8 +34,8 @@ if runOnMC :
     files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
     process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]    
 else :
-    process.GlobalTag.globaltag = cms.string('74X_dataRun2_Prompt_v0')
-    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/643/00000"
+    process.GlobalTag.globaltag = cms.string('74X_dataRun2_Prompt_v4')
+    sourcefilesfolder = "/store/data/Run2015D/SingleMuon/AOD/PromptReco-v3/000/258/158/00000"
     files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
     process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]
 

@@ -51,6 +51,49 @@ namespace muon_pog {
     ClassDef(METs,1)
   };
 
+  enum MuonDetType { DT=0, CSC, RPC };
+
+  class ChambMatch {
+  public:
+    Int_t r; // station/ring
+    Int_t phi; // sector
+    Int_t eta;   // ring/wheel
+    
+    MuonDetType type;
+    
+    Float_t dx; 
+    Float_t dy; 
+    
+    Float_t errxTk; 
+    Float_t erryTk; 
+    
+    Float_t errxSeg; 
+    Float_t errySeg; 
+    
+    ChambMatch(){};
+    virtual ~ChambMatch(){};
+    
+    ClassDef(ChambMatch,1)
+  };
+
+  class HitInfo {
+  public:
+    Int_t r; // station/ring
+    Int_t phi; // sector
+    Int_t eta;   // ring/wheel
+
+    MuonDetType type;
+
+    Int_t nHits; 
+    Int_t nHitsPhi; 
+    Int_t nHitsTheta; 
+
+    HitInfo(){};
+    virtual ~HitInfo(){};
+    
+    ClassDef(HitInfo,1)
+  };
+
   class Muon {
   public:
 
@@ -148,7 +191,10 @@ namespace muon_pog {
     // Muon time 
     Float_t muonTimeDof; 
     Float_t muonTime; 
-    Float_t muonTimeErr; 
+    Float_t muonTimeErr;
+
+    std::vector<HitInfo> hits;
+    std::vector<ChambMatch> matches;
 
     Muon(){};
     virtual ~Muon(){};
