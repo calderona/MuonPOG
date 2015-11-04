@@ -256,7 +256,7 @@ int main(int argc, char* argv[]){
       int nFilteredEvents = 0;
 
       for (Long64_t iEvent=0; iEvent<nEntries; ++iEvent) 
-	//for (Long64_t iEvent=0; iEvent<50000; ++iEvent) 
+	//for (Long64_t iEvent=0; iEvent<10000; ++iEvent) 
 	{
 	  if (tree->LoadTree(iEvent)<0) break;
 	  
@@ -266,66 +266,66 @@ int main(int argc, char* argv[]){
 
 	  //weight for dataD-Startup
 
-	  // float PUweight[60] = {  0,
-	  // 			  24.6564,
-	  // 			  10.7846,
-	  // 			  9.75522,
-	  // 			  8.29381,
-	  // 			  7.5551,
-	  // 			  6.52192,
-	  // 			  5.46865,
-	  // 			  4.58941,
-	  // 			  3.76588,
-	  // 			  2.9334,
-	  // 			  2.31009,
-	  // 			  1.74043,
-	  // 			  1.2886,
-	  // 			  0.935587,
-	  // 			  0.678059,
-	  // 			  0.47279,
-	  // 			  0.332189,
-	  // 			  0.230285,
-	  // 			  0.151753,
-	  // 			  0.105131,
-	  // 			  0.0694238,
-	  // 			  0.0463378,
-	  // 			  0.0312494,
-	  // 			  0.019313,
-	  // 			  0.0125001,
-	  // 			  0.00766361,
-	  // 			  0.00596304,
-	  // 			  0.00421311,
-	  // 			  0.0012315,
-	  // 			  0.00091048,
-	  // 			  0.000602633,
-	  // 			  0,
-	  // 			  0.00110585,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0};
+	  float PUweight[60] = {  0,
+	  			  24.6564,
+	  			  10.7846,
+	  			  9.75522,
+	  			  8.29381,
+	  			  7.5551,
+	  			  6.52192,
+	  			  5.46865,
+	  			  4.58941,
+	  			  3.76588,
+	  			  2.9334,
+	  			  2.31009,
+	  			  1.74043,
+	  			  1.2886,
+	  			  0.935587,
+	  			  0.678059,
+	  			  0.47279,
+	  			  0.332189,
+	  			  0.230285,
+	  			  0.151753,
+	  			  0.105131,
+	  			  0.0694238,
+	  			  0.0463378,
+	  			  0.0312494,
+	  			  0.019313,
+	  			  0.0125001,
+	  			  0.00766361,
+	  			  0.00596304,
+	  			  0.00421311,
+	  			  0.0012315,
+	  			  0.00091048,
+	  			  0.000602633,
+	  			  0,
+	  			  0.00110585,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0,
+	  			  0};
 
 
 
@@ -390,70 +390,72 @@ int main(int argc, char* argv[]){
 	  // 			  0,
 	  // 			  0,
 	  // 			  0,
-	  // 			  0};			 
+	  // 			  0};
+	  
+	  
 
 	  
 	  //weight for dataC-dataD comparisons.
-	  float PUweight[60] = {  0,
-				  0.818782,
-				  0.777041,
-				  1.85606,
-				  1.59566,
-				  1.80562,
-				  1.81222,
-				  1.79909,
-				  1.50801,
-				  1.3662,
-				  1.29328,
-				  1.13194,
-				  1.05819,
-				  0.821376,
-				  0.823951,
-				  0.67575,
-				  0.569473,
-				  0.528223,
-				  0.429261,
-				  0.386063,
-				  0.293675,
-				  0.286689,
-				  0.245489,
-				  0.222443,
-				  0.133406,
-				  0.194772,
-				  0.154812,
-				  0.220177,
-				  0.106648,
-				  0,
-				  0.0275221,
-				  0.0275221,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0,
-				  0};
+	  // float PUweight[60] = {  0,
+	  // 			  0.818782,
+	  // 			  0.777041,
+	  // 			  1.85606,
+	  // 			  1.59566,
+	  // 			  1.80562,
+	  // 			  1.81222,
+	  // 			  1.79909,
+	  // 			  1.50801,
+	  // 			  1.3662,
+	  // 			  1.29328,
+	  // 			  1.13194,
+	  // 			  1.05819,
+	  // 			  0.821376,
+	  // 			  0.823951,
+	  // 			  0.67575,
+	  // 			  0.569473,
+	  // 			  0.528223,
+	  // 			  0.429261,
+	  // 			  0.386063,
+	  // 			  0.293675,
+	  // 			  0.286689,
+	  // 			  0.245489,
+	  // 			  0.222443,
+	  // 			  0.133406,
+	  // 			  0.194772,
+	  // 			  0.154812,
+	  // 			  0.220177,
+	  // 			  0.106648,
+	  // 			  0,
+	  // 			  0.0275221,
+	  // 			  0.0275221,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0,
+	  // 			  0};
 
 
 	  //weight for Data-Mc comparison config4.ini 2015D vs All MC 
@@ -589,12 +591,12 @@ muon_pog::Observable::Observable(TString hName, TString sampleTag, TString xTitl
   m_plots.push_back(new TH1F("h" + hName + "_" + sampleTag, hName + " ;" + xTitle + ";" + yTitle, nBins, min, max));
   if (kinPlots)
     { // CB book here for other plots vs kin variables
-      m_plots.push_back(new TProfile("h" + hName + "VsEta_"      + sampleTag, hName + " vs #eta;    #eta;"        + xTitle, 24, -2.4, 2.4, min, max));
-      m_plots.push_back(new TProfile("h" + hName + "VsPhi_"      + sampleTag, hName + " vs #phi;    #phi;"        + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));
-      m_plots.push_back(new TProfile("h" + hName + "VsPhiPlus_"  + sampleTag, hName + " vs #phi for #eta +;  #phi;"        + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));
-      m_plots.push_back(new TProfile("h" + hName + "VsPhiMinus_" + sampleTag, hName + " vs #phi for #eta -;  #phi;"        + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));
-      m_plots.push_back(new TProfile("h" + hName + "VsPt_"       + sampleTag, hName + " vs p_{T};   p_{T} (GeV);" + xTitle, 50,  0., 150., min, max));
-      m_plots.push_back(new TProfile("h" + hName + "VsPV_"       + sampleTag, hName + " vs PV;      # of PV;"     + xTitle, 60,  0., 60., min, max));
+      m_plots.push_back(new TProfile("h" + hName + "VsEta_"      + sampleTag, hName + " vs #eta;    #eta;"          + xTitle, 24, -2.4, 2.4, min, max));
+      m_plots.push_back(new TProfile("h" + hName + "VsPhi_"      + sampleTag, hName + " vs #phi;    #phi;"          + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));     
+      m_plots.push_back(new TProfile("h" + hName + "VsPhiPlus_"  + sampleTag, hName + " vs #phi for #eta +;  #phi;" + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));
+      m_plots.push_back(new TProfile("h" + hName + "VsPhiMinus_" + sampleTag, hName + " vs #phi for #eta -;  #phi;" + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));
+      m_plots.push_back(new TProfile("h" + hName + "VsPt_"       + sampleTag, hName + " vs p_{T};   p_{T} (GeV);"   + xTitle, 50,  0., 150., min, max));
+      m_plots.push_back(new TProfile("h" + hName + "VsPV_"       + sampleTag, hName + " vs PV;      # of PV;"       + xTitle, 60,  0., 60., min, max));
     }
 }
 
@@ -891,7 +893,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 		  TLorentzVector muTk(muonTk(muon));
 		  
 		  Float_t mass = (tagMuTk+muTk).M();
-		  
+		  	  
 		  // CB Fill control plots
 		  m_plots[CONT]["01_invMass"].fill(mass,emptyTk,weight,nVtx);
 		  if ( mass > m_tnpConfig.pair_minInvMass &&
@@ -1107,7 +1109,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 		  m_plots[ID]["TrkKink"  + etaTag].fill(probeMuon.trkKink, probeMuTk, weight, nVtx);          
 		}
 
-	      if (probeMuon.isTracker && probeMuon.isGlobal)    
+	      if (probeMuon.isTrackerArb && probeMuon.isGlobal)    
 		{
 		  m_plots[ID]["SegmentComp"  + etaTag].fill(probeMuon.muSegmComp, probeMuTk, weight, nVtx);      
 		  m_plots[ID]["NHitsTRK"  + etaTag].fill(probeMuon.nHitsTracker, probeMuTk, weight, nVtx);
@@ -1125,7 +1127,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 		  m_plots[ID]["NHitsSTA"  + etaTag].fill(probeMuon.nHitsStandAlone, probeMuTk, weight, nVtx);
 		}
 
-	      if (probeMuon.isTracker)
+	      if (probeMuon.isTrackerArb)
 		{
 		  m_plots[ID]["NMatchedStation"  + etaTag].fill(probeMuon.trkMuonMatchedStations, probeMuTk, weight, nVtx);
 		}
@@ -1151,10 +1153,10 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 		      m_plots[ID]["qOverPtTrkSta200" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
 		      m_plots[ID]["qOverPtTrkGlb200" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
 		      if (probeMuon.charge_tracker > 0 )
-			{
-			  m_plots[ID]["qOverPtTrkSta200Plus" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
-			  m_plots[ID]["qOverPtTrkGlb200Plus" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
-			}
+		  	{
+		  	  m_plots[ID]["qOverPtTrkSta200Plus" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
+		  	  m_plots[ID]["qOverPtTrkGlb200Plus" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
+		  	}
 		    }
 		}
 
@@ -1384,6 +1386,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  TH1 * hData = 0;
 
 	  int colorMap[5] {kGray+1, kRed, kAzure+7, kGreen+1, kOrange};
+	 
 	  int iColor = 0;
 	  
 	  float integralData = 0;
@@ -1424,13 +1427,14 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	      if(plotter.m_sampleConfig.sampleName.Contains("Data"))
 		{
 		  hData = plot;
-		  hData->Sumw2();
 		  //FP Add OF and UF for iso variables only
 		  if (!plot->IsA()->InheritsFrom("TProfile"))
 		    {
-		      addOverFlow(*hData);
-		      if(plotName.Contains("Iso") || plotName.Contains("Dxy") || plotName.Contains("Dz"))
+		      hData->Sumw2();
+		      if(!plotName.Contains("mass")){
+			addOverFlow(*hData);		     
 			addUnderFlow(*hData);
+		      }
 		    }
 		  
 		  Double_t stat = hData->GetEntries();	
@@ -1438,18 +1442,23 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 		}
 	      else
 		{
-		  plot->SetFillColor(colorMap[iColor]);
+		  if(plotter.m_sampleConfig.sampleName.Contains("Startup"))
+		    plot->SetFillColor(colorMap[iColor+1]);
+		  if(plotter.m_sampleConfig.sampleName.Contains("Asymptotic"))
+		    plot->SetFillColor(colorMap[iColor+2]);
 		  plot->SetMarkerStyle(0);
-		 
+		 		 
 		  float scale = plotter.m_sampleConfig.cSection/plotter.m_sampleConfig.nEvents;
 		  
 		  if (!plot->IsA()->InheritsFrom("TProfile"))
 		    {
 		      //FP Add OF and UF for iso variables only
-		      addOverFlow(*plot);
-		      if(plotName.Contains("Iso") || plotName.Contains("Dxy") || plotName.Contains("Dz"))
+		      if(!plotName.Contains("mass")){
+			addOverFlow(*plot);
+			//if(plotName.Contains("Iso") || plotName.Contains("Dxy") || plotName.Contains("Dz"))
 			addUnderFlow(*plot);
-
+		      }
+		      
 		      float scaleToData = integralData/integralMC;
 		      plot->Scale(scale*scaleToData);
 	     
@@ -1465,22 +1474,21 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 			  pMc->Clear();
 			  pMc->SetFillColor(0);
 			  pMc->SetMarkerStyle(26);
+			  if(plotter.m_sampleConfig.sampleName.Contains("Startup"))
+			    pMc->SetMarkerColor(colorMap[iColor+1]);
+			  if(plotter.m_sampleConfig.sampleName.Contains("Asymptotic"))
+			    pMc->SetMarkerColor(colorMap[iColor+2]);
 			  
 			  pMc->Add(plot,scale);
-			  //for(int i = 0; i < pMc->GetNbinsX(); ++i){
-			  // errors[i] =  sqrt(errors[i]*errors[i] + pMc->GetBinError(i)*pMc->GetBinError(i)*scale*scale);
-			    // errors[i] =  sqrt(errors[i]*errors[i] + pMc->GetBinError(i)*pMc->GetBinError(i));
-			  // }
-			  leg->AddEntry(pMc, "Weighted sum of MCs", "LP"); 
+			  // leg->AddEntry(pMc, "Weighted sum of MCs", "LP"); 
+			  leg->AddEntry(pMc, plotter.m_sampleConfig.sampleName, "LP");
 			}
 		      else
 		  	{
 			  pMc->Add(plot,scale);
-			  //  for(int i = 0; i < pMc->GetNbinsX(); ++i){
-			  //  errors[i] =  sqrt(errors[i]*errors[i] + plot->GetBinError(i)*plot->GetBinError(i)*scale*scale);
-			  //errors[i] =  sqrt(errors[i]*errors[i] + plot->GetBinError(i)*plot->GetBinError(i));
-			  //}
 			}
+		    
+		      iColor++;
 		    }
 		}
 	    }
@@ -1491,19 +1499,16 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  canvas->cd();
 	  
 	  if(pMc){
-	    Double_t max = hData->GetMaximum() > pMc->GetMaximum() ? hData->GetMaximum() : pMc->GetMaximum();
-	    Double_t min = hData->GetMinimum() < pMc->GetMinimum() ? hData->GetMinimum() : pMc->GetMinimum();
 	    
-	    hData->GetYaxis()->SetRangeUser(0.8*min, 1.2*max);
+	    if(plotName.Contains("goodMuMass"))
+	      hData->GetYaxis()->SetRangeUser(89.,93.);
+	    else{
+	      Double_t max = hData->GetMaximum() > pMc->GetMaximum() ? hData->GetMaximum() : pMc->GetMaximum();
+	      Double_t min = hData->GetMinimum() < pMc->GetMinimum() ? hData->GetMinimum() : pMc->GetMinimum();
+	      hData->GetYaxis()->SetRangeUser(0.8*min, 1.2*max);
+	    }
+
 	    hData->Draw();
-	    
-	    // proj = pMc->ProjectionX();
-	    // proj->SetMarkerStyle(26);
-	    // for(int i = 0; i < pMc->GetNbinsX(); ++i){
-	    //   proj->SetBinError(i, errors[i]);
-	    // }
-	    // proj->SetOption("E");
-	    // proj->Draw("same");
 	    pMc->Draw("same");
 	  }
 	  else{
@@ -1530,13 +1535,16 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  hData->GetXaxis()->SetTitleSize(0.);
 	  
 	  if(pMc){
-	    Double_t max = hData->GetMaximum() > pMc->GetMaximum() ? hData->GetMaximum() : pMc->GetMaximum();
-	    Double_t min = hData->GetMinimum() < pMc->GetMinimum() ? hData->GetMinimum() : pMc->GetMinimum();
-	    
-	    hData->GetYaxis()->SetRangeUser(0.8*min, 1.2*max);
+
+	    if(plotName.Contains("goodMuMass"))
+	      hData->GetYaxis()->SetRangeUser(89.,93.);
+	    else{
+	      Double_t max = hData->GetMaximum() > pMc->GetMaximum() ? hData->GetMaximum() : pMc->GetMaximum();
+	      Double_t min = hData->GetMinimum() < pMc->GetMinimum() ? hData->GetMinimum() : pMc->GetMinimum();
+	      hData->GetYaxis()->SetRangeUser(0.8*min, 1.2*max);
+	    }
+
 	    hData->Draw();
-	      		
-	    //proj->Draw("same");
 	    pMc->Draw("same");
 	  }
 	  else{
@@ -1782,17 +1790,12 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  hRatio->GetYaxis()->SetTitleOffset(.6);
 	  hRatio->GetYaxis()->SetTitle("Data/MC");
 	  hRatio->GetYaxis()->SetRangeUser(0.,2.);
-	  hRatio->Sumw2();	  
-
-	  if(pMc){
-	    ((TH1*)pMc)->Sumw2();
+	  
+	  if(pMc)
 	    hRatio->Divide((TH1*)pMc);
-	  }
-	  else{
-	    ((TH1*)hMc.GetStack()->Last())->Sumw2();
+	  else
 	    hRatio->Divide((TH1*)hMc.GetStack()->Last());
-	  }
-
+	  
 	  hRatio->Draw();
 
 	  Double_t Xmax = hRatio->GetXaxis()->GetXmax();
