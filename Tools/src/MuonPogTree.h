@@ -55,20 +55,20 @@ namespace muon_pog {
 
   class ChambMatch {
   public:
-    Int_t r; // station/ring
+    Int_t r;   // station/disk
     Int_t phi; // sector
-    Int_t eta;   // ring/wheel
+    Int_t eta; // ring/wheel
     
     MuonDetType type;
     
-    Float_t dx; 
-    Float_t dy; 
+    Float_t dx;  // 999999 if not matched with a segment (I think) 
+    Float_t dy;  // 999999 if not matched with a segment (I think)
     
     Float_t errxTk; 
     Float_t erryTk; 
     
-    Float_t errxSeg; 
-    Float_t errySeg; 
+    Float_t errxSeg;  // 999999 if not matched with a segment (I think)
+    Float_t errySeg;  // 999999 if not matched with a segment (I think) 
     
     ChambMatch(){};
     virtual ~ChambMatch(){};
@@ -78,10 +78,10 @@ namespace muon_pog {
 
   class HitInfo {
   public:
-    Int_t r; // station/ring
+    Int_t r; // station/disk
     Int_t phi; // sector
     Int_t eta;   // ring/wheel
-
+    
     MuonDetType type;
 
     Int_t nHits; 
@@ -199,7 +199,7 @@ namespace muon_pog {
     Muon(){};
     virtual ~Muon(){};
 
-    ClassDef(Muon,1)
+    ClassDef(Muon,2)
   };
 
   class HLTObject {
@@ -275,7 +275,7 @@ namespace muon_pog {
     Event(){};
     virtual ~Event(){};
 
-    ClassDef(Event,1)
+    ClassDef(Event,2)
   };
 
 }

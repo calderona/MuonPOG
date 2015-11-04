@@ -679,9 +679,9 @@ bool MuonPogTreeProducer::getMuonChamberId(DetId & id, muon_pog::MuonDetType & d
       CSCDetId cscId(id.rawId());
     
       det = muon_pog::MuonDetType::CSC;
-      r   = cscId.station();
+      r   = cscId.station() * cscId.zendcap();
       phi = cscId.chamber();
-      eta = cscId.zendcap() * cscId.ring();
+      eta = cscId.ring();
 
       return true;
     }
