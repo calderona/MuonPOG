@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 
-def appendMuonPogNtuple(process, runOnMC, processTag="HLT", ntupleFileName="MuonPogTree.root") :
+def appendMuonPogNtuple(process, runOnMC, processTag="HLT", ntupleFileName="MuonPogTree.root", pathCut = "all", filterCut = "all") :
 
     process.load("MuonPOG.Tools.MuonPogTreeProducer_cfi")
 
@@ -23,6 +23,9 @@ def appendMuonPogNtuple(process, runOnMC, processTag="HLT", ntupleFileName="Muon
         fileName = cms.string(ntupleFileName)
     )
 
+    process.MuonPogTree.TrigPathCut = pathCut
+    process.MuonPogTree.TrigFilterCut = filterCut
+    
     if hasattr(process,"AOutput") :
         print "[MuonPogNtuples]: EndPath AOutput found, appending ntuples"
         process.AOutput.replace(process.hltOutputA, process.hltOutputA + process.muonPogNtuple)

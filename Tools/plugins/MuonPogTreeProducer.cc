@@ -26,6 +26,8 @@
 
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
+#include "DataFormats/MuonDetId/interface/DTChamberId.h"
+#include "DataFormats/MuonDetId/interface/CSCDetId.h"
 
 #include "DataFormats/METReco/interface/CaloMET.h"
 #include "DataFormats/METReco/interface/CaloMETFwd.h"
@@ -74,24 +76,30 @@ private:
   
   void fillPV(const edm::Handle<std::vector<reco::Vertex> > &);
   
-  void fillMuons(const edm::Handle<reco::MuonCollection> &,
+  void fillMuons(const edm::Handle<edm::View<reco::Muon> > &,
 		 const edm::Handle<std::vector<reco::Vertex> > &,
 		 const edm::Handle<reco::BeamSpot> &);
+
+  // returns false in case the match is for a RPC chamber
+  bool getMuonChamberId(DetId & id, muon_pog::MuonDetType & det, Int_t & r, Int_t & phi, Int_t & eta) const ;
   
-  edm::InputTag trigResultsTag_;
-  edm::InputTag trigSummaryTag_;
+  edm::EDGetTokenT<edm::TriggerResults> trigResultsToken_;
+  edm::EDGetTokenT<trigger::TriggerEvent> trigSummaryToken_;
 
-  edm::InputTag muonTag_;
-  edm::InputTag primaryVertexTag_;
-  edm::InputTag beamSpotTag_;
+  std::string trigFilterCut_;
+  std::string trigPathCut_;
 
-  edm::InputTag pfMetTag_;
-  edm::InputTag pfChMetTag_;
-  edm::InputTag caloMetTag_;
+  edm::EDGetTokenT<edm::View<reco::Muon> > muonToken_;
+  edm::EDGetTokenT<std::vector<reco::Vertex> > primaryVertexToken_;
+  edm::EDGetTokenT<reco::BeamSpot> beamSpotToken_;
 
-  edm::InputTag genTag_;
-  edm::InputTag pileUpInfoTag_;
-  edm::InputTag genInfoTag_;
+  edm::EDGetTokenT<reco::PFMETCollection> pfMetToken_;
+  edm::EDGetTokenT<reco::PFMETCollection> pfChMetToken_;
+  edm::EDGetTokenT<reco::CaloMETCollection> caloMetToken_;
+
+  edm::EDGetTokenT<reco::GenParticleCollection> genToken_;
+  edm::EDGetTokenT<std::vector<PileupSummaryInfo> > pileUpInfoToken_;
+  edm::EDGetTokenT<GenEventInfoProduct> genInfoToken_;
 
   muon_pog::Event event_;
   muon_pog::EventId eventId_;
@@ -100,24 +108,44 @@ private:
 };
 
 
-MuonPogTreeProducer::MuonPogTreeProducer( const edm::ParameterSet & cfg ) :
-  // Input collections
-  trigResultsTag_(cfg.getUntrackedParameter<edm::InputTag>("TrigResultsTag", edm::InputTag("TriggerResults::HLT"))),
-  trigSummaryTag_(cfg.getUntrackedParameter<edm::InputTag>("TrigSummaryTag", edm::InputTag("hltTriggerSummaryAOD::HLT"))),
-
-  muonTag_(cfg.getUntrackedParameter<edm::InputTag>("MuonTag", edm::InputTag("muons"))),
-  primaryVertexTag_(cfg.getUntrackedParameter<edm::InputTag>("PrimaryVertexTag", edm::InputTag("offlinePrimaryVertices"))),
-  beamSpotTag_(cfg.getUntrackedParameter<edm::InputTag>("BeamSpotTag", edm::InputTag("offlineBeamSpot"))),
-
-  pfMetTag_(cfg.getUntrackedParameter<edm::InputTag>("PFMetTag", edm::InputTag("pfMet"))), 
-  pfChMetTag_(cfg.getUntrackedParameter<edm::InputTag>("PFChMetTag", edm::InputTag("pfChMet"))), 
-  caloMetTag_(cfg.getUntrackedParameter<edm::InputTag>("CaloMetTag", edm::InputTag("caloMet"))), 
-
-  genTag_(cfg.getUntrackedParameter<edm::InputTag>("GenTag", edm::InputTag("prunedGenParticles"))),
-  pileUpInfoTag_(cfg.getUntrackedParameter<edm::InputTag>("PileUpInfoTag", edm::InputTag("pileupInfo"))),
-  genInfoTag_(cfg.getUntrackedParameter<edm::InputTag>("GenInfoTag", edm::InputTag("generator")))
-  
+MuonPogTreeProducer::MuonPogTreeProducer( const edm::ParameterSet & cfg )
 {
+
+  // Input collections
+  edm::InputTag tag = cfg.getUntrackedParameter<edm::InputTag>("TrigResultsTag", edm::InputTag("TriggerResults::HLT"));
+  if (tag.label() != "none") trigResultsToken_ = consumes<edm::TriggerResults>(tag);
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("TrigSummaryTag", edm::InputTag("hltTriggerSummaryAOD::HLT")); 
+  if (tag.label() != "none") trigSummaryToken_ =consumes<trigger::TriggerEvent>(tag);
+
+  trigFilterCut_ = cfg.getUntrackedParameter<std::string>("TrigFilterCut", std::string("all"));
+  trigPathCut_ = cfg.getUntrackedParameter<std::string>("TrigPathCut", std::string("all"));
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("MuonTag", edm::InputTag("muons"));
+  if (tag.label() != "none") muonToken_ = consumes<edm::View<reco::Muon> >(tag);
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("PrimaryVertexTag", edm::InputTag("offlinePrimaryVertices"));
+  if (tag.label() != "none") primaryVertexToken_ = consumes<std::vector<reco::Vertex> >(tag);
+  tag = cfg.getUntrackedParameter<edm::InputTag>("BeamSpotTag", edm::InputTag("offlineBeamSpot"));
+  if (tag.label() != "none") beamSpotToken_ = consumes<reco::BeamSpot>(tag);
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("PFMetTag", edm::InputTag("pfMet"));
+  if (tag.label() != "none") pfMetToken_ = consumes<reco::PFMETCollection>(tag);
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("PFChMetTag", edm::InputTag("pfChMet"));
+  if (tag.label() != "none") pfChMetToken_ = consumes<reco::PFMETCollection>(tag);
+ 
+  tag = cfg.getUntrackedParameter<edm::InputTag>("CaloMetTag", edm::InputTag("caloMet"));
+  if (tag.label() != "none") caloMetToken_ = consumes<reco::CaloMETCollection>(tag); 
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("GenTag", edm::InputTag("prunedGenParticles"));
+  if (tag.label() != "none") genToken_ = consumes<reco::GenParticleCollection>(tag);
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("PileUpInfoTag", edm::InputTag("pileupInfo"));
+  if (tag.label() != "none") pileUpInfoToken_ = consumes<std::vector<PileupSummaryInfo> >(tag);
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("GenInfoTag", edm::InputTag("generator"));
+  if (tag.label() != "none") genInfoToken_ = consumes<GenEventInfoProduct>(tag);  
 
 }
 
@@ -185,14 +213,14 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
   // Fill GEN pile up information
   if (!ev.isRealData()) 
     {
-      if (pileUpInfoTag_.label() != "none" &&
-	  genInfoTag_.label() != "none") 
+      if (!pileUpInfoToken_.isUninitialized() &&
+	  !genInfoToken_.isUninitialized()) 
 	{
 	  edm::Handle<std::vector<PileupSummaryInfo> > puInfo;
 	  edm::Handle<GenEventInfoProduct> genInfo;
 
-	  if (ev.getByLabel(pileUpInfoTag_, puInfo) &&
-	      ev.getByLabel(genInfoTag_, genInfo) ) 
+	  if (ev.getByToken(pileUpInfoToken_, puInfo) &&
+	      ev.getByToken(genInfoToken_, genInfo) ) 
 	    fillGenInfo(puInfo,genInfo);
 	  else 
 	    edm::LogError("") << "[MuonPogTreeProducer]: Pile-Up Info collection does not exist !!!";
@@ -203,10 +231,10 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
   // Fill GEN particles information
   if (!ev.isRealData()) 
     {
-      if (genTag_.label() != "none" ) 
+      if (!genToken_.isUninitialized() ) 
 	{ 
 	  edm::Handle<reco::GenParticleCollection> genParticles;
-	  if (ev.getByLabel(genTag_, genParticles)) 
+	  if (ev.getByToken(genToken_, genParticles)) 
 	    fillGenParticles(genParticles);
 	  else 
 	    edm::LogError("") << ">>> GEN collection does not exist !!!";
@@ -215,15 +243,15 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
   
 
   // Fill trigger information
-  if (trigResultsTag_.label() != "none" &&
-      trigSummaryTag_.label() != "none") 
+  if (!trigResultsToken_.isUninitialized() &&
+      !trigSummaryToken_.isUninitialized()) 
     {
       
       edm::Handle<edm::TriggerResults> triggerResults;
       edm::Handle<trigger::TriggerEvent> triggerEvent;
       
-      if (ev.getByLabel(trigResultsTag_, triggerResults) &&
-	  ev.getByLabel(trigSummaryTag_, triggerEvent)) 
+      if (ev.getByToken(trigResultsToken_, triggerResults) &&
+	  ev.getByToken(trigSummaryToken_, triggerEvent)) 
 	fillHlt(triggerResults, triggerEvent,ev.triggerNames(*triggerResults));
       else 
 	edm::LogError("") << "[MuonPogTreeProducer]: Trigger collections do not exist !!!";
@@ -233,9 +261,9 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
   // Fill vertex information
   edm::Handle<std::vector<reco::Vertex> > vertexes;
 
-  if(primaryVertexTag_.label() != "none") 
+  if(!primaryVertexToken_.isUninitialized()) 
     {
-      if (ev.getByLabel(primaryVertexTag_, vertexes))
+      if (ev.getByToken(primaryVertexToken_, vertexes))
 	fillPV(vertexes);
       else 
 	edm::LogError("") << "[MuonPogTreeProducer]: Vertex collection does not exist !!!";
@@ -243,17 +271,17 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
 
   // Get beam spot for muons
   edm::Handle<reco::BeamSpot> beamSpot;
-  if (beamSpotTag_.label() != "none" ) 
+  if (!beamSpotToken_.isUninitialized() ) 
     { 
-      if (!ev.getByLabel(beamSpotTag_, beamSpot)) 
+      if (!ev.getByToken(beamSpotToken_, beamSpot)) 
 	edm::LogError("") << "[MuonPogTreeProducer]: Beam spot collection not found !!!";
     }
 
   // Fill (raw) MET information: PF, PF charged, Calo    
   edm::Handle<reco::PFMETCollection> pfMet; 
-  if(pfMetTag_.label() != "none") 
+  if(!pfMetToken_.isUninitialized()) 
     { 
-      if (!ev.getByLabel(pfMetTag_, pfMet)) 
+      if (!ev.getByToken(pfMetToken_, pfMet)) 
 	edm::LogError("") << "[MuonPogTreeProducer] PFMet collection does not exist !!!"; 
       else { 
 	const reco::PFMET &iPfMet = (*pfMet)[0]; 
@@ -262,9 +290,9 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
     } 
 
   edm::Handle<reco::PFMETCollection> pfChMet; 
-  if(pfChMetTag_.label() != "none") 
+  if(!pfChMetToken_.isUninitialized()) 
     { 
-      if (!ev.getByLabel(pfChMetTag_, pfChMet)) 
+      if (!ev.getByToken(pfChMetToken_, pfChMet)) 
 	edm::LogError("") << "[MuonPogTreeProducer] PFChMet collection does not exist !!!"; 
       else { 
 	const reco::PFMET &iPfChMet = (*pfChMet)[0]; 
@@ -273,9 +301,9 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
     } 
 
   edm::Handle<reco::CaloMETCollection> caloMet; 
-  if(caloMetTag_.label() != "none") 
+  if(!caloMetToken_.isUninitialized()) 
     { 
-      if (!ev.getByLabel(caloMetTag_, caloMet)) 
+      if (!ev.getByToken(caloMetToken_, caloMet)) 
 	edm::LogError("") << "[MuonPogTreeProducer] CaloMet collection does not exist !!!"; 
       else { 
 	const reco::CaloMET &iCaloMet = (*caloMet)[0]; 
@@ -284,10 +312,10 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
     } 
 
   // Get muons  
-  edm::Handle<reco::MuonCollection> muons;
-  if (muonTag_.label() != "none" ) 
+  edm::Handle<edm::View<reco::Muon> > muons;
+  if (!muonToken_.isUninitialized() ) 
     { 
-      if (!ev.getByLabel(muonTag_, muons)) 
+      if (!ev.getByToken(muonToken_, muons)) 
 	edm::LogError("") << "[MuonPogTreeProducer] Muon collection does not exist !!!";
     }
   
@@ -297,7 +325,7 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
     {
       fillMuons(muons,vertexes,beamSpot);
     }
-  
+
   tree_["muPogTree"]->Fill();
   
 }
@@ -383,7 +411,8 @@ void MuonPogTreeProducer::fillHlt(const edm::Handle<edm::TriggerResults> & trigg
       if (triggerResults->accept(iTrig)) 
 	{
 	  std::string pathName = triggerNames.triggerName(iTrig);
-	  event_.hlt.triggers.push_back(pathName);
+	  if (trigPathCut_ == "all" || pathName.find(trigPathCut_) != std::string::npos)
+	    event_.hlt.triggers.push_back(pathName);
 	}
     }
       
@@ -393,30 +422,34 @@ void MuonPogTreeProducer::fillHlt(const edm::Handle<edm::TriggerResults> & trigg
     {
 	
       std::string filterTag = triggerEvent->filterTag(iFilter).encode();
+      
+      if (trigFilterCut_ == "all" || filterTag.find(trigFilterCut_) != std::string::npos)
+	{
 
-      trigger::Keys objectKeys = triggerEvent->filterKeys(iFilter);
-      const trigger::TriggerObjectCollection& triggerObjects(triggerEvent->getObjects());
+	  trigger::Keys objectKeys = triggerEvent->filterKeys(iFilter);
+	  const trigger::TriggerObjectCollection& triggerObjects(triggerEvent->getObjects());
 	
-      for (trigger::size_type iKey=0; iKey<objectKeys.size(); ++iKey) 
-	{  
-	  trigger::size_type objKey = objectKeys.at(iKey);
-	  const trigger::TriggerObject& triggerObj(triggerObjects[objKey]);
-	  
-	  muon_pog::HLTObject hltObj;
-	  
-	  float trigObjPt = triggerObj.pt();
-	  float trigObjEta = triggerObj.eta();
-	  float trigObjPhi = triggerObj.phi();
-	  
-	  hltObj.filterTag = filterTag;
-
-	  hltObj.pt  = trigObjPt;
-	  hltObj.eta = trigObjEta;
-	  hltObj.phi = trigObjPhi;
-	  
-	  event_.hlt.objects.push_back(hltObj);
-	  
-	}       
+	  for (trigger::size_type iKey=0; iKey<objectKeys.size(); ++iKey) 
+	    {  
+	      trigger::size_type objKey = objectKeys.at(iKey);
+	      const trigger::TriggerObject& triggerObj(triggerObjects[objKey]);
+	      
+	      muon_pog::HLTObject hltObj;
+	      
+	      float trigObjPt = triggerObj.pt();
+	      float trigObjEta = triggerObj.eta();
+	      float trigObjPhi = triggerObj.phi();
+	      
+	      hltObj.filterTag = filterTag;
+	      
+	      hltObj.pt  = trigObjPt;
+	      hltObj.eta = trigObjEta;
+	      hltObj.phi = trigObjPhi;
+	      
+	      event_.hlt.objects.push_back(hltObj);
+	      
+	    }
+	}
     }
 
 }
@@ -459,13 +492,13 @@ void MuonPogTreeProducer::fillPV(const edm::Handle<std::vector<reco::Vertex> > &
 }
 
 
-void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & muons,
+void MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > & muons,
 				    const edm::Handle<std::vector<reco::Vertex> > & vertexes,
 				    const edm::Handle<reco::BeamSpot> & beamSpot)
 {
 
-  reco::MuonCollection::const_iterator muonIt  = muons->begin();
-  reco::MuonCollection::const_iterator muonEnd = muons->end();
+  edm::View<reco::Muon>::const_iterator muonIt  = muons->begin();
+  edm::View<reco::Muon>::const_iterator muonEnd = muons->end();
 
   for (; muonIt != muonEnd; ++muonIt) 
     {
@@ -546,6 +579,30 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & mu
       ntupleMu.isTrkMuOST               = muon::isGoodMuon(mu, muon::TMOneStationTight) ? 1 : 0; 
       ntupleMu.isTrkHP                  = hasInnerTrack && mu.innerTrack()->quality(reco::TrackBase::highPurity) ? 1 : 0; 
 
+      if ( mu.isMatchesValid() )
+	{
+	  for ( reco::MuonChamberMatch match : mu.matches() )
+	    {
+	      muon_pog::ChambMatch ntupleMatch;
+	      
+	      if (getMuonChamberId(match.id,ntupleMatch.type,ntupleMatch.r,
+				   ntupleMatch.phi,ntupleMatch.eta))
+		{
+	      
+		  ntupleMatch.errxTk = match.xErr;
+		  ntupleMatch.erryTk = match.yErr;
+	      
+		  ntupleMatch.dx = mu.dX(match.station(),match.detector());
+		  ntupleMatch.dy = mu.dY(match.station(),match.detector());
+		  
+		  ntupleMatch.errxSeg = mu.segmentXErr(match.station(),match.detector());
+		  ntupleMatch.errySeg = mu.segmentYErr(match.station(),match.detector());
+		  
+		  ntupleMu.matches.push_back(ntupleMatch);
+		}
+	    }
+	}
+      
       ntupleMu.dxyBest  = -999; 
       ntupleMu.dzBest   = -999; 
       ntupleMu.dxyInner = -999; 
@@ -555,8 +612,6 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & mu
     
       ntupleMu.isoPflow03 = (iso03.sumChargedHadronPt+ std::max(0.,iso03.sumPhotonEt+iso03.sumNeutralHadronEt - 0.5*iso03.sumPUPt)) / mu.pt();
 
-      const reco::Vertex & vertex = vertexes->at(0); // CB for now vertex is always valid, but add a protection	    
-      
       double dxybs = isGlobal ? mu.globalTrack()->dxy(beamSpot->position()) :
 	hasInnerTrack ? mu.innerTrack()->dxy(beamSpot->position()) : -1000;
       double dzbs  = isGlobal ? mu.globalTrack()->dz(beamSpot->position()) :
@@ -616,6 +671,38 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<reco::MuonCollection> & mu
 
     }
 
+}
+
+bool MuonPogTreeProducer::getMuonChamberId(DetId & id, muon_pog::MuonDetType & det,
+					   Int_t & r, Int_t & phi, Int_t & eta) const
+{
+
+  if (id.det() == DetId::Muon && id.subdetId() == MuonSubdetId::DT)
+    {
+      DTChamberId dtId(id.rawId());  
+  
+      det = muon_pog::MuonDetType::DT;
+      r   = dtId.station();
+      phi = dtId.sector();
+      eta = dtId.wheel();
+
+      return true;
+    }
+
+  if (id.det() == DetId::Muon && id.subdetId() == MuonSubdetId::CSC)
+    {
+      CSCDetId cscId(id.rawId());
+    
+      det = muon_pog::MuonDetType::CSC;
+      r   = cscId.station() * cscId.zendcap();
+      phi = cscId.chamber();
+      eta = cscId.ring();
+
+      return true;
+    }
+
+  return false;
+      
 }
 
 

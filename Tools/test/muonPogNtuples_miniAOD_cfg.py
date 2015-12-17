@@ -2,11 +2,11 @@ import FWCore.ParameterSet.Config as cms
 
 import subprocess
 
-runOnMC = False
-#pathCut   = "all"
-#filterCut = "all"
-pathCut   = "HLT_IsoMu20_v"
-filterCut = "hltL3crIsoL1sMu16L1f0L2f10QL3f20QL3trkIsoFiltered0p09"
+runOn761 = False
+pathCut   = "all"
+filterCut = "all"
+#pathCut   = "HLT_IsoMu20_v"
+#filterCut = "hltL3crIsoL1sMu16L1f0L2f10QL3f20QL3trkIsoFiltered0p09"
 
 process = cms.Process("NTUPLES")
 
@@ -15,7 +15,7 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 
 
 
@@ -28,14 +28,14 @@ process.source = cms.Source("PoolSource",
 
 )
 
-if runOnMC :
-    process.GlobalTag.globaltag = cms.string('MCRUN2_74_V9A')
-    sourcefilesfolder = " /store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/AODSIM/Asympt50ns_MCRUN2_74_V9A-v2/60000"
+if runOn761 :
+    process.GlobalTag.globaltag = cms.string('76X_dataRun2_v15')
+    sourcefilesfolder = "/store/relval/CMSSW_7_6_1/DoubleMuon/MINIAOD/76X_dataRun2_v15_rerecoGT_RelVal_doubMu2015D-v1/00000"
     files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
     process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]    
 else :
-    process.GlobalTag.globaltag = cms.string('74X_dataRun2_Prompt_v4')
-    sourcefilesfolder = "/store/data/Run2015D/SingleMuon/AOD/PromptReco-v3/000/258/158/00000"
+    process.GlobalTag.globaltag = cms.string('76X_dataRun2_v10')
+    sourcefilesfolder = "/store/relval/CMSSW_7_6_0/DoubleMuon/MINIAOD/76X_dataRun2_v10_RelVal_doubMu2015D-v1/00000"
     files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
     process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]
 
@@ -46,9 +46,19 @@ process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 
 from MuonPOG.Tools.MuonPogNtuples_cff import appendMuonPogNtuple
 
-if runOnMC :
-    ntupleName = "ntuples_DY_NLO.root"
+if runOn761 :
+    ntupleName = "ntuples_761.root"
 else :
-    ntupleName = "ntuples_SingleMu.root"
+    ntupleName = "ntuples_760.root"
     
-appendMuonPogNtuple(process,runOnMC,"HLT",ntupleName,pathCut,filterCut)
+appendMuonPogNtuple(process,False,"HLT",ntupleName,pathCut,filterCut)
+
+process.MuonPogTree.MuonTag = cms.untracked.InputTag("slimmedMuons")
+process.MuonPogTree.PrimaryVertexTag = cms.untracked.InputTag("offlineSlimmedPrimaryVertices")
+process.MuonPogTree.TrigResultsTag = cms.untracked.InputTag("none")
+process.MuonPogTree.TrigSummaryTag = cms.untracked.InputTag("none")
+process.MuonPogTree.PFMetTag = cms.untracked.InputTag("none")
+process.MuonPogTree.PFChMetTag = cms.untracked.InputTag("none")
+process.MuonPogTree.CaloMetTag = cms.untracked.InputTag("none")
+
+
