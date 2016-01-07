@@ -5,15 +5,13 @@ process = cms.Process("PRINT")
 process.source = cms.Source("PoolSource",
                             
         fileNames = cms.untracked.vstring(
-        #"file:///afs/cern.ch/user/j/jhgoh/public/MuonPOG/20150922_poorQualityMuon/reco__254790__75X_dataRun2_v5.root"
-        "/store/user/isildak/JetHT/CMSSW_7_4_X_RECO_run_254790_lumi_129_event_148424615.root"
-        #"file://step3_prompt.root"
+        "/store/relval/CMSSW_7_6_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v11-v1/00000/2E482387-FA7F-E511-9F8E-0025905A60A6.root"
              ),
         secondaryFileNames = cms.untracked.vstring()
 )
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
-process.GlobalTag.globaltag = "74X_dataRun2_Prompt_v3"
+process.GlobalTag.globaltag = "76X_mcRun2_asymptotic_v11"
 
 process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 process.load("Configuration.StandardSequences.GeometryDB_cff")
@@ -39,4 +37,4 @@ process.muonEventDumper = cms.EDAnalyzer("MuonEventDumper",
 
 process.AOutput = cms.EndPath(process.muonEventDumper)
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))

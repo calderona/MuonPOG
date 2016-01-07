@@ -40,17 +40,17 @@
 #include <iostream>
 
 template<typename T> edm::Handle<T> conditionalGet(const edm::Event & ev,
-						   const edm::InputTag & inputTag,
+						   const edm::EDGetTokenT<T> & token,
 						   const std::string & collectionName)
 {
 
   edm::Handle<T> collection ;
 
-  if (inputTag.label() != "none") 
+  if (!token.isUninitialized()) 
     {
-      if (!ev.getByLabel(inputTag, collection)) 
+      if (!ev.getByToken(token, collection)) 
 	edm::LogError("") << "[MuonEventDumper]::conditionalGet: "
-			  << collectionName << " " << inputTag.label() << " collection does not exist !!!";
+			  << collectionName << " collection does not exist !!!";
     }
 
   return collection;
@@ -80,7 +80,7 @@ private:
   
   void printPV(const edm::Handle<std::vector<reco::Vertex> > &) const ;
   
-  void printMuons(const edm::Handle<reco::MuonCollection> &,
+  void printMuons(const edm::Handle<edm::View<reco::Muon> > &,
 		  const edm::Handle<std::vector<reco::Vertex> > &,
 		  const edm::Handle<reco::BeamSpot> &) const ;
 
@@ -95,31 +95,43 @@ private:
   void printIsolation( const reco::MuonIsolation & iso, const std::string & cone) const;
   void printPFIsolation( const reco::MuonPFIsolation & iso, const std::string & cone) const;
   
-  edm::InputTag trigResultsTag_;
-  edm::InputTag trigSummaryTag_;
+  edm::EDGetTokenT<edm::TriggerResults> trigResultsToken_;
+  edm::EDGetTokenT<trigger::TriggerEvent> trigSummaryToken_;
 
-  edm::InputTag muonTag_;
-  edm::InputTag primaryVertexTag_;
-  edm::InputTag beamSpotTag_;
+  edm::EDGetTokenT<edm::View<reco::Muon> > muonToken_;
+  edm::EDGetTokenT<std::vector<reco::Vertex> > primaryVertexToken_;
+  edm::EDGetTokenT<reco::BeamSpot> beamSpotToken_;
 
-  edm::InputTag genTag_;
-  edm::InputTag pileUpInfoTag_;
+  edm::EDGetTokenT<reco::GenParticleCollection> genToken_;
+  edm::EDGetTokenT<std::vector<PileupSummaryInfo> > pileUpInfoToken_;
 
 };
 
 
-MuonEventDumper::MuonEventDumper( const edm::ParameterSet & cfg ) :
-  // Input collections
-  trigResultsTag_(cfg.getUntrackedParameter<edm::InputTag>("TrigResultsTag", edm::InputTag("TriggerResults::HLT"))),
-  trigSummaryTag_(cfg.getUntrackedParameter<edm::InputTag>("TrigSummaryTag", edm::InputTag("hltTriggerSummaryAOD::HLT"))),
-
-  muonTag_(cfg.getUntrackedParameter<edm::InputTag>("MuonTag", edm::InputTag("muons"))),
-  primaryVertexTag_(cfg.getUntrackedParameter<edm::InputTag>("PrimaryVertexTag", edm::InputTag("offlinePrimaryVertices"))),
-  beamSpotTag_(cfg.getUntrackedParameter<edm::InputTag>("BeamSpotTag", edm::InputTag("offlineBeamSpot"))),
-
-  genTag_(cfg.getUntrackedParameter<edm::InputTag>("GenTag", edm::InputTag("prunedGenParticles"))),
-  pileUpInfoTag_(cfg.getUntrackedParameter<edm::InputTag>("PileUpInfoTag", edm::InputTag("pileupInfo")))
+MuonEventDumper::MuonEventDumper( const edm::ParameterSet & cfg )
 {
+
+  // Input collections
+  edm::InputTag tag = cfg.getUntrackedParameter<edm::InputTag>("TrigResultsTag", edm::InputTag("TriggerResults::HLT"));
+  if (tag.label() != "none") trigResultsToken_ = consumes<edm::TriggerResults>(tag);
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("TrigSummaryTag", edm::InputTag("hltTriggerSummaryAOD::HLT")); 
+  if (tag.label() != "none") trigSummaryToken_ =consumes<trigger::TriggerEvent>(tag);
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("MuonTag", edm::InputTag("muons"));
+  if (tag.label() != "none") muonToken_ = consumes<edm::View<reco::Muon> >(tag);
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("PrimaryVertexTag", edm::InputTag("offlinePrimaryVertices"));
+  if (tag.label() != "none") primaryVertexToken_ = consumes<std::vector<reco::Vertex> >(tag);
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("BeamSpotTag", edm::InputTag("offlineBeamSpot"));
+  if (tag.label() != "none") beamSpotToken_ = consumes<reco::BeamSpot>(tag);
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("GenTag", edm::InputTag("prunedGenParticles"));
+  if (tag.label() != "none") genToken_ = consumes<reco::GenParticleCollection>(tag);
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("PileUpInfoTag", edm::InputTag("pileupInfo"));
+  if (tag.label() != "none") pileUpInfoToken_ = consumes<std::vector<PileupSummaryInfo> >(tag);
 
 }
 
@@ -152,7 +164,7 @@ void MuonEventDumper::analyze (const edm::Event & ev, const edm::EventSetup &)
   // Print GEN pile up information
   if (!ev.isRealData()) 
     {
-      auto puInfo = conditionalGet<std::vector<PileupSummaryInfo> >(ev,pileUpInfoTag_,"Pile-Up Info");
+      auto puInfo = conditionalGet<std::vector<PileupSummaryInfo> >(ev,pileUpInfoToken_,"Pile-Up Info");
       if (puInfo.isValid()) printGenInfo(puInfo);
     }
   
@@ -160,26 +172,26 @@ void MuonEventDumper::analyze (const edm::Event & ev, const edm::EventSetup &)
   // Print GEN particles information
   if (!ev.isRealData()) 
     {
-      auto genParticles= conditionalGet<reco::GenParticleCollection>(ev,genTag_,"GenParticle Collection");
+      auto genParticles= conditionalGet<reco::GenParticleCollection>(ev,genToken_,"GenParticle Collection");
       if (genParticles.isValid()) printGenParticles(genParticles);
     } 
   
   // Print trigger information
-  auto triggerResults = conditionalGet<edm::TriggerResults>(ev,trigResultsTag_,"TriggerResults");
-  auto triggerEvent   = conditionalGet<trigger::TriggerEvent>(ev,trigSummaryTag_,"TriggerEvent");
+  auto triggerResults = conditionalGet<edm::TriggerResults>(ev,trigResultsToken_,"TriggerResults");
+  auto triggerEvent   = conditionalGet<trigger::TriggerEvent>(ev,trigSummaryToken_,"TriggerEvent");
       
   if (triggerResults.isValid() && triggerEvent.isValid()) 
     printHlt(triggerResults, triggerEvent,ev.triggerNames(*triggerResults));
   
   // Print vertex information
-  auto vertexes = conditionalGet<std::vector<reco::Vertex> >(ev,primaryVertexTag_,"Vertex");
+  auto vertexes = conditionalGet<std::vector<reco::Vertex> >(ev,primaryVertexToken_,"Vertex");
   if (vertexes.isValid()) printPV(vertexes);
   
   // Get beam spot for muons
-  auto beamSpot = conditionalGet<reco::BeamSpot>(ev,beamSpotTag_,"BeamSpot");
+  auto beamSpot = conditionalGet<reco::BeamSpot>(ev,beamSpotToken_,"BeamSpot");
 
   // Get muons  
-  auto muons = conditionalGet<reco::MuonCollection>(ev,muonTag_,"MuonCollection");
+  auto muons = conditionalGet<edm::View<reco::Muon> >(ev,muonToken_,"MuonCollection");
 
   // Print muon information
   if (muons.isValid() && vertexes.isValid() && beamSpot.isValid()) 
@@ -379,7 +391,7 @@ void MuonEventDumper::printTrack(const reco::Track * track, const std::string & 
   
 }
 
-void MuonEventDumper::printMuons(const edm::Handle<reco::MuonCollection> & muons,
+void MuonEventDumper::printMuons(const edm::Handle<edm::View<reco::Muon> > & muons,
 				    const edm::Handle<std::vector<reco::Vertex> > & vertexes,
 				    const edm::Handle<reco::BeamSpot> & beamSpot) const
 {
@@ -387,8 +399,8 @@ void MuonEventDumper::printMuons(const edm::Handle<reco::MuonCollection> & muons
   std::cout << "[MuonEventDumper::printMuons]: " << std::endl;
   std::cout << "[MUON COLLECTION SIZE]: " << muons->size() << std::endl;
 
-  reco::MuonCollection::const_iterator muonIt  = muons->begin();
-  reco::MuonCollection::const_iterator muonEnd = muons->end();
+  edm::View<reco::Muon> ::const_iterator muonIt  = muons->begin();
+  edm::View<reco::Muon> ::const_iterator muonEnd = muons->end();
 
   for (; muonIt != muonEnd; ++muonIt) 
     {
