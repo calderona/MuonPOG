@@ -3,9 +3,9 @@ Collection of MuonPOG related tools
 
 ## Installation instructions
 
-cmsrel CMSSW_7_4_6_patch5 # Just an example release, works in 74X at present 
+cmsrel CMSSW_7_6_3 # Just an example release, works in CMSSW >= 74X at present 
 
-cd CMSSW_7_4_6_patch5/src/
+cd CMSSW_7_6_3/src/
 
 git clone git@github.com:battibass/MuonPOG.git
 
@@ -13,10 +13,25 @@ cmsenv
 
 scramv1 b -j 5
 
-## Ntuples
-Ntuple interface defined in : MuonPOG/Tools/src/MuonPogTree.h
+## Event dumper:
 
-Ntuple are filed by code in : MuonPOG/Tools/plugins/MuonPogTreeProducer.cc
+A duper, printing event information relevant for muons is available in :  MuonPOG/Tools/plugins/EventDumper.cc
+
+It prints HLT, GEN level, beam spot, vertex and muon information. It works both in AOD and miniAOD.
+
+To dump information from a given event :
+
+cd MuonPOG/Tools/test/
+
+cmsRun muonPrinter_cfg.py # modify files according to your needs
+
+## Ntuples
+
+The interface of muon Ntuples is defined in : MuonPOG/Tools/src/MuonPogTree.h
+
+The code filling ntuples is available in : MuonPOG/Tools/plugins/MuonPogTreeProducer.cc
+
+It fills HLT, GEN level, beam spot, vertex and muon information. It works both in AOD and miniAOD.
 
 To create some ntuples :
 
@@ -24,11 +39,11 @@ cd MuonPOG/Tools/test/
 
 cmsRun muonPogNtuples_cfg.py # modify files according to your needs
 
-The ntuple gets loaded by :
+The ntuple producer gets loaded by :
 
 from MuonPOG.Tools.MuonPogNtuples_cff import appendMuonPogNtuple
 
-appendMuonPogNtuple(process,False,"HLT","ntuple_DoubleMuon_251244_251252.root")
+appendMuonPogNtuple(process,False,"HLT","MY_NTUPLE_NAME.root")
 
 Where arguments are :
 
@@ -37,14 +52,23 @@ Where arguments are :
 3. The label of the process giving HLT results
 4. The name of the output ntuple
 
-## Invariant mass macro 
+## List of macros running on ntuples
 
-To run the invariant masses macro on ntuples :
+The presently committed list of macros are:
+
+MuonPOG/Tools/invariant_mass/ : makes dimuon invariant mas plots for different resonances
+
+MuonPOG/Tools/variables_comparison/ : performs a cut'n'count tnp study of commissioning and isolation variables, muon IDs and muon scale and resolution using muons from Z
+
+Both macros use ini configuration files to allow freedom to chose some configuration parameters, the are stored under the config/ directory in each macro package.
+
+The syntax to run the macros is:
 
 cd MuonPOG/Tools/invariant_mass/
 
-./invariantMassPlots \
+./invariantMassPlots PATH_TO_INPUT_FILE PAT_TO_CONFIG_FILE(s)
 
-/afs/cern.ch/user/b/battilan/work/public/MuonPOG_Ntuples_2015/ntuple_DoubleMuon_251244_251252.root \ 
+MuonPOG/Tools/variables_comparison/
 
-config_z/*ini #modify input ntuple and config files according to your needs
+./variableComparisonPlots PATH_TO_CONFIG_FILE PATH_TO_OUTPUT_DIR
+
