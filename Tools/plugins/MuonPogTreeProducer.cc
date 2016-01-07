@@ -126,6 +126,7 @@ MuonPogTreeProducer::MuonPogTreeProducer( const edm::ParameterSet & cfg )
 
   tag = cfg.getUntrackedParameter<edm::InputTag>("PrimaryVertexTag", edm::InputTag("offlinePrimaryVertices"));
   if (tag.label() != "none") primaryVertexToken_ = consumes<std::vector<reco::Vertex> >(tag);
+
   tag = cfg.getUntrackedParameter<edm::InputTag>("BeamSpotTag", edm::InputTag("offlineBeamSpot"));
   if (tag.label() != "none") beamSpotToken_ = consumes<reco::BeamSpot>(tag);
 
