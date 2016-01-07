@@ -3,15 +3,15 @@ Collection of MuonPOG related tools
 
 ## Installation instructions
 
+```bash
 cmsrel CMSSW_7_6_3 # Just an example release, works in CMSSW >= 74X at present 
-
 cd CMSSW_7_6_3/src/
 
-git clone git@github.com:battibass/MuonPOG.git
+git clone https://github.com/battibass/MuonPOG/blob/master/README.md
 
 cmsenv
-
 scramv1 b -j 5
+```
 
 ## Event dumper:
 
@@ -21,9 +21,10 @@ It prints HLT, GEN level, beam spot, vertex and muon information. It works both 
 
 To dump information from a given event :
 
+```bash
 cd MuonPOG/Tools/test/
-
 cmsRun muonPrinter_cfg.py # modify files according to your needs
+```
 
 ## Ntuples
 
@@ -35,15 +36,17 @@ It fills HLT, GEN level, beam spot, vertex and muon information. It works both i
 
 To create some ntuples :
 
+```bash
 cd MuonPOG/Tools/test/
-
 cmsRun muonPogNtuples_cfg.py # modify files according to your needs
+```
 
 The ntuple producer gets loaded by :
 
+```python
 from MuonPOG.Tools.MuonPogNtuples_cff import appendMuonPogNtuple
-
 appendMuonPogNtuple(process,False,"HLT","MY_NTUPLE_NAME.root")
+```
 
 Where arguments are :
 
@@ -56,19 +59,21 @@ Where arguments are :
 
 The presently committed list of macros are:
 
-MuonPOG/Tools/invariant_mass/ : makes dimuon invariant mas plots for different resonances
+| *Macro*        | *Description*  |
+| -------------- | -------------- |
+| MuonPOG/Tools/invariant_mass/  | makes dimuon invariant mas plots for different resonances  |
+| MuonPOG/Tools/variables_comparison/  | performs a cut'n'count tnp study of commissioning and isolation variables, muon IDs and muon scale and resolution using muons from Z  |
 
-MuonPOG/Tools/variables_comparison/ : performs a cut'n'count tnp study of commissioning and isolation variables, muon IDs and muon scale and resolution using muons from Z
-
-Both macros use ini configuration files to allow freedom to chose some configuration parameters, the are stored under the config/ directory in each macro package.
+Both macros use ini configuration files to allow freedom to chose parameters at run time, the are stored under the config/ directory of each macro package.
 
 The syntax to run the macros is:
 
+```bash
 cd MuonPOG/Tools/invariant_mass/
-
 ./invariantMassPlots PATH_TO_INPUT_FILE PAT_TO_CONFIG_FILE(s)
+```
 
+```bash
 MuonPOG/Tools/variables_comparison/
-
 ./variableComparisonPlots PATH_TO_CONFIG_FILE PATH_TO_OUTPUT_DIR
-
+```
