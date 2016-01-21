@@ -18,7 +18,7 @@ process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring('file:PlaceHolder.root')
                             )
 
-process.GlobalTag.globaltag = cms.string('MCRUN2_74_V9A')
+process.GlobalTag.globaltag = cms.string('76X_mcRun2_asymptotic_v12')
 
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
 process.load("Configuration.StandardSequences.MagneticField_38T_cff")
