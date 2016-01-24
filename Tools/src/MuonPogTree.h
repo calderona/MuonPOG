@@ -262,6 +262,10 @@ namespace muon_pog {
     Int_t luminosityBlockNumber; // luminosity block number
     Int_t eventNumber;           // event number
 
+    Int_t bxId;                  // bunch crossing number
+    unsigned long long orbit;    // orbit number
+    Float_t instLumi;            // inst lumi from scalers [10E30]
+
     Int_t nVtx;                      // number of valid reconstructed primary vertices 
     Float_t primaryVertex[3];        // 3d coordinates of PV [cm]
     Float_t cov_primaryVertex[3][3]; // 3x3 covariance matrix of PV estimation [cm*cm]
@@ -275,7 +279,7 @@ namespace muon_pog {
     Event(){};
     virtual ~Event(){};
 
-    ClassDef(Event,2)
+    ClassDef(Event,3)
   };
 
 }

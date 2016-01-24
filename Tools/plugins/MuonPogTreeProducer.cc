@@ -42,6 +42,9 @@
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
 
+#include "DataFormats/Scalers/interface/LumiScalers.h"
+#include "DataFormats/Luminosity/interface/LumiDetails.h"
+
 #include "DataFormats/GeometryVector/interface/VectorUtil.h"
 #include "CommonTools/CandUtils/interface/AddFourMomenta.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
@@ -101,6 +104,9 @@ private:
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> > pileUpInfoToken_;
   edm::EDGetTokenT<GenEventInfoProduct> genInfoToken_;
 
+  edm::EDGetTokenT<LumiScalersCollection> scalersToken_;
+
+
   muon_pog::Event event_;
   muon_pog::EventId eventId_;
   std::map<std::string,TTree*> tree_;
@@ -147,6 +153,9 @@ MuonPogTreeProducer::MuonPogTreeProducer( const edm::ParameterSet & cfg )
 
   tag = cfg.getUntrackedParameter<edm::InputTag>("GenInfoTag", edm::InputTag("generator"));
   if (tag.label() != "none") genInfoToken_ = consumes<GenEventInfoProduct>(tag);  
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("ScalersTag", edm::InputTag("scalersRawToDigi"));
+  if (tag.label() != "none") scalersToken_ = consumes<LumiScalersCollection>(tag);  
 
 }
 
@@ -241,7 +250,23 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
 	    edm::LogError("") << ">>> GEN collection does not exist !!!";
 	}
     }
-  
+
+  if (ev.isRealData()) 
+    {
+
+      event_.bxId  = ev.bunchCrossing();
+      event_.orbit = ev.orbitNumber();
+
+      if (!scalersToken_.isUninitialized()) 
+        { 
+          edm::Handle<LumiScalersCollection> lumiScalers;
+          if (ev.getByToken(scalersToken_, lumiScalers) && 
+              lumiScalers->size() > 0 ) 
+            event_.instLumi  = lumiScalers->begin()->instantLumi();
+          else 
+            edm::LogError("") << ">>> Scaler collection does not exist !!!";
+        }
+    }
 
   // Fill trigger information
   if (!trigResultsToken_.isUninitialized() &&

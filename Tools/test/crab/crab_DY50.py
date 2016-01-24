@@ -1,8 +1,8 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-config.General.requestName = 'DY50_reReco' 
-config.General.workArea = 'NTuples_DY50_reReco'
+config.General.requestName = 'DY50_reReco_v2' 
+config.General.workArea = 'NTuples_DY50_reReco_v2'
 config.General.transferLogs = True
 
 config.JobType.pluginName = 'Analysis'
@@ -14,7 +14,7 @@ config.Data.inputDBS = 'global'
 config.Data.splitting = 'EventAwareLumiBased' 
 config.Data.unitsPerJob = 100000
 
-config.Data.outLFNDirBase    = '/store/user/battilan/NTuplesMuonPOG/reRECO/MC/DY' 
+config.Data.outLFNDirBase    = '/store/user/battilan/NTuplesMuonPOG/reRECO/v2/MC/DY' 
 config.Data.ignoreLocality   = True
 
 

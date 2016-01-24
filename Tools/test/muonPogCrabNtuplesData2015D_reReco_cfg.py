@@ -7,6 +7,11 @@ process = cms.Process("NTUPLES")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 
+pathCut   = "HLT_IsoMu20_v"
+filterCut = "hltL3crIsoL1sMu16L1f0L2f10QL3f20QL3trkIsoFiltered0p09"
+ntupleName = "MuonPOGntuples.root"
+runOnMC = False 
+
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
@@ -27,6 +32,4 @@ process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 
 from MuonPOG.Tools.MuonPogNtuples_cff import appendMuonPogNtuple
 
-ntupleName = "MuonPOGntuples.root"
-runOnMC = False 
-appendMuonPogNtuple(process,runOnMC,"HLT",ntupleName)
+appendMuonPogNtuple(process,runOnMC,"HLT",ntupleName,pathCut,filterCut)
