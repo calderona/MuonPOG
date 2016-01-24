@@ -50,7 +50,7 @@ namespace muon_pog {
     TString fileName;  
     TString sampleName;  
     Float_t cSection;
-    Float_t nEvents;
+    Int_t nEvents;
     Bool_t applyReweighting;
         
     SampleConfig() {};
@@ -83,7 +83,9 @@ namespace muon_pog {
   
     Float_t probe_minPt;      
     std::vector<TString> probe_IDs;
-    std::vector<std::pair<TString,TString> > probe_fEtaBins;
+    std::vector<std::pair<TString,TString> > probe_etaBins;
+
+    std::vector<Float_t> pu_weights;
      
     std::string hlt_path; 
    
@@ -97,6 +99,7 @@ namespace muon_pog {
     
   private:
     std::vector<TString> toArray(const std::string & entries); 
+    std::vector<Float_t> toArrayF(const std::string & entries); 
     std::vector<std::pair<TString,TString> > toPairArray(const std::vector<TString> &,
 							 const std::vector<TString> &); 
   
@@ -128,7 +131,7 @@ namespace muon_pog {
 
   public :
 
-    enum HistoType { KIN=0, ID, ISO, TIME, CONT, EFF};
+    enum HistoType { KIN=0, MOM, ID, ISO, TIME, CONT, EFF};
       
     Plotter(muon_pog::TagAndProbeConfig tnpConfig, muon_pog::SampleConfig & sampleConfig) :
       m_tnpConfig(tnpConfig) , m_sampleConfig(sampleConfig) {};
@@ -190,7 +193,7 @@ int main(int argc, char* argv[]){
   if (argc != 3) 
     {
       std::cout << "Usage : "
-		<< argv[0] << " PAT_TO_CONFIG_FILE PATH_TO_OUTPUT_DIR\n";
+		<< argv[0] << " PATH_TO_CONFIG_FILE PATH_TO_OUTPUT_DIR\n";
       exit(100);
     }
 
@@ -250,229 +253,28 @@ int main(int argc, char* argv[]){
       evBranch->SetAddress(&ev);
 
       // Watch number of entries
-      int nEntries = tree->GetEntriesFast();
+      int nEntries = tree->GetEntriesFast();      
       std::cout << "[" << argv[0] << "] Number of entries = " << nEntries << std::endl;
+
+      if (nEntries < plotter.m_sampleConfig.nEvents || plotter.m_sampleConfig.nEvents < 0)
+	plotter.m_sampleConfig.nEvents = nEntries;
+      std::cout << "[" << argv[0] << "] Number of entries that will be processed = " << plotter.m_sampleConfig.nEvents << std::endl;
 
       int nFilteredEvents = 0;
 
-      for (Long64_t iEvent=0; iEvent<nEntries; ++iEvent) 
-	//for (Long64_t iEvent=0; iEvent<10000; ++iEvent) 
+      for (Long64_t iEvent=0; iEvent<plotter.m_sampleConfig.nEvents; ++iEvent) 
 	{
 	  if (tree->LoadTree(iEvent)<0) break;
-	  
+
+	  if (iEvent % 25000 == 0 )
+	    std::cout << "[" << argv[0] << "] processing event : " << iEvent << "\r" << std::flush;	  
+
 	  evBranch->GetEntry(iEvent);
 	  float weight = ev->genInfos.size() > 0 ?
 	    ev->genInfos[0].genWeight/fabs(ev->genInfos[0].genWeight) : 1.;
 
-	  //weight for dataD-Startup
-
-	  float PUweight[60] = {  0,
-	  			  24.6564,
-	  			  10.7846,
-	  			  9.75522,
-	  			  8.29381,
-	  			  7.5551,
-	  			  6.52192,
-	  			  5.46865,
-	  			  4.58941,
-	  			  3.76588,
-	  			  2.9334,
-	  			  2.31009,
-	  			  1.74043,
-	  			  1.2886,
-	  			  0.935587,
-	  			  0.678059,
-	  			  0.47279,
-	  			  0.332189,
-	  			  0.230285,
-	  			  0.151753,
-	  			  0.105131,
-	  			  0.0694238,
-	  			  0.0463378,
-	  			  0.0312494,
-	  			  0.019313,
-	  			  0.0125001,
-	  			  0.00766361,
-	  			  0.00596304,
-	  			  0.00421311,
-	  			  0.0012315,
-	  			  0.00091048,
-	  			  0.000602633,
-	  			  0,
-	  			  0.00110585,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0,
-	  			  0};
-
-
-
-	  //weight for dataD-DYasymptotic comparisons.
-	  
-	  // float PUweight[60] = {  0,
-	  // 			  5.60605,
-	  // 			  1.7979,
-	  // 			  1.72712,
-	  // 			  1.67129,
-	  // 			  1.88794,
-	  // 			  1.95294,
-	  // 			  2.00093,
-	  // 			  1.95066,
-	  // 			  1.82526,
-	  // 			  1.67957,
-	  // 			  1.51496,
-	  // 			  1.27748,
-	  // 			  1.0463,
-	  // 			  0.862064,
-	  // 			  0.672516,
-	  // 			  0.5231,
-	  // 			  0.395426,
-	  // 			  0.295751,
-	  // 			  0.212734,
-	  // 			  0.162864,
-	  // 			  0.121367,
-	  // 			  0.0900407,
-	  // 			  0.0711253,
-	  // 			  0.0487265,
-	  // 			  0.0376877,
-	  // 			  0.0286602,
-	  // 			  0.0229082,
-	  // 			  0.0220411,
-	  // 			  0.00732292,
-	  // 			  0.00630842,
-	  // 			  0.00568248,
-	  // 			  0,
-	  // 			  0.0192158,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0};
-	  
-	  
-
-	  
-	  //weight for dataC-dataD comparisons.
-	  // float PUweight[60] = {  0,
-	  // 			  0.818782,
-	  // 			  0.777041,
-	  // 			  1.85606,
-	  // 			  1.59566,
-	  // 			  1.80562,
-	  // 			  1.81222,
-	  // 			  1.79909,
-	  // 			  1.50801,
-	  // 			  1.3662,
-	  // 			  1.29328,
-	  // 			  1.13194,
-	  // 			  1.05819,
-	  // 			  0.821376,
-	  // 			  0.823951,
-	  // 			  0.67575,
-	  // 			  0.569473,
-	  // 			  0.528223,
-	  // 			  0.429261,
-	  // 			  0.386063,
-	  // 			  0.293675,
-	  // 			  0.286689,
-	  // 			  0.245489,
-	  // 			  0.222443,
-	  // 			  0.133406,
-	  // 			  0.194772,
-	  // 			  0.154812,
-	  // 			  0.220177,
-	  // 			  0.106648,
-	  // 			  0,
-	  // 			  0.0275221,
-	  // 			  0.0275221,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0,
-	  // 			  0};
-
-
-	  //weight for Data-Mc comparison config4.ini 2015D vs All MC 
-	  //float PUweight[60] = {0,6.68472,4.41435,3.49289,3.14212,3.173,2.94319,2.71174,2.44124,2.0717,1.7103,1.39812,1.11666,0.855547,0.618711,0.453196,0.328689,0.228592,0.166069,0.100075,0.070327,0.0567964,0.0405713,0.0308903,0.0186064,0.0208503,0.00264836,0.00779018,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-
-
-	  //weight for Data-Mc comparison config5.ini 2015D-v3 FullStat vs All MC 
-	  //float PUweight[60] = {0, 2.83379, 1.78476, 1.68828, 1.68078, 1.89932, 1.94938, 1.98453, 1.95908, 1.85889, 1.67011, 1.50816, 1.29412,1.07878, 0.855702, 0.6922, 0.517513, 0.397616, 0.30073, 0.211495, 0.165432, 0.112824, 0.0852806, 0.0690589, 0.0472335, 0.0365517, 0.0262368, 0.0229718, 0.0228724, 0.00656045, 0.00546197,0.00366466, 0, 0.0131781, 0, 0, 0.0596201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-	  //weight for Data-Mc comparison configStartupDY.ini 2015D-v3 FullStat vs DY Startup 
-	  // float PUweight[60] = {0, 23.5718, 11.623, 9.75004, 8.38437, 7.49407, 6.5513, 5.50713, 4.56761, 3.75242, 2.94015, 2.3024, 1.73567, 1.28708, 0.940598, 0.677024, 0.473512, 0.331202, 0.23009, 0.152347, 0.104783, 0.0694506, 0.046307, 0.031299, 0.0193667, 0.0124493, 0.00760724, 0.00600702, 0.00425913, 0.00123227, 0.00091714, 0.00060431, 0, 0.00110741, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	  
-	  //weight for Data to Data comparison 2015C 25ns "old" vs 50 ns
-	  //float PUweight[60] = {0, 2.59252, 7.0705, 6.74054, 7.77755, 3.26155, 3.42985, 2.89984, 2.28284, 2.13837, 1.70971, 1.50287, 1.20367, 1.17027, 0.956894, 0.881644, 0.7398, 0.635878, 0.595542, 0.494059, 0.499049, 0.408914, 0.344204, 0.286958, 0.388219, 0.244787, 0.265499, 0.216043, 0.172834, 0.0540108, 0.360072, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	 
 	  if(plotter.m_sampleConfig.applyReweighting==true)
-	    weight *= ev->nVtx < 60 ? PUweight[ev->nVtx] : 0;
+	    weight *= ev->nVtx < 60 ? tnpConfig.pu_weights[ev->nVtx] : 0;
 	    
 	  plotter.fill(ev->muons, ev->hlt, ev->nVtx, weight);
 	}
@@ -515,8 +317,10 @@ muon_pog::TagAndProbeConfig::TagAndProbeConfig(boost::property_tree::ptree::valu
 
       probe_minPt  = vt.second.get<Float_t>("probe_minPt");
       probe_IDs    = toArray(vt.second.get<std::string>("probe_muonIDs"));
-      probe_fEtaBins = toPairArray(toArray(vt.second.get<std::string>("probe_fEtaMin")),
-				   toArray(vt.second.get<std::string>("probe_fEtaMax")));
+      probe_etaBins = toPairArray(toArray(vt.second.get<std::string>("probe_etaMin")),
+				  toArray(vt.second.get<std::string>("probe_etaMax")));
+
+      pu_weights = toArrayF(vt.second.get<std::string>("pu_weights"));
   
     }
 
@@ -537,7 +341,7 @@ muon_pog::SampleConfig::SampleConfig(boost::property_tree::ptree::value_type & v
       fileName     = TString(vt.second.get<std::string>("fileName").c_str());
       sampleName   = TString(vt.first.c_str());
       cSection = vt.second.get<Float_t>("cSection");
-      nEvents = vt.second.get<Float_t>("nEvents"); //CB do we really need this? can't we take nEvents from the file itself?
+      nEvents  = vt.second.get<Int_t>("nEvents");
       applyReweighting = vt.second.get<Bool_t>("applyReweighting");
     }
   
@@ -563,22 +367,35 @@ std::vector<TString> muon_pog::TagAndProbeConfig::toArray(const std::string& ent
 
 }
 
-std::vector<std::pair<TString,TString> > muon_pog::TagAndProbeConfig::toPairArray(const std::vector<TString> & fEtaMin,
-										  const std::vector<TString> & fEtaMax)
+std::vector<Float_t> muon_pog::TagAndProbeConfig::toArrayF(const std::string& entries)
+{
+  
+  std::vector<Float_t> result;
+  std::stringstream sentries(entries);
+  std::string item;
+  while(std::getline(sentries, item, ','))
+    result.push_back(atof(item.c_str()));
+  return result;
+
+}
+
+
+std::vector<std::pair<TString,TString> > muon_pog::TagAndProbeConfig::toPairArray(const std::vector<TString> & etaMin,
+										  const std::vector<TString> & etaMax)
 {
 
   std::vector<std::pair<TString,TString> > result;
 
-  std::vector<TString>::const_iterator fEtaMinIt  = fEtaMin.begin();
-  std::vector<TString>::const_iterator fEtaMinEnd = fEtaMin.end();
+  std::vector<TString>::const_iterator etaMinIt  = etaMin.begin();
+  std::vector<TString>::const_iterator etaMinEnd = etaMin.end();
 
-  std::vector<TString>::const_iterator fEtaMaxIt  = fEtaMax.begin();
-  std::vector<TString>::const_iterator fEtaMaxEnd = fEtaMax.end();
+  std::vector<TString>::const_iterator etaMaxIt  = etaMax.begin();
+  std::vector<TString>::const_iterator etaMaxEnd = etaMax.end();
   
-  for (; fEtaMinIt != fEtaMinEnd || fEtaMaxIt != fEtaMaxEnd; ++fEtaMinIt, ++fEtaMaxIt)
+  for (; etaMinIt != etaMinEnd || etaMaxIt != etaMaxEnd; ++etaMinIt, ++etaMaxIt)
     {
-      result.push_back(std::make_pair((*fEtaMinIt),
-				      (*fEtaMaxIt)));
+      result.push_back(std::make_pair((*etaMinIt),
+				      (*etaMaxIt)));
     }
 
   return result;
@@ -593,8 +410,6 @@ muon_pog::Observable::Observable(TString hName, TString sampleTag, TString xTitl
     { // CB book here for other plots vs kin variables
       m_plots.push_back(new TProfile("h" + hName + "VsEta_"      + sampleTag, hName + " vs #eta;    #eta;"          + xTitle, 24, -2.4, 2.4, min, max));
       m_plots.push_back(new TProfile("h" + hName + "VsPhi_"      + sampleTag, hName + " vs #phi;    #phi;"          + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));     
-      m_plots.push_back(new TProfile("h" + hName + "VsPhiPlus_"  + sampleTag, hName + " vs #phi for #eta +;  #phi;" + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));
-      m_plots.push_back(new TProfile("h" + hName + "VsPhiMinus_" + sampleTag, hName + " vs #phi for #eta -;  #phi;" + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));
       m_plots.push_back(new TProfile("h" + hName + "VsPt_"       + sampleTag, hName + " vs p_{T};   p_{T} (GeV);"   + xTitle, 50,  0., 150., min, max));
       m_plots.push_back(new TProfile("h" + hName + "VsPV_"       + sampleTag, hName + " vs PV;      # of PV;"       + xTitle, 60,  0., 60., min, max));
     }
@@ -609,12 +424,8 @@ void muon_pog::Observable::fill(Float_t value, TLorentzVector & muonTk, Float_t 
     {   
       ((TProfile*)m_plots.at(1))->Fill(muonTk.Eta(), value, weight);
       ((TProfile*)m_plots.at(2))->Fill(muonTk.Phi(), value, weight);
-      if (muonTk.Eta() > 0)
-	((TProfile*)m_plots.at(3))->Fill(muonTk.Phi(), value, weight);
-      else
-	((TProfile*)m_plots.at(4))->Fill(muonTk.Phi(), value, weight);
-      ((TProfile*)m_plots.at(5))->Fill(muonTk.Pt(),  value, weight);
-      ((TProfile*)m_plots.at(6))->Fill(PV,           value, weight);
+      ((TProfile*)m_plots.at(3))->Fill(muonTk.Pt(),  value, weight);
+      ((TProfile*)m_plots.at(4))->Fill(PV,           value, weight);
     }
 }
 
@@ -631,6 +442,7 @@ void muon_pog::Plotter::book(TFile *outFile)
   outFile->mkdir(sampleTag+"/timing");
   outFile->mkdir(sampleTag+"/id_variables");
   outFile->mkdir(sampleTag+"/kinematical_variables");
+  outFile->mkdir(sampleTag+"/momentum_variables");
   outFile->mkdir(sampleTag+"/isolation");
   outFile->mkdir(sampleTag+"/control");
  
@@ -734,10 +546,10 @@ void muon_pog::Plotter::book(TFile *outFile)
   m_plots[TIME]["UnbSTAmuonTimeBarrel"] = muon_pog::Observable("UnbSTAmuonTimeBarrel", sampleTag, "time (ns)", "# entries", 400, -200., 200., false);
   m_plots[TIME]["UnbSTAmuonTimeEndcap"] = muon_pog::Observable("UnbSTAmuonTimeEndcap", sampleTag, "time (ns)", "# entries", 400, -200., 200., false);
 
-  for (auto fEtaBin : m_tnpConfig.probe_fEtaBins)
+  for (auto etaBin : m_tnpConfig.probe_etaBins)
     {
       
-      TString etaTag = "_fEtaMin" + fEtaBin.first + "_fEtaMax" + fEtaBin.second;
+      TString etaTag = "_etaMin" + etaBin.first + "_etaMax" + etaBin.second;
 
       outFile->cd(sampleTag+"/id_variables");
 
@@ -775,18 +587,21 @@ void muon_pog::Plotter::book(TFile *outFile)
       m_plots[ID]["qOverPtTrkGlb200" + etaTag]      = muon_pog::Observable("qOverPtTrkGlb200" + etaTag, sampleTag, "q/p_{T}^{glb} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
       m_plots[ID]["qOverPtTrkGlb200Plus" + etaTag]      = muon_pog::Observable("qOverPtTrkGlb200Plus" + etaTag, sampleTag, "q/p_{T}^{glb} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
 
-      outFile->cd(sampleTag+"/kinematical_variables");
-
       for ( auto & probe_ID : m_tnpConfig.probe_IDs)
 	{
 	  TString IDTag = "_" + probe_ID;
 	  
+	  outFile->cd(sampleTag+"/kinematical_variables");
+
 	  m_plots[KIN]["ProbePt" + etaTag + IDTag]  = muon_pog::Observable("ProbePt" + etaTag + IDTag, sampleTag, "p_{T} (GeV)", "# entries", 75,0.,150., true);
 	  m_plots[KIN]["ProbeEta" + etaTag + IDTag] = muon_pog::Observable("hProbeEta_" + etaTag + IDTag, sampleTag, "#eta", "# entries", 48,-2.4, 2.4, true);
 	  m_plots[KIN]["ProbePhi" + etaTag + IDTag] = muon_pog::Observable("hProbePhi_" + etaTag + IDTag, sampleTag, "#phi", "# entries", 48,-TMath::Pi(),TMath::Pi(), true); 
-	  m_plots[KIN]["goodMuMass" + etaTag + IDTag]  = muon_pog::Observable("goodMuMass" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 30,85.,115., true);
-	  m_plots[KIN]["goodMuMassPlus" + etaTag + IDTag]  = muon_pog::Observable("goodMuMassPlus" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 20 ,86.5,96.5, true);
-	  m_plots[KIN]["goodMuMassMinus" + etaTag + IDTag]  = muon_pog::Observable("goodMuMassMinus" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 20,86.5,96.5, true);
+
+	  outFile->cd(sampleTag+"/momentum_variables");
+
+	  m_plots[MOM]["goodMuMass" + etaTag + IDTag]  = muon_pog::Observable("goodMuMass" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 30,85.,115., false);
+	  m_plots[MOM]["goodMuMassPlus" + etaTag + IDTag]  = muon_pog::Observable("goodMuMassPlus" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 20 ,86.5,96.5, true);
+	  m_plots[MOM]["goodMuMassMinus" + etaTag + IDTag]  = muon_pog::Observable("goodMuMassMinus" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 20,86.5,96.5, true);
    
 	}
   
@@ -905,13 +720,13 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 		      m_plots[CONT]["02_dilepPt"].fill(dilepPt,emptyTk,weight,nVtx);
 		      m_plots[CONT]["03_nVertices"].fill(nVtx,emptyTk,weight,nVtx);
 		      
-		      for (auto fEtaBin : m_tnpConfig.probe_fEtaBins)
+		      for (auto etaBin : m_tnpConfig.probe_etaBins)
 			{
-			  if (fabs(muTk.Eta()) > fEtaBin.first.Atof() &&
-			      fabs(muTk.Eta()) < fEtaBin.second.Atof() )
+			  if (muTk.Eta() > etaBin.first.Atof() &&
+			      muTk.Eta() < etaBin.second.Atof() )
 			    {
 
-			      TString etaTag = "_fEtaMin" + fEtaBin.first + "_fEtaMax" + fEtaBin.second;
+			      TString etaTag = "_etaMin" + etaBin.first + "_etaMax" + etaBin.second;
 	
 			      for (auto & probe_ID : m_tnpConfig.probe_IDs)
 				{
@@ -919,13 +734,13 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 
 				  if(hasGoodId(muon,probe_ID) && muon.isoPflow04 < 0.25 && mass > 60 && mass < 115)
 				    {
-				    m_plots[KIN]["goodMuMass" + etaTag + IDTag].fill(mass, muTk, weight, nVtx);
+				    m_plots[MOM]["goodMuMass" + etaTag + IDTag].fill(mass, muTk, weight, nVtx);
 				    if (mass > 86.5 && mass < 96.5)
 				      {
 					if (chargeFromTrk(muon) > 0)
-					  m_plots[KIN]["goodMuMassPlus" + etaTag + IDTag].fill(mass, muTk, weight, nVtx);
+					  m_plots[MOM]["goodMuMassPlus" + etaTag + IDTag].fill(mass, muTk, weight, nVtx);
 					else
-					  m_plots[KIN]["goodMuMassMinus" + etaTag + IDTag].fill(mass, muTk, weight, nVtx);
+					  m_plots[MOM]["goodMuMassMinus" + etaTag + IDTag].fill(mass, muTk, weight, nVtx);
 				      }
 				    }
 				}
@@ -1088,16 +903,16 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
     {
       const muon_pog::Muon & probeMuon = *probeMuonPointer;
       			  
-      for (auto fEtaBin : m_tnpConfig.probe_fEtaBins)
+      for (auto etaBin : m_tnpConfig.probe_etaBins)
 	{
 
 	  TLorentzVector probeMuTk(muonTk(probeMuon));
 	  
-	  if (fabs(probeMuTk.Eta()) > fEtaBin.first.Atof() &&
-	      fabs(probeMuTk.Eta()) < fEtaBin.second.Atof() )
+	  if (probeMuTk.Eta() > etaBin.first.Atof() &&
+	      probeMuTk.Eta() < etaBin.second.Atof() )
 	    {
 	      
-	      TString etaTag = "_fEtaMin" + fEtaBin.first + "_fEtaMax" + fEtaBin.second;
+	      TString etaTag = "_etaMin" + etaBin.first + "_etaMax" + etaBin.second;
 
 	      //id var
 	      if (probeMuon.isGlobal)
@@ -1339,6 +1154,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
   outFile->mkdir("comparison/isolation");
   outFile->mkdir("comparison/id_variables");
   outFile->mkdir("comparison/kinematical_variables");
+  outFile->mkdir("comparison/momentum_variables");
   outFile->mkdir("comparison/efficiencies");
   
   system("mkdir -p " + outputDir + "/comparison/control/no_ratio");
@@ -1346,6 +1162,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
   system("mkdir -p " + outputDir + "/comparison/isolation/no_ratio");
   system("mkdir -p " + outputDir + "/comparison/id_variables/no_ratio");
   system("mkdir -p " + outputDir + "/comparison/kinematical_variables/no_ratio");
+  system("mkdir -p " + outputDir + "/comparison/momentum_variables/no_ratio");
   system("mkdir -p " + outputDir + "/comparison/efficiencies/no_ratio");
   
   outFile->cd("comparison");
@@ -1363,7 +1180,8 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
   for (auto & plotTypeAndName : plotTypesAndNames)
     {
 
-      TString outputDirMap[6] {"/comparison/kinematical_variables", "/comparison/id_variables", "/comparison/isolation", "/comparison/timing", "/comparison/control", "/comparison/efficiencies"};
+      TString outputDirMap[7] {"/comparison/kinematical_variables", "/comparison/momentum_variables", "/comparison/id_variables", 
+	  "/comparison/isolation", "/comparison/timing", "/comparison/control", "/comparison/efficiencies"};
       
       Plotter::HistoType plotType = plotTypeAndName.first;
       TString plotName = plotTypeAndName.second;
@@ -1385,7 +1203,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  Float_t errors[1000] = {0.};
 	  TH1 * hData = 0;
 
-	  int colorMap[5] {kGray+1, kRed, kAzure+7, kGreen+1, kOrange};
+	  int colorMap[5] {kAzure+7, kGray+1, kRed, kGreen+1, kOrange};
 	 
 	  int iColor = 0;
 	  
@@ -1556,220 +1374,220 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  
 	  leg->Draw();
 	  
-	  //Get Integral before/after ID cuts
-	  std::vector<TString> fEtaBinMin = {"0.0","2.1"};
-	  std::vector<TString> fEtaBinMax = {"2.4","2.4"};
+	  // //Get Integral before/after ID cuts
+	  // std::vector<TString> etaBinMin = {"0.0","2.1"};
+	  // std::vector<TString> etaBinMax = {"2.4","2.4"};
 	  
-	  for (int i = 0; i < 2; ++i){
-	    TString etaTag = "_fEtaMin" + fEtaBinMin[i] + "_fEtaMax" + fEtaBinMax[i];	    
+	  // for (int i = 0; i < 2; ++i){
+	  //   TString etaTag = "_fEtaMin" + fEtaBinMin[i] + "_fEtaMax" + fEtaBinMax[i];	    
 
-	    if(plotName == "HitFractionTRK" + etaTag && !pMc)
-	      {
-		//the cut is > 0.8
-		double x1 = hData->FindBin(0.8);
-		double x2 = hData->GetNbinsX();
-		double Data_HitFractionTRK_a = hData->Integral(x1+1,x2)/hData->Integral(1,x2);
-		double Data_HitFractionTRK_b = hData->Integral(1,x1)/hData->Integral(1,x2);
-		double MC_HitFractionTRK_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1+1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_HitFractionTRK_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  //   if(plotName == "HitFractionTRK" + etaTag && !pMc)
+	  //     {
+	  // 	//the cut is > 0.8
+	  // 	double x1 = hData->FindBin(0.8);
+	  // 	double x2 = hData->GetNbinsX();
+	  // 	double Data_HitFractionTRK_a = hData->Integral(x1+1,x2)/hData->Integral(1,x2);
+	  // 	double Data_HitFractionTRK_b = hData->Integral(1,x1)/hData->Integral(1,x2);
+	  // 	double MC_HitFractionTRK_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1+1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_HitFractionTRK_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
 		
-		integrals << std::endl;
-		integrals << "********* Medium ID " + etaTag + " ********" << std::endl;
-		integrals << "Data: HitFractionTRK_a = " << Data_HitFractionTRK_a << "  HitFractionTRK_b = " << Data_HitFractionTRK_b << "  --> " << Data_HitFractionTRK_a+Data_HitFractionTRK_b << std::endl;
-		integrals << "MC  : HitFractionTRK_a = " << MC_HitFractionTRK_a << "  HitFractionTRK_b = " << MC_HitFractionTRK_b << "  --> " << MC_HitFractionTRK_a+MC_HitFractionTRK_b << std::endl;
-		integrals << std::endl;
-	      }
+	  // 	integrals << std::endl;
+	  // 	integrals << "********* Medium ID " + etaTag + " ********" << std::endl;
+	  // 	integrals << "Data: HitFractionTRK_a = " << Data_HitFractionTRK_a << "  HitFractionTRK_b = " << Data_HitFractionTRK_b << "  --> " << Data_HitFractionTRK_a+Data_HitFractionTRK_b << std::endl;
+	  // 	integrals << "MC  : HitFractionTRK_a = " << MC_HitFractionTRK_a << "  HitFractionTRK_b = " << MC_HitFractionTRK_b << "  --> " << MC_HitFractionTRK_a+MC_HitFractionTRK_b << std::endl;
+	  // 	integrals << std::endl;
+	  //     }
 	    
-	    if(plotName == "Chi2GLB" + etaTag && !pMc) // chi2<3
-	      {
-		double x1 = hData->FindBin(3.);
-		double x2 = hData->GetNbinsX();
-		double Data_Chi2GLB_a = hData->Integral(x1,x2)/hData->Integral(1,x2);
-		double Data_Chi2GLB_b = hData->Integral(1,x1-1)/hData->Integral(1,x2);
-		double MC_Chi2GLB_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_Chi2GLB_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  //   if(plotName == "Chi2GLB" + etaTag && !pMc) // chi2<3
+	  //     {
+	  // 	double x1 = hData->FindBin(3.);
+	  // 	double x2 = hData->GetNbinsX();
+	  // 	double Data_Chi2GLB_a = hData->Integral(x1,x2)/hData->Integral(1,x2);
+	  // 	double Data_Chi2GLB_b = hData->Integral(1,x1-1)/hData->Integral(1,x2);
+	  // 	double MC_Chi2GLB_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_Chi2GLB_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
 		
-		integrals << std::endl;
-		integrals << "********* Medium ID " + etaTag + " ********" << std::endl;
-		integrals << "Data: Chi2GLB_a = " << Data_Chi2GLB_a << "  Chi2GLB_b = " << Data_Chi2GLB_b << "  --> " << Data_Chi2GLB_a+Data_Chi2GLB_b << std::endl;
-		integrals << "MC  : Chi2GLB_a = " << MC_Chi2GLB_a << "  Chi2GLB_b = " << MC_Chi2GLB_b << "  --> " << MC_Chi2GLB_a+MC_Chi2GLB_b << std::endl;
-		integrals << std::endl;
-	      }
-	    
-	    
-	    if(plotName == "TrkStaChi2" + etaTag && !pMc)
-	      {
-		double x1 = hData->FindBin(12.);
-		double x2 = hData->GetNbinsX();
-		double Data_TrkStaChi2_a = hData->Integral(x1,x2)/hData->Integral(1,x2);
-		double Data_TrkStaChi2_b = hData->Integral(1,x1-1)/hData->Integral(1,x2);
-		double MC_TrkStaChi2_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_TrkStaChi2_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		integrals << std::endl;
-		integrals << "********* Medium ID " + etaTag + " ********" << std::endl;
-		integrals << "Data: TrkStaChi2_a = " << Data_TrkStaChi2_a << "  TrkStaChi2_b = " << Data_TrkStaChi2_b << "  --> " << Data_TrkStaChi2_a+Data_TrkStaChi2_b << std::endl;
-		integrals << "MC  : TrkStaChi2_a = " << MC_TrkStaChi2_a << "  TrkStaChi2_b = " << MC_TrkStaChi2_b << "  --> " << MC_TrkStaChi2_a+MC_TrkStaChi2_b << std::endl;
-		integrals << std::endl;
-		
-	      }
-	    
-	    if(plotName == "TrkKink" + etaTag && !pMc)
-	      {
-		double x1 = hData->FindBin(20.);
-		double x2 = hData->GetNbinsX();
-		double Data_TrkKink_a = hData->Integral(x1,x2)/hData->Integral(1,x2);
-		double Data_TrkKink_b = hData->Integral(1,x1-1)/hData->Integral(1,x2);
-		double MC_TrkKink_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_TrkKink_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		
-		integrals << std::endl;
-		integrals << "********* Medium ID " + etaTag + " ********" << std::endl;
-		integrals << "Data: TrkKink_a = " << Data_TrkKink_a << "  TrkKink_b = " << Data_TrkKink_b << "  --> " << Data_TrkKink_a+Data_TrkKink_b << std::endl;
-		integrals << "MC  : TrkKink_a = " << MC_TrkKink_a << "  TrkKink_b = " << MC_TrkKink_b << "  --> " << MC_TrkKink_a+MC_TrkKink_b << std::endl;
-		integrals << std::endl;
-		
-	      }
-	    
-	    if(plotName == "SegmentComp" + etaTag && !pMc)
-	      {
-		double x0  = hData->FindBin(.303);
-		double x1  = hData->FindBin(.451);
-		double x2  = hData->GetNbinsX();
-		
-		double Data_SegmentCompLoose_a = hData->Integral(x0+1,x2)/hData->Integral(1,x2);
-		double Data_SegmentCompTight_a = hData->Integral(x1+1,x2)/hData->Integral(1,x2);
-		double Data_SegmentCompLoose_b = hData->Integral(1,x0)/hData->Integral(1,x2);
-		double Data_SegmentCompTight_b = hData->Integral(1,x1)/hData->Integral(1,x2);
-		double MC_SegmentCompLoose_a = ((TH1*)hMc.GetStack()->Last())->Integral(x0+1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_SegmentCompTight_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1+1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_SegmentCompLoose_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x0)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_SegmentCompTight_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		
-		integrals << std::endl;
-		integrals << "********* Medium ID " + etaTag + " ********" << std::endl;
-		integrals << "Data: SegmentCompLoose_a = " << Data_SegmentCompLoose_a << "  SegmentCompLoose_b = " << Data_SegmentCompLoose_b << "  --> " << Data_SegmentCompLoose_a+Data_SegmentCompLoose_b << std::endl;
-		integrals << "MC  : SegmentCompLoose_a = " << MC_SegmentCompLoose_a << "  SegmentCompLoose_b = " << MC_SegmentCompLoose_b << "  --> " << MC_SegmentCompLoose_a+MC_SegmentCompLoose_b << std::endl;
-		integrals << "Data: SegmentCompTight_a = " << Data_SegmentCompTight_a << "  SegmentCompTight_b = " << Data_SegmentCompTight_b << "  --> " << Data_SegmentCompLoose_a+Data_SegmentCompLoose_b << std::endl;
-		integrals << "MC  : SegmentCompTight_a = " << MC_SegmentCompTight_a << "  SegmentCompTight_b = " << MC_SegmentCompTight_b << "  --> " << MC_SegmentCompLoose_a+MC_SegmentCompLoose_b << std::endl;
-		integrals << std::endl;
-	      }
-	    
-	    //Tight ID
-	    if(plotName == "Chi2GLB" + etaTag && !pMc)
-	      {
-		double x1 = hData->FindBin(10.);
-		double x2 = hData->GetNbinsX();
-		double Data_Chi2GLB_a = hData->Integral(x1,x2)/hData->Integral(1,x2);
-		double Data_Chi2GLB_b = hData->Integral(1,x1-1)/hData->Integral(1,x2);
-		double MC_Chi2GLB_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_Chi2GLB_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		
-		integrals << std::endl;
-		integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
-		integrals << "Data: Chi2GLB_a = " << Data_Chi2GLB_a << "  Chi2GLB_b = " << Data_Chi2GLB_b << "  --> " << Data_Chi2GLB_a+Data_Chi2GLB_b << std::endl;
-		integrals << "MC  : Chi2GLB_a = " << MC_Chi2GLB_a << "  Chi2GLB_b = " << MC_Chi2GLB_b << "  --> " << MC_Chi2GLB_a+MC_Chi2GLB_b << std::endl;
-		integrals << std::endl;
-	      }
-	    
-	    if(plotName == "NMuonValidHitsGLB" + etaTag && !pMc)
-	      {
-		double x1 = hData->FindBin(0.);
-		double x2 = hData->GetNbinsX();
-		double Data_NMuonValidHitsGLB_a = hData->Integral(x1+1,x2)/hData->Integral(1,x2);
-		double Data_NMuonValidHitsGLB_b = hData->Integral(1,x1)/hData->Integral(1,x2);
-		double MC_NMuonValidHitsGLB_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1+1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_NMuonValidHitsGLB_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		
-		integrals << std::endl;
-		integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
-		integrals << "Data: NMuonValidHitsGLB_a = " << Data_NMuonValidHitsGLB_a << "  NMuonValidHitsGLB_b = " << Data_NMuonValidHitsGLB_b << "  --> " << Data_NMuonValidHitsGLB_a+Data_NMuonValidHitsGLB_b << std::endl;
-		integrals << "MC  : NMuonValidHitsGLB_a = " << MC_NMuonValidHitsGLB_a << "  NMuonValidHitsGLB_b = " << MC_NMuonValidHitsGLB_b << "  --> " << MC_NMuonValidHitsGLB_a+MC_NMuonValidHitsGLB_b << std::endl;
-		integrals << std::endl;
-	      }
-	    
-	    if(plotName == "NMatchedStation" + etaTag && !pMc)
-	      {
-		double x1 = hData->FindBin(1.);
-		double x2 = hData->GetNbinsX();
-		double Data_NMatchedStation_a = hData->Integral(x1+1,x2)/hData->Integral(1,x2);
-		double Data_NMatchedStation_b = hData->Integral(1,x1)/hData->Integral(1,x2);
-		double MC_NMatchedStation_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1+1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_NMatchedStation_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		
-		integrals << std::endl;
-		integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
-		integrals << "Data: NMatchedStation_a = " << Data_NMatchedStation_a << "  NMatchedStation_b = " << Data_NMatchedStation_b << "  --> " << Data_NMatchedStation_a+Data_NMatchedStation_b << std::endl;
-		integrals << "MC  : NMatchedStation_a = " << MC_NMatchedStation_a << "  NMatchedStation_b = " << MC_NMatchedStation_b << "  --> " << MC_NMatchedStation_a+MC_NMatchedStation_b << std::endl;
-		integrals << std::endl;
-	      }
-	    
-	    if(plotName == "Dxy" + etaTag && !pMc)
-	      {
-		double mx1 = hData->FindBin(-0.2);
-		double x1  = hData->FindBin(.2);
-		double x2  = hData->GetNbinsX();
-		double Data_Dxy_a = (hData->Integral(x1,x2) + hData->Integral(1,mx1))/hData->Integral(1,x2);  
-		double Data_Dxy_b = hData->Integral(mx1+1,x1-1)/hData->Integral(1,x2);
-		double MC_Dxy_a = (((TH1*)hMc.GetStack()->Last())->Integral(x1,x2) + ((TH1*)hMc.GetStack()->Last())->Integral(1,mx1))/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_Dxy_b = ((TH1*)hMc.GetStack()->Last())->Integral(mx1+1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		
-		integrals << std::endl;
-		integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
-		integrals << "Data: Dxy_a = " << Data_Dxy_a << "  Dxy_b = " << Data_Dxy_b << "  --> " << Data_Dxy_a+Data_Dxy_b << std::endl;
-		integrals << "MC  : Dxy_a = " << MC_Dxy_a << "  Dxy_b = " << MC_Dxy_b << "  --> " << MC_Dxy_a+MC_Dxy_b << std::endl;
-		integrals << std::endl;
-	      }
-	    
-	    if(plotName == "Dz" + etaTag && !pMc)
-	      {
-		double mx1 = hData->FindBin(-0.5);
-		double x1 = hData->FindBin(.5);
-		double x2 = hData->GetNbinsX();
-		double Data_Dz_a = (hData->Integral(x1,x2) + hData->Integral(1,mx1))/hData->Integral(1,x2); //the cut is above th 
-		double Data_Dz_b = hData->Integral(mx1+1,x1-1)/hData->Integral(1,x2);
-		double MC_Dz_a = (((TH1*)hMc.GetStack()->Last())->Integral(x1,x2) + ((TH1*)hMc.GetStack()->Last())->Integral(1,mx1))/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_Dz_b = ((TH1*)hMc.GetStack()->Last())->Integral(mx1+1,x1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		
-		integrals << std::endl;
-		integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
-		integrals << "Data: Dz_a = " << Data_Dz_a << "  Dz_b = " << Data_Dz_b << "  --> " << Data_Dz_a+Data_Dz_b << std::endl;
-		integrals << "MC  : Dz_a = " << MC_Dz_a << "  Dz_b = " << MC_Dz_b << "  --> " << MC_Dz_a+MC_Dz_b << std::endl;
-		integrals << std::endl;
-	      }
+	  // 	integrals << std::endl;
+	  // 	integrals << "********* Medium ID " + etaTag + " ********" << std::endl;
+	  // 	integrals << "Data: Chi2GLB_a = " << Data_Chi2GLB_a << "  Chi2GLB_b = " << Data_Chi2GLB_b << "  --> " << Data_Chi2GLB_a+Data_Chi2GLB_b << std::endl;
+	  // 	integrals << "MC  : Chi2GLB_a = " << MC_Chi2GLB_a << "  Chi2GLB_b = " << MC_Chi2GLB_b << "  --> " << MC_Chi2GLB_a+MC_Chi2GLB_b << std::endl;
+	  // 	integrals << std::endl;
+	  //     }
 	    
 	    
-	    if(plotName == "PixelHitsTRK" + etaTag && !pMc)
-	      {
-		double x1 = hData->FindBin(1);
-		double x2 = hData->GetNbinsX();
-		double Data_PixelHitsTRK_a = hData->Integral(x1,x2)/hData->Integral(1,x2);
-		double Data_PixelHitsTRK_b = hData->Integral(1,x1-1)/hData->Integral(1,x2);
-		double MC_PixelHitsTRK_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_PixelHitsTRK_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  //   if(plotName == "TrkStaChi2" + etaTag && !pMc)
+	  //     {
+	  // 	double x1 = hData->FindBin(12.);
+	  // 	double x2 = hData->GetNbinsX();
+	  // 	double Data_TrkStaChi2_a = hData->Integral(x1,x2)/hData->Integral(1,x2);
+	  // 	double Data_TrkStaChi2_b = hData->Integral(1,x1-1)/hData->Integral(1,x2);
+	  // 	double MC_TrkStaChi2_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_TrkStaChi2_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	integrals << std::endl;
+	  // 	integrals << "********* Medium ID " + etaTag + " ********" << std::endl;
+	  // 	integrals << "Data: TrkStaChi2_a = " << Data_TrkStaChi2_a << "  TrkStaChi2_b = " << Data_TrkStaChi2_b << "  --> " << Data_TrkStaChi2_a+Data_TrkStaChi2_b << std::endl;
+	  // 	integrals << "MC  : TrkStaChi2_a = " << MC_TrkStaChi2_a << "  TrkStaChi2_b = " << MC_TrkStaChi2_b << "  --> " << MC_TrkStaChi2_a+MC_TrkStaChi2_b << std::endl;
+	  // 	integrals << std::endl;
 		
-		integrals << std::endl;
-		integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
-		integrals << "Data: PixelHitsTRK_a = " << Data_PixelHitsTRK_a << "  PixelHitsTRK_b = " << Data_PixelHitsTRK_b << "  --> " << Data_PixelHitsTRK_a+Data_PixelHitsTRK_b << std::endl;
-		integrals << "MC  : PixelHitsTRK_a = " << MC_PixelHitsTRK_a << "  PixelHitsTRK_b = " << MC_PixelHitsTRK_b << "  --> " << MC_PixelHitsTRK_a+MC_PixelHitsTRK_b << std::endl;
-		integrals << std::endl;
-	      }
+	  //     }
 	    
-	    if(plotName == "TrackerLayersTRK" + etaTag && !pMc)
-	      {
-		double x1 = hData->FindBin(6);
-		double x2 = hData->GetNbinsX();
-		double Data_TrackerLayersTRK_a = hData->Integral(x1,x2)/hData->Integral(1,x2);
-		double Data_TrackerLayersTRK_b = hData->Integral(1,x1-1)/hData->Integral(1,x2);
-		double MC_TrackerLayersTRK_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
-		double MC_TrackerLayersTRK_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  //   if(plotName == "TrkKink" + etaTag && !pMc)
+	  //     {
+	  // 	double x1 = hData->FindBin(20.);
+	  // 	double x2 = hData->GetNbinsX();
+	  // 	double Data_TrkKink_a = hData->Integral(x1,x2)/hData->Integral(1,x2);
+	  // 	double Data_TrkKink_b = hData->Integral(1,x1-1)/hData->Integral(1,x2);
+	  // 	double MC_TrkKink_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_TrkKink_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
 		
-		integrals << std::endl;
-		integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
-		integrals << "Data: TrackerLayersTRK_a = " << Data_TrackerLayersTRK_a << "  TrackerLayersTRK_b = " << Data_TrackerLayersTRK_b << "  --> " << Data_TrackerLayersTRK_a+Data_TrackerLayersTRK_b << std::endl;
-		integrals << "MC  : TrackerLayersTRK_a = " << MC_TrackerLayersTRK_a << "  TrackerLayersTRK_b = " << MC_TrackerLayersTRK_b << "  --> " << MC_TrackerLayersTRK_a+MC_TrackerLayersTRK_b << std::endl;
-		integrals << std::endl;
-	      }
-	  }
+	  // 	integrals << std::endl;
+	  // 	integrals << "********* Medium ID " + etaTag + " ********" << std::endl;
+	  // 	integrals << "Data: TrkKink_a = " << Data_TrkKink_a << "  TrkKink_b = " << Data_TrkKink_b << "  --> " << Data_TrkKink_a+Data_TrkKink_b << std::endl;
+	  // 	integrals << "MC  : TrkKink_a = " << MC_TrkKink_a << "  TrkKink_b = " << MC_TrkKink_b << "  --> " << MC_TrkKink_a+MC_TrkKink_b << std::endl;
+	  // 	integrals << std::endl;
+		
+	  //     }
+	    
+	  //   if(plotName == "SegmentComp" + etaTag && !pMc)
+	  //     {
+	  // 	double x0  = hData->FindBin(.303);
+	  // 	double x1  = hData->FindBin(.451);
+	  // 	double x2  = hData->GetNbinsX();
+		
+	  // 	double Data_SegmentCompLoose_a = hData->Integral(x0+1,x2)/hData->Integral(1,x2);
+	  // 	double Data_SegmentCompTight_a = hData->Integral(x1+1,x2)/hData->Integral(1,x2);
+	  // 	double Data_SegmentCompLoose_b = hData->Integral(1,x0)/hData->Integral(1,x2);
+	  // 	double Data_SegmentCompTight_b = hData->Integral(1,x1)/hData->Integral(1,x2);
+	  // 	double MC_SegmentCompLoose_a = ((TH1*)hMc.GetStack()->Last())->Integral(x0+1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_SegmentCompTight_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1+1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_SegmentCompLoose_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x0)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_SegmentCompTight_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+		
+	  // 	integrals << std::endl;
+	  // 	integrals << "********* Medium ID " + etaTag + " ********" << std::endl;
+	  // 	integrals << "Data: SegmentCompLoose_a = " << Data_SegmentCompLoose_a << "  SegmentCompLoose_b = " << Data_SegmentCompLoose_b << "  --> " << Data_SegmentCompLoose_a+Data_SegmentCompLoose_b << std::endl;
+	  // 	integrals << "MC  : SegmentCompLoose_a = " << MC_SegmentCompLoose_a << "  SegmentCompLoose_b = " << MC_SegmentCompLoose_b << "  --> " << MC_SegmentCompLoose_a+MC_SegmentCompLoose_b << std::endl;
+	  // 	integrals << "Data: SegmentCompTight_a = " << Data_SegmentCompTight_a << "  SegmentCompTight_b = " << Data_SegmentCompTight_b << "  --> " << Data_SegmentCompLoose_a+Data_SegmentCompLoose_b << std::endl;
+	  // 	integrals << "MC  : SegmentCompTight_a = " << MC_SegmentCompTight_a << "  SegmentCompTight_b = " << MC_SegmentCompTight_b << "  --> " << MC_SegmentCompLoose_a+MC_SegmentCompLoose_b << std::endl;
+	  // 	integrals << std::endl;
+	  //     }
+	    
+	  //   //Tight ID
+	  //   if(plotName == "Chi2GLB" + etaTag && !pMc)
+	  //     {
+	  // 	double x1 = hData->FindBin(10.);
+	  // 	double x2 = hData->GetNbinsX();
+	  // 	double Data_Chi2GLB_a = hData->Integral(x1,x2)/hData->Integral(1,x2);
+	  // 	double Data_Chi2GLB_b = hData->Integral(1,x1-1)/hData->Integral(1,x2);
+	  // 	double MC_Chi2GLB_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_Chi2GLB_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+		
+	  // 	integrals << std::endl;
+	  // 	integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
+	  // 	integrals << "Data: Chi2GLB_a = " << Data_Chi2GLB_a << "  Chi2GLB_b = " << Data_Chi2GLB_b << "  --> " << Data_Chi2GLB_a+Data_Chi2GLB_b << std::endl;
+	  // 	integrals << "MC  : Chi2GLB_a = " << MC_Chi2GLB_a << "  Chi2GLB_b = " << MC_Chi2GLB_b << "  --> " << MC_Chi2GLB_a+MC_Chi2GLB_b << std::endl;
+	  // 	integrals << std::endl;
+	  //     }
+	    
+	  //   if(plotName == "NMuonValidHitsGLB" + etaTag && !pMc)
+	  //     {
+	  // 	double x1 = hData->FindBin(0.);
+	  // 	double x2 = hData->GetNbinsX();
+	  // 	double Data_NMuonValidHitsGLB_a = hData->Integral(x1+1,x2)/hData->Integral(1,x2);
+	  // 	double Data_NMuonValidHitsGLB_b = hData->Integral(1,x1)/hData->Integral(1,x2);
+	  // 	double MC_NMuonValidHitsGLB_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1+1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_NMuonValidHitsGLB_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+		
+	  // 	integrals << std::endl;
+	  // 	integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
+	  // 	integrals << "Data: NMuonValidHitsGLB_a = " << Data_NMuonValidHitsGLB_a << "  NMuonValidHitsGLB_b = " << Data_NMuonValidHitsGLB_b << "  --> " << Data_NMuonValidHitsGLB_a+Data_NMuonValidHitsGLB_b << std::endl;
+	  // 	integrals << "MC  : NMuonValidHitsGLB_a = " << MC_NMuonValidHitsGLB_a << "  NMuonValidHitsGLB_b = " << MC_NMuonValidHitsGLB_b << "  --> " << MC_NMuonValidHitsGLB_a+MC_NMuonValidHitsGLB_b << std::endl;
+	  // 	integrals << std::endl;
+	  //     }
+	    
+	  //   if(plotName == "NMatchedStation" + etaTag && !pMc)
+	  //     {
+	  // 	double x1 = hData->FindBin(1.);
+	  // 	double x2 = hData->GetNbinsX();
+	  // 	double Data_NMatchedStation_a = hData->Integral(x1+1,x2)/hData->Integral(1,x2);
+	  // 	double Data_NMatchedStation_b = hData->Integral(1,x1)/hData->Integral(1,x2);
+	  // 	double MC_NMatchedStation_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1+1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_NMatchedStation_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+		
+	  // 	integrals << std::endl;
+	  // 	integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
+	  // 	integrals << "Data: NMatchedStation_a = " << Data_NMatchedStation_a << "  NMatchedStation_b = " << Data_NMatchedStation_b << "  --> " << Data_NMatchedStation_a+Data_NMatchedStation_b << std::endl;
+	  // 	integrals << "MC  : NMatchedStation_a = " << MC_NMatchedStation_a << "  NMatchedStation_b = " << MC_NMatchedStation_b << "  --> " << MC_NMatchedStation_a+MC_NMatchedStation_b << std::endl;
+	  // 	integrals << std::endl;
+	  //     }
+	    
+	  //   if(plotName == "Dxy" + etaTag && !pMc)
+	  //     {
+	  // 	double mx1 = hData->FindBin(-0.2);
+	  // 	double x1  = hData->FindBin(.2);
+	  // 	double x2  = hData->GetNbinsX();
+	  // 	double Data_Dxy_a = (hData->Integral(x1,x2) + hData->Integral(1,mx1))/hData->Integral(1,x2);  
+	  // 	double Data_Dxy_b = hData->Integral(mx1+1,x1-1)/hData->Integral(1,x2);
+	  // 	double MC_Dxy_a = (((TH1*)hMc.GetStack()->Last())->Integral(x1,x2) + ((TH1*)hMc.GetStack()->Last())->Integral(1,mx1))/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_Dxy_b = ((TH1*)hMc.GetStack()->Last())->Integral(mx1+1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+		
+	  // 	integrals << std::endl;
+	  // 	integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
+	  // 	integrals << "Data: Dxy_a = " << Data_Dxy_a << "  Dxy_b = " << Data_Dxy_b << "  --> " << Data_Dxy_a+Data_Dxy_b << std::endl;
+	  // 	integrals << "MC  : Dxy_a = " << MC_Dxy_a << "  Dxy_b = " << MC_Dxy_b << "  --> " << MC_Dxy_a+MC_Dxy_b << std::endl;
+	  // 	integrals << std::endl;
+	  //     }
+	    
+	  //   if(plotName == "Dz" + etaTag && !pMc)
+	  //     {
+	  // 	double mx1 = hData->FindBin(-0.5);
+	  // 	double x1 = hData->FindBin(.5);
+	  // 	double x2 = hData->GetNbinsX();
+	  // 	double Data_Dz_a = (hData->Integral(x1,x2) + hData->Integral(1,mx1))/hData->Integral(1,x2); //the cut is above th 
+	  // 	double Data_Dz_b = hData->Integral(mx1+1,x1-1)/hData->Integral(1,x2);
+	  // 	double MC_Dz_a = (((TH1*)hMc.GetStack()->Last())->Integral(x1,x2) + ((TH1*)hMc.GetStack()->Last())->Integral(1,mx1))/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_Dz_b = ((TH1*)hMc.GetStack()->Last())->Integral(mx1+1,x1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+		
+	  // 	integrals << std::endl;
+	  // 	integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
+	  // 	integrals << "Data: Dz_a = " << Data_Dz_a << "  Dz_b = " << Data_Dz_b << "  --> " << Data_Dz_a+Data_Dz_b << std::endl;
+	  // 	integrals << "MC  : Dz_a = " << MC_Dz_a << "  Dz_b = " << MC_Dz_b << "  --> " << MC_Dz_a+MC_Dz_b << std::endl;
+	  // 	integrals << std::endl;
+	  //     }
+	    
+	    
+	  //   if(plotName == "PixelHitsTRK" + etaTag && !pMc)
+	  //     {
+	  // 	double x1 = hData->FindBin(1);
+	  // 	double x2 = hData->GetNbinsX();
+	  // 	double Data_PixelHitsTRK_a = hData->Integral(x1,x2)/hData->Integral(1,x2);
+	  // 	double Data_PixelHitsTRK_b = hData->Integral(1,x1-1)/hData->Integral(1,x2);
+	  // 	double MC_PixelHitsTRK_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_PixelHitsTRK_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+		
+	  // 	integrals << std::endl;
+	  // 	integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
+	  // 	integrals << "Data: PixelHitsTRK_a = " << Data_PixelHitsTRK_a << "  PixelHitsTRK_b = " << Data_PixelHitsTRK_b << "  --> " << Data_PixelHitsTRK_a+Data_PixelHitsTRK_b << std::endl;
+	  // 	integrals << "MC  : PixelHitsTRK_a = " << MC_PixelHitsTRK_a << "  PixelHitsTRK_b = " << MC_PixelHitsTRK_b << "  --> " << MC_PixelHitsTRK_a+MC_PixelHitsTRK_b << std::endl;
+	  // 	integrals << std::endl;
+	  //     }
+	    
+	  //   if(plotName == "TrackerLayersTRK" + etaTag && !pMc)
+	  //     {
+	  // 	double x1 = hData->FindBin(6);
+	  // 	double x2 = hData->GetNbinsX();
+	  // 	double Data_TrackerLayersTRK_a = hData->Integral(x1,x2)/hData->Integral(1,x2);
+	  // 	double Data_TrackerLayersTRK_b = hData->Integral(1,x1-1)/hData->Integral(1,x2);
+	  // 	double MC_TrackerLayersTRK_a = ((TH1*)hMc.GetStack()->Last())->Integral(x1,x2)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+	  // 	double MC_TrackerLayersTRK_b = ((TH1*)hMc.GetStack()->Last())->Integral(1,x1-1)/((TH1*)hMc.GetStack()->Last())->Integral(1,x2);
+		
+	  // 	integrals << std::endl;
+	  // 	integrals << "********* Tight ID " + etaTag + " ********" << std::endl;
+	  // 	integrals << "Data: TrackerLayersTRK_a = " << Data_TrackerLayersTRK_a << "  TrackerLayersTRK_b = " << Data_TrackerLayersTRK_b << "  --> " << Data_TrackerLayersTRK_a+Data_TrackerLayersTRK_b << std::endl;
+	  // 	integrals << "MC  : TrackerLayersTRK_a = " << MC_TrackerLayersTRK_a << "  TrackerLayersTRK_b = " << MC_TrackerLayersTRK_b << "  --> " << MC_TrackerLayersTRK_a+MC_TrackerLayersTRK_b << std::endl;
+	  // 	integrals << std::endl;
+	  //     }
+	  // }
 	  
 	  
 	  ratioCanvas->cd(2);
@@ -1808,11 +1626,14 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  if(plotName == "03_nVertices" && !pMc)
 	    {
 	      Int_t nbins = hRatio->GetNbinsX();
-	      
+	 
+	      std::cout << "[comparisonPlots] : reweight w.r.t. data sample: " << std::endl;
+	      std::cout << "pu_weights =0.,";
 	      for (Int_t i=1;i<=nbins;i++)
 		{
-		  std::cout << " PUweight: " << hRatio->GetBinContent(i) << ", " << std::endl;
+		  std::cout << hRatio->GetBinContent(i) << ",";
 		}
+	      std::cout << std::endl;
 	    }
 	        
 	  ratioCanvas->Write();
