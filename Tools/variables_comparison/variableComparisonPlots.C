@@ -230,7 +230,7 @@ int main(int argc, char* argv[]){
       plotters.push_back(plotter);
     }
  
-  for (auto plotter : plotters)
+  for (auto & plotter : plotters)
     {
 
       TString fileName = plotter.m_sampleConfig.fileName;
@@ -1260,10 +1260,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 		}
 	      else
 		{
-		  if(plotter.m_sampleConfig.sampleName.Contains("Startup"))
-		    plot->SetFillColor(colorMap[iColor+1]);
-		  if(plotter.m_sampleConfig.sampleName.Contains("Asymptotic"))
-		    plot->SetFillColor(colorMap[iColor+2]);
+		  plot->SetFillColor(colorMap[iColor]);
 		  plot->SetMarkerStyle(0);
 		 		 
 		  float scale = plotter.m_sampleConfig.cSection/plotter.m_sampleConfig.nEvents;
@@ -1292,10 +1289,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 			  pMc->Clear();
 			  pMc->SetFillColor(0);
 			  pMc->SetMarkerStyle(26);
-			  if(plotter.m_sampleConfig.sampleName.Contains("Startup"))
-			    pMc->SetMarkerColor(colorMap[iColor+1]);
-			  if(plotter.m_sampleConfig.sampleName.Contains("Asymptotic"))
-			    pMc->SetMarkerColor(colorMap[iColor+2]);
+			  pMc->SetMarkerColor(colorMap[iColor]);
 			  
 			  pMc->Add(plot,scale);
 			  // leg->AddEntry(pMc, "Weighted sum of MCs", "LP"); 
@@ -1319,7 +1313,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  if(pMc){
 	    
 	    if(plotName.Contains("goodMuMass"))
-	      hData->GetYaxis()->SetRangeUser(89.,93.);
+	      hData->GetYaxis()->SetRangeUser(90.,92.);
 	    else{
 	      Double_t max = hData->GetMaximum() > pMc->GetMaximum() ? hData->GetMaximum() : pMc->GetMaximum();
 	      Double_t min = hData->GetMinimum() < pMc->GetMinimum() ? hData->GetMinimum() : pMc->GetMinimum();
@@ -1355,7 +1349,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  if(pMc){
 
 	    if(plotName.Contains("goodMuMass"))
-	      hData->GetYaxis()->SetRangeUser(89.,93.);
+	      hData->GetYaxis()->SetRangeUser(90.,92.);
 	    else{
 	      Double_t max = hData->GetMaximum() > pMc->GetMaximum() ? hData->GetMaximum() : pMc->GetMaximum();
 	      Double_t min = hData->GetMinimum() < pMc->GetMinimum() ? hData->GetMinimum() : pMc->GetMinimum();
