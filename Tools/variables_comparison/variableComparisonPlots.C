@@ -138,7 +138,7 @@ namespace muon_pog {
     ~Plotter() {};
     
     void book(TFile *outFile);
-    void fill(const std::vector<muon_pog::Muon> & muons, const muon_pog::HLT & hlt, int nVtx, float weight);
+    void fill(const std::vector<muon_pog::Muon> & muons, const muon_pog::HLT & hlt, int nVtx, float weight, int run);
 
     std::map<Plotter::HistoType, std::map<TString, muon_pog::Observable> > m_plots;
     TagAndProbeConfig m_tnpConfig;
@@ -276,7 +276,7 @@ int main(int argc, char* argv[]){
 	  if(plotter.m_sampleConfig.applyReweighting==true)
 	    weight *= ev->nVtx < 60 ? tnpConfig.pu_weights[ev->nVtx] : 0;
 	    
-	  plotter.fill(ev->muons, ev->hlt, ev->nVtx, weight);
+	  plotter.fill(ev->muons, ev->hlt, ev->nVtx, weight, ev->runNumber);
 	}
       
       delete ev;
@@ -542,9 +542,9 @@ void muon_pog::Plotter::book(TFile *outFile)
   m_plots[TIME]["STAmuonTimeBarrel"] = muon_pog::Observable("STAmuonTimeBarrel", sampleTag, "time (ns)", "# entries", 400, -200., 200., false);
   m_plots[TIME]["STAmuonTimeEndcap"] = muon_pog::Observable("STAmuonTimeEndcap", sampleTag, "time (ns)", "# entries", 400, -200., 200., false);
 
-  m_plots[TIME]["UnbSTAmuonTime"] = muon_pog::Observable("UnbSTAmuonTime", sampleTag, "time (ns)", "# entries", 400, -200., 200., false);
-  m_plots[TIME]["UnbSTAmuonTimeBarrel"] = muon_pog::Observable("UnbSTAmuonTimeBarrel", sampleTag, "time (ns)", "# entries", 400, -200., 200., false);
-  m_plots[TIME]["UnbSTAmuonTimeEndcap"] = muon_pog::Observable("UnbSTAmuonTimeEndcap", sampleTag, "time (ns)", "# entries", 400, -200., 200., false);
+  m_plots[TIME]["UnbSTAmuonTime"] = muon_pog::Observable("UnbSTAmuonTime", sampleTag, "time (ns)", "# entries", 400, -200., 200., true);
+  m_plots[TIME]["UnbSTAmuonTimeBarrel"] = muon_pog::Observable("UnbSTAmuonTimeBarrel", sampleTag, "time (ns)", "# entries", 400, -200., 200., true);
+  m_plots[TIME]["UnbSTAmuonTimeEndcap"] = muon_pog::Observable("UnbSTAmuonTimeEndcap", sampleTag, "time (ns)", "# entries", 400, -200., 200., true);
 
   for (auto etaBin : m_tnpConfig.probe_etaBins)
     {
@@ -576,16 +576,17 @@ void muon_pog::Plotter::book(TFile *outFile)
       m_plots[ID]["Dxy" + etaTag]             = muon_pog::Observable("Dxy" + etaTag, sampleTag, "d_{xy} (cm)", "# entries", 50,-0.5,0.5, true);
       m_plots[ID]["Dz" + etaTag]              = muon_pog::Observable("Dz" + etaTag, sampleTag, "d_{z} (cm)", "# entries", 60,-1.5,1.5, true);    
 
-      m_plots[ID]["qOverPtTrkSta" + etaTag]      = muon_pog::Observable("qOverPtTrkSta" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
-      m_plots[ID]["qOverPtTrkStaOverPt" + etaTag]      = muon_pog::Observable("qOverPtTrkStaOverPt" + etaTag, sampleTag, "(q/p_{T}^{sta} - q/p_{T}^{trk})/q/p_{T}^{trk}", "# entries", 50,-5.,5., true); 
-      m_plots[ID]["qOverPtTrkStaPlus" + etaTag]      = muon_pog::Observable("qOverPtTrkStaPlus" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
+      m_plots[ID]["qOverPtTrkSta" + etaTag]      = muon_pog::Observable("qOverPtTrkSta" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.05,0.05, true); 
+      // m_plots[ID]["qOverPtTrkStaOverPt" + etaTag]      = muon_pog::Observable("qOverPtTrkStaOverPt" + etaTag, sampleTag, "(q/p_{T}^{sta} - q/p_{T}^{trk})/q/p_{T}^{trk}", "# entries", 50,-5.,5., true); 
+      // m_plots[ID]["qOverPtTrkStaPlus" + etaTag]      = muon_pog::Observable("qOverPtTrkStaPlus" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
       m_plots[ID]["qOverPtTrkSta200" + etaTag]      = muon_pog::Observable("qOverPtTrkSta200" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
-      m_plots[ID]["qOverPtTrkSta200Plus" + etaTag]      = muon_pog::Observable("qOverPtTrkSta200Plus" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
+      // m_plots[ID]["qOverPtTrkSta200Plus" + etaTag]      = muon_pog::Observable("qOverPtTrkSta200Plus" + etaTag, sampleTag, "q/p_{T}^{sta} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
 
       m_plots[ID]["qOverPtTrkGlb" + etaTag]      = muon_pog::Observable("qOverPtTrkGlb" + etaTag, sampleTag, "q/p_{T}^{glb} - q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
-      m_plots[ID]["qOverPtTrkGlbPlus" + etaTag]      = muon_pog::Observable("qOverPtTrkGlbPlus" + etaTag, sampleTag, "q/p_{T}^{glb} - q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
+      // m_plots[ID]["qOverPtTrkGlbPlus" + etaTag]      = muon_pog::Observable("qOverPtTrkGlbPlus" + etaTag, sampleTag, "q/p_{T}^{glb} - q/p_{T}^{trk}", "# entries", 50,-0.03,0.03, true); 
       m_plots[ID]["qOverPtTrkGlb200" + etaTag]      = muon_pog::Observable("qOverPtTrkGlb200" + etaTag, sampleTag, "q/p_{T}^{glb} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
-      m_plots[ID]["qOverPtTrkGlb200Plus" + etaTag]      = muon_pog::Observable("qOverPtTrkGlb200Plus" + etaTag, sampleTag, "q/p_{T}^{glb} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
+      // m_plots[ID]["qOverPtTrkGlb200Plus" + etaTag]      = muon_pog::Observable("qOverPtTrkGlb200Plus" + etaTag, sampleTag, "q/p_{T}^{glb} - q/p_{T}^{trk}", "# entries", 50,-0.2,0.2, true); 
+      m_plots[TIME]["TightMuonTime" + etaTag] = muon_pog::Observable("TightMuonTime", sampleTag + etaTag, "time (ns)", "# entries", 200, -100., 100., true);
 
       for ( auto & probe_ID : m_tnpConfig.probe_IDs)
 	{
@@ -601,8 +602,7 @@ void muon_pog::Plotter::book(TFile *outFile)
 
 	  m_plots[MOM]["goodMuMass" + etaTag + IDTag]  = muon_pog::Observable("goodMuMass" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 30,85.,115., false);
 	  m_plots[MOM]["goodMuMassPlus" + etaTag + IDTag]  = muon_pog::Observable("goodMuMassPlus" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 20 ,86.5,96.5, true);
-	  m_plots[MOM]["goodMuMassMinus" + etaTag + IDTag]  = muon_pog::Observable("goodMuMassMinus" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 20,86.5,96.5, true);
-   
+	  m_plots[MOM]["goodMuMassMinus" + etaTag + IDTag]  = muon_pog::Observable("goodMuMassMinus" + etaTag + IDTag, sampleTag, "invariant mass (GeV)", "# entries", 20,86.5,96.5, true);   
 	}
   
       outFile->cd(sampleTag+"/isolation");
@@ -624,7 +624,8 @@ void muon_pog::Plotter::book(TFile *outFile)
   m_plots[CONT]["01_invMass"] = muon_pog::Observable("invMass", sampleTag ,"mass (GeV)", "# entries", 100,0.,200., false);
   m_plots[CONT]["02_dilepPt"] = muon_pog::Observable("dilepPt", sampleTag ,"p_{T} (GeV)", "# entries", 100,0.,200., false);
   m_plots[CONT]["03_nVertices"] = muon_pog::Observable("nVertices", sampleTag ,"# vertices", "# entries", 60,0.,60., false);
-  
+  m_plots[CONT]["04_runNumber"] = muon_pog::Observable("runNumber", sampleTag ,"run number", "# entries", 9000,253000.,262000., false);
+
   m_plots[CONT]["99_invMassInRange"] = muon_pog::Observable("invMassInRange", sampleTag ,"mass (GeV)", "# entries", 100,0.,200., false);
 
   
@@ -634,7 +635,7 @@ void muon_pog::Plotter::book(TFile *outFile)
 }
 
 void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
-			     const muon_pog::HLT & hlt, int nVtx, float weight)
+			     const muon_pog::HLT & hlt, int nVtx, float weight, Int_t run)
 {
   
   TLorentzVector emptyTk;
@@ -689,23 +690,22 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	  if ( tagMuonPointer != &muon && 
 	       chargeFromTrk(tagMuon) * chargeFromTrk(muon) == -1)
 	    {
-	      if(muon.isStandAlone) {
-		if((fabs(muon.eta) < 1.2  && muon.nHitsStandAlone > 20) || (fabs(muon.eta) >= 1.2 && muon.nHitsStandAlone > 11)) 
-		  m_plots[TIME]["UnbSTAmuonTime"].fill(muon.muonTime,emptyTk,weight,nVtx);
-		
-		if(fabs(muon.eta) < 0.9  && muon.nHitsStandAlone > 20) 
-		  m_plots[TIME]["UnbSTAmuonTimeBarrel"].fill(muon.muonTime,emptyTk,weight,nVtx);
-		
-		if(fabs(muon.eta) > 1.2  && muon.nHitsStandAlone > 11) 
-		  m_plots[TIME]["UnbSTAmuonTimeEndcap"].fill(muon.muonTime,emptyTk,weight,nVtx);
-	      }
-   
+
 	      // General Probe Muons	      
 	      if((muon.isGlobal || muon.isTrackerArb) &&  // CB minimal cuts on potental probe 
 		 muon.pt > m_tnpConfig.probe_minPt)
 		{
 		  TLorentzVector tagMuTk(muonTk(tagMuon));
 		  TLorentzVector muTk(muonTk(muon));
+
+		  if((fabs(muon.eta) < 1.2  && muon.nHitsStandAlone > 20) || (fabs(muon.eta) >= 1.2 && muon.nHitsStandAlone > 11)) 
+		    m_plots[TIME]["UnbSTAmuonTime"].fill(muon.muonTime,muTk,weight,nVtx);
+		  
+		  if(fabs(muon.eta) < 0.9  && muon.nHitsStandAlone > 20) 
+		    m_plots[TIME]["UnbSTAmuonTimeBarrel"].fill(muon.muonTime,muTk,weight,nVtx);
+		
+		  if(fabs(muon.eta) > 1.2  && muon.nHitsStandAlone > 11) 
+		    m_plots[TIME]["UnbSTAmuonTimeEndcap"].fill(muon.muonTime,muTk,weight,nVtx);
 		  
 		  Float_t mass = (tagMuTk+muTk).M();
 		  	  
@@ -898,6 +898,9 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
     }
   
   // m_plots[CONT]["04_nProbesVsnTags"]->Fill(tagMuons.size(),probeMuons.size());
+
+  m_plots[CONT]["04_runNumber"].fill(run,emptyTk,weight,nVtx);
+		     
   
   for (auto probeMuonPointer : probeMuons)
     {
@@ -955,24 +958,32 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 		  Float_t qOverPtGlb = probeMuon.charge_global / probeMuon.pt_global;
 
 		  m_plots[ID]["qOverPtTrkSta" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
-		  m_plots[ID]["qOverPtTrkStaOverPt" + etaTag].fill((qOverPtSta - qOverPtTrk)/qOverPtTrk, probeMuTk, weight, nVtx);  
+		  // m_plots[ID]["qOverPtTrkStaOverPt" + etaTag].fill((qOverPtSta - qOverPtTrk)/qOverPtTrk, probeMuTk, weight, nVtx);  
 		  m_plots[ID]["qOverPtTrkGlb" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
 
-		  if (probeMuon.charge_tracker > 0 )
-		    {
-		      m_plots[ID]["qOverPtTrkGlbPlus" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
-		      m_plots[ID]["qOverPtTrkStaPlus" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
-		    }
+		  // if (probeMuon.charge_tracker > 0 )
+		  //   {
+		  //     m_plots[ID]["qOverPtTrkGlbPlus" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
+		  //     m_plots[ID]["qOverPtTrkStaPlus" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
+		  //   }
 		  if (probeMuon.pt_tracker > 200)
 		    {
 		      m_plots[ID]["qOverPtTrkSta200" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
 		      m_plots[ID]["qOverPtTrkGlb200" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
-		      if (probeMuon.charge_tracker > 0 )
-		  	{
-		  	  m_plots[ID]["qOverPtTrkSta200Plus" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
-		  	  m_plots[ID]["qOverPtTrkGlb200Plus" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
-		  	}
+		      // if (probeMuon.charge_tracker > 0 )
+		      // 	{
+		      // 	  m_plots[ID]["qOverPtTrkSta200Plus" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
+		      // 	  m_plots[ID]["qOverPtTrkGlb200Plus" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
+		      // 	}
 		    }
+		}
+
+	      if( hasGoodId(probeMuon,"TIGHT") && probeMuon.isoPflow04 < 0.25 &&
+		  ( (fabs(probeMuon.eta) < 1.2  && probeMuon.nHitsStandAlone > 20) || 
+		    (fabs(probeMuon.eta) >= 1.2 && probeMuon.nHitsStandAlone > 11)
+		    ))
+		{
+		  m_plots[TIME]["TightMuonTime" + etaTag].fill(probeMuon.muonTime, probeMuTk, weight, nVtx);
 		}
 
 	      for (auto & probe_ID : m_tnpConfig.probe_IDs)
@@ -992,7 +1003,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	      	      m_plots[ISO]["NeutralIso" + etaTag + IDTag].fill(probeMuon.neutralHadronIso, probeMuTk, weight, nVtx);
 	      	      m_plots[ISO]["DBetaRelIso" + etaTag + IDTag].fill(probeMuon.isoPflow04, probeMuTk, weight, nVtx);
 	      	    }
-	      	}
+		  }
 	    }
 	}
     }
@@ -1203,7 +1214,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  Float_t errors[1000] = {0.};
 	  TH1 * hData = 0;
 
-	  int colorMap[5] {kAzure+7, kGray+1, kRed, kGreen+1, kOrange};
+	  int colorMap[5] {kGreen+1, kAzure+7, kGray+1, kRed, kOrange};
 	 
 	  int iColor = 0;
 	  
@@ -1275,7 +1286,9 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 		      }
 		      
 		      float scaleToData = integralData/integralMC;
-		      plot->Scale(scale*scaleToData);
+
+		      if(!plotName.Contains("runNumber"))		      
+			plot->Scale(scale*scaleToData);
 	     
 		      hMc.Add(plot);
 		      leg->AddEntry(plot, plotter.m_sampleConfig.sampleName, "LF"); 
@@ -1291,13 +1304,13 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 			  pMc->SetMarkerStyle(26);
 			  pMc->SetMarkerColor(colorMap[iColor]);
 			  
-			  pMc->Add(plot,scale);
+			  pMc->Add(plot,plotName.Contains("runNumber") ? 1 : scale);
 			  // leg->AddEntry(pMc, "Weighted sum of MCs", "LP"); 
 			  leg->AddEntry(pMc, plotter.m_sampleConfig.sampleName, "LP");
 			}
 		      else
 		  	{
-			  pMc->Add(plot,scale);
+			  pMc->Add(plot,plotName.Contains("runNumber") ? 1 :scale);
 			}
 		    
 		      iColor++;
@@ -1310,25 +1323,34 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  TCanvas *canvas = new TCanvas("c"+histoName, "c"+histoName, 500, 500);
 	  canvas->cd();
 	  
-	  if(pMc){
-	    
-	    if(plotName.Contains("goodMuMass"))
-	      hData->GetYaxis()->SetRangeUser(90.,92.);
-	    else{
-	      Double_t max = hData->GetMaximum() > pMc->GetMaximum() ? hData->GetMaximum() : pMc->GetMaximum();
-	      Double_t min = hData->GetMinimum() < pMc->GetMinimum() ? hData->GetMinimum() : pMc->GetMinimum();
-	      hData->GetYaxis()->SetRangeUser(0.8*min, 1.2*max);
-	    }
+	  if(pMc)
+	    {
+	      if(plotName.Contains("goodMuMass"))
+		{
+		  if(histoName.Contains("VsPhi"))
+		    hData->GetYaxis()->SetRangeUser(89.,93.);
+		  else
+		    hData->GetYaxis()->SetRangeUser(90.5,91.5);
+		}
+	      else
+		{
+		  Double_t max = hData->GetMaximum() > pMc->GetMaximum() ? hData->GetMaximum() : pMc->GetMaximum();
+		  Double_t min = hData->GetMinimum() < pMc->GetMinimum() ? hData->GetMinimum() : pMc->GetMinimum();
 
-	    hData->Draw();
-	    pMc->Draw("same");
-	  }
-	  else{
-	    canvas->SetLogy(1);
-	    hData->Draw();
-	    hMc.Draw("samehist");
-	    hData->Draw("same");
-	  }  
+		  Float_t range = max - min;
+		  hData->GetYaxis()->SetRangeUser(min-range*0.2, max+range*0.2);
+		}
+	      
+	      hData->Draw();
+	      pMc->Draw("same");
+	    }
+	  else
+	    {
+	      canvas->SetLogy(1);
+	      hData->Draw();
+	      hMc.Draw("samehist");
+	      hData->Draw("same");
+	    }  
 	  
 	  leg->Draw();
 	  
@@ -1346,25 +1368,34 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  hData->GetXaxis()->SetLabelSize(0.);
 	  hData->GetXaxis()->SetTitleSize(0.);
 	  
-	  if(pMc){
+	  if(pMc)
+	    {
+	      if(plotName.Contains("goodMuMass"))
+		{
+		  if(histoName.Contains("VsPhi"))
+		    hData->GetYaxis()->SetRangeUser(89.,93.);
+		  else
+		    hData->GetYaxis()->SetRangeUser(90.5,91.5);
+		}
+	      else
+		{
+		  Double_t max = hData->GetMaximum() > pMc->GetMaximum() ? hData->GetMaximum() : pMc->GetMaximum();
+		  Double_t min = hData->GetMinimum() < pMc->GetMinimum() ? hData->GetMinimum() : pMc->GetMinimum();
 
-	    if(plotName.Contains("goodMuMass"))
-	      hData->GetYaxis()->SetRangeUser(90.,92.);
-	    else{
-	      Double_t max = hData->GetMaximum() > pMc->GetMaximum() ? hData->GetMaximum() : pMc->GetMaximum();
-	      Double_t min = hData->GetMinimum() < pMc->GetMinimum() ? hData->GetMinimum() : pMc->GetMinimum();
-	      hData->GetYaxis()->SetRangeUser(0.8*min, 1.2*max);
+		  Double_t range = max-min;
+		  hData->GetYaxis()->SetRangeUser(min-range*0.2, max+range*0.2);
+		}
+	      
+	      hData->Draw();
+	      pMc->Draw("same");
 	    }
-
-	    hData->Draw();
-	    pMc->Draw("same");
-	  }
-	  else{
-	    plotPad->SetLogy(1);
-	    hData->Draw();
-	    hMc.Draw("samehist");
-	    hData->Draw("same");
-	  }
+	  else
+	    {
+	      plotPad->SetLogy(1);
+	      hData->Draw();
+	      hMc.Draw("samehist");
+	      hData->Draw("same");
+	    }
 	  
 	  leg->Draw();
 	  
@@ -1622,7 +1653,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	      Int_t nbins = hRatio->GetNbinsX();
 	 
 	      std::cout << "[comparisonPlots] : reweight w.r.t. data sample: " << std::endl;
-	      std::cout << "pu_weights =0.,";
+	      std::cout << "pu_weights =";
 	      for (Int_t i=1;i<=nbins;i++)
 		{
 		  std::cout << hRatio->GetBinContent(i) << ",";
