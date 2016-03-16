@@ -1,0 +1,25 @@
+#!/bin/sh
+
+file=$0
+fileC=${file}.C
+fileEXE=${file}.exe
+
+ROOTLIBS="-L/usr/lib64 `$ROOTSYS/bin/root-config --glibs` -lMathCore -lMinuit"
+ROOTINCDIR=`$ROOTSYS/bin/root-config --incdir`
+
+BASETREEDIR="../src"
+
+rm -f ${fileEXE}
+
+echo "[$file]: Compiling"
+rootcling -f MuonPogTreeDict.C -c ${BASETREEDIR}/MuonPogTree.h ${BASETREEDIR}/MuonPogTreeLinkDef.h
+
+g++ -g -std=gnu++11 -I${ROOTINCDIR} -c muresolution_run2.cc ${ROOTLIBS} -lX11
+g++ -g -std=gnu++11 -I${ROOTINCDIR} -c rochcor2015.cc ${ROOTLIBS} -lX11 
+
+g++ -g -std=gnu++11 -I${ROOTINCDIR} ${fileC} MuonPogTreeDict.C muresolution_run2.o rochcor2015.o ${ROOTLIBS} -lX11 -lboost_system -lboost_filesystem -o ${fileEXE}
+
+echo "[$file]: Running with parameters $@" 
+${fileEXE} $@
+
+rm -f *.oMuonPogTreeDict.C MuonPogTreeDict.h MuonPogTreeDict_rdict.pcm 
