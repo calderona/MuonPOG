@@ -24,6 +24,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <iomanip>
 #include <algorithm>
 #include <sstream>
 #include <iostream>
@@ -164,17 +165,29 @@ int main(int argc, char* argv[]){
   //const double etaBins[18] = {-2.4,-2.1,-1.6,-1.2,-1.05,-0.9,-0.6,-0.3,-0.2,
   // 			      0.2, 0.3, 0.6, 0.9, 1.05, 1.2, 1.6, 2.1, 2.4};
 
-  const double etaBins[7] = {-2.4, -1.2, -0.9, 0., 0.9, 1.2, 2.4};
+  //const double etaBins[7] = {-2.4, -1.2, -0.9, 0., 0.9, 1.2, 2.4};
 
-  // const double etaBins[8] = {-2.4, -2.1, -1.2, -0.9, 0.9, 1.2, 2.1, 2.4};
+  const double etaBins[8] = {-2.4, -2.1, -1.2, -0.9, 0.9, 1.2, 2.1, 2.4};
 
   double binW = TMath::Pi()/6.;
 
   const double phiBins[13] = {-6*binW, -5*binW, -4*binW, -3*binW, -2*binW, -binW, 0., binW, 2*binW, 3*binW, 4*binW, 5*binW, 6*binW};
 
-  TProfile2D * pScaleMC   = new TProfile2D("pScaleMC",  "Average scale correction in montecarlo", 6, etaBins, 12, phiBins);
-  TProfile2D * pScaleDATA = new TProfile2D("pScaleDATA","Average scale correction in real data",  6, etaBins, 12, phiBins);
-  TH2F * hResolMC = new TH2F("hResolMC",  "Average resol correction in montecarlo", 6, etaBins, 500,-.1, .1);
+  TProfile2D * pScaleMC   = new TProfile2D("pScaleMC",  "Average scale correction in montecarlo", 7, etaBins, 12, phiBins);
+  TProfile2D * pScaleData = new TProfile2D("pScaleData","Average scale correction in real data",  7, etaBins, 12, phiBins);
+  TH2F * hResolMC = new TH2F("hResolMC",  "Resol correction in montecarlo", 7, etaBins, 500,-.1, .1);
+
+  // CB just a control plot
+  TH2F * hScaleData = new TH2F("hScaleData", "Scale correction in montecarlo", 7, etaBins, 500,-.1, .1);
+  TH2F * hScaleMC   = new TH2F("hScaleMC",   "Scale correction in montecarlo", 7, etaBins, 500,-.1, .1);
+
+
+  TH1F * hMassData = new TH1F("hMassData", "Pre corrected mass distribution DATA", 50, 70., 120.);
+  TH1F * hMassMC   = new TH1F("hMassMC",   "Pre corrected mass distribution MC", 50, 70., 120.);
+
+  TH1F * hMassCorrData = new TH1F("hMassCorrData", "Corrected mass distribution DATA", 50, 70., 120.);
+  TH1F * hMassCorrMC   = new TH1F("hMassCorrMC",   "Corrected mass distribution MC", 50, 70., 120.);
+
 
 
   // Set it to kTRUE if you do not run interactively
@@ -183,7 +196,7 @@ int main(int argc, char* argv[]){
   // Initialize Root application
   TRint* app = new TRint("CMS Root Application", &argc, argv);
 
-  setTDRStyle();
+  //setTDRStyle();
 
   rochcor2015 *rochCor = new rochcor2015();
  
@@ -218,7 +231,7 @@ int main(int argc, char* argv[]){
       evBranch->SetAddress(&ev);
 
       // Watch number of entries
-      int nEntries = 100000.; //tree->GetEntriesFast();
+      int nEntries = tree->GetEntriesFast();
       std::cout << "[" << argv[0] << "] Number of entries = " << nEntries << std::endl;
 
       int nFilteredEvents = 0;
@@ -280,62 +293,83 @@ int main(int argc, char* argv[]){
 			  TLorentzVector tagMuTk(muon_pog::muonTk(tagMuon,tnpConfig.muon_trackType));
 			  TLorentzVector muTk(muon_pog::muonTk(muon,tnpConfig.muon_trackType));
 		  
-			  //Float_t mass = (tagMuTk+muTk).M();
+			  Float_t mass = (tagMuTk+muTk).M();
 			  //Float_t dilepPt = (tagMuTk+muTk).Pt();
 			  
-			  Float_t origPtTag   = tagMuTk.Pt();
-			  Float_t origPtProbe = muTk.Pt();
-			      
-			  Int_t chTag   = muon_pog::chargeFromTrk(tagMuon,tnpConfig.muon_trackType);
-			  Int_t chProbe = muon_pog::chargeFromTrk(muon,tnpConfig.muon_trackType);
-
-			  Float_t q = 1.;
-
-			  if (runOnMC)
+			  if (mass > tnpConfig.pair_minInvMass && mass < tnpConfig.pair_maxInvMass)
 			    {
 
-			      TLorentzVector tagMuTkResol = tagMuTk;
-			      TLorentzVector muTkResol = muTk;
- 
-			      rochCor->momcor_mc(tagMuTk,chTag,0,q,false);
-			      rochCor->momcor_mc(muTk,chProbe,0,q,false);
-
-			      rochCor->momcor_mc(tagMuTkResol,chTag,0,q,true);
-			      rochCor->momcor_mc(muTkResol,chProbe,0,q,true);
-
-			      Float_t corrPtTag   = tagMuTk.Pt();
-			      Float_t corrPtProbe = muTk.Pt();
-
-			      Float_t resolPtTag   = tagMuTkResol.Pt();
-			      Float_t resolPtProbe = muTkResol.Pt();
-
-			      pScaleMC->Fill(tagMuTk.Eta(),tagMuTk.Phi(),chTag*(corrPtTag-origPtTag)/corrPtTag);
-			      pScaleMC->Fill(muTk.Eta(),muTk.Phi(),chProbe*(corrPtProbe-origPtProbe)/corrPtProbe);
+			      Float_t origPtTag   = tagMuTk.Pt();
+			      Float_t origPtProbe = muTk.Pt();
 			      
-			      // why need to apply cut on resol ?????
-			      if(fabs(resolPtTag-corrPtTag)>0.0001)
-				hResolMC->Fill(tagMuTk.Eta(),(resolPtTag-corrPtTag)/corrPtTag);
-			      if(fabs(resolPtProbe-corrPtProbe)>0.0001)
-				hResolMC->Fill(muTk.Eta(),(resolPtProbe-corrPtProbe)/corrPtProbe);
-			    }
-			  else
-			    {
-			      
-			      rochCor->momcor_data(tagMuTk,chTag,0,q);
-			      rochCor->momcor_data(muTk,chProbe,0,q);
+			      Int_t chTag   = muon_pog::chargeFromTrk(tagMuon,tnpConfig.muon_trackType);
+			      Int_t chProbe = muon_pog::chargeFromTrk(muon,tnpConfig.muon_trackType);
 
-			      Float_t corrPtTag   = tagMuTk.Pt();
-			      Float_t corrPtProbe = muTk.Pt();
+			      Float_t q = 1.;
 
-			      pScaleDATA->Fill(tagMuTk.Eta(),tagMuTk.Phi(),chTag*(corrPtTag-origPtTag)/corrPtTag);
-			      pScaleDATA->Fill(muTk.Eta(),muTk.Phi(),chProbe*(corrPtProbe-origPtProbe)/corrPtProbe);
+			      if (runOnMC)
+				{
+
+				  TLorentzVector tagMuTkResol = tagMuTk;
+				  TLorentzVector muTkResol = muTk;
+				  
+				  rochCor->momcor_mc(tagMuTk,chTag,0,q,false);
+				  rochCor->momcor_mc(muTk,chProbe,0,q,false);
+				  
+				  rochCor->momcor_mc(tagMuTkResol,chTag,0,q,true);
+				  rochCor->momcor_mc(muTkResol,chProbe,0,q,true);
+				  
+				  Float_t corrPtTag   = tagMuTk.Pt();
+				  Float_t corrPtProbe = muTk.Pt();
+				  
+				  Float_t resolPtTag   = tagMuTkResol.Pt();
+				  Float_t resolPtProbe = muTkResol.Pt();
+				  
+				  pScaleMC->Fill(tagMuTk.Eta(),tagMuTk.Phi(),chTag*(corrPtTag-origPtTag)/corrPtTag);
+				  pScaleMC->Fill(muTk.Eta(),muTk.Phi(),chProbe*(corrPtProbe-origPtProbe)/corrPtProbe);
+
+				  hScaleMC->Fill(tagMuTk.Eta(),chTag*(corrPtTag-origPtTag)/corrPtTag);
+				  hScaleMC->Fill(muTk.Eta(),chProbe*(corrPtProbe-origPtProbe)/corrPtProbe);
+				  
+				  // CB why need to apply cut on resol ?????
+				  if(fabs(resolPtTag-corrPtTag)>0.0001)
+				    hResolMC->Fill(tagMuTk.Eta(),(resolPtTag-corrPtTag)/corrPtTag);
+				  if(fabs(resolPtProbe-corrPtProbe)>0.0001)
+				    hResolMC->Fill(muTk.Eta(),(resolPtProbe-corrPtProbe)/corrPtProbe);
+				  
+				  Float_t corrMass = (tagMuTk+muTk).M();
+				  
+				  hMassMC->Fill(mass);
+				  hMassCorrMC->Fill(corrMass);
+				  
+				}
+			      else
+				{
+				  
+				  rochCor->momcor_data(tagMuTk,chTag,0,q);
+				  rochCor->momcor_data(muTk,chProbe,0,q);
+				  
+				  Float_t corrPtTag   = tagMuTk.Pt();
+				  Float_t corrPtProbe = muTk.Pt();
+				  
+				  pScaleData->Fill(tagMuTk.Eta(),tagMuTk.Phi(),chTag*(corrPtTag-origPtTag)/corrPtTag);
+				  pScaleData->Fill(muTk.Eta(),muTk.Phi(),chProbe*(corrPtProbe-origPtProbe)/corrPtProbe);
+
+				  hScaleData->Fill(tagMuTk.Eta(),chTag*(corrPtTag-origPtTag)/corrPtTag);
+				  hScaleData->Fill(muTk.Eta(),chProbe*(corrPtProbe-origPtProbe)/corrPtProbe);
+
+				  
+				  Float_t corrMass = (tagMuTk+muTk).M();
+				  
+				  hMassData->Fill(mass);
+				  hMassCorrData->Fill(corrMass);
+				}
 			      
 			    }
 			}
 		    }
 		}
 	    }
-	  
 	}
       
       delete ev;
@@ -346,12 +380,14 @@ int main(int argc, char* argv[]){
 
       if (runOnMC)
 	{
-	  for (Int_t iBin = 0; iBin < hResolMC->GetNbinsX(); ++iBin)
+	  for (Int_t iBin = 1; iBin <= hResolMC->GetNbinsX(); ++iBin)
 	    {
-	      TH1D *proj = hResolMC->ProjectionY(TString("resolProjectionBin_")+TString(iBin),iBin,iBin+1);
+	      TH1D *proj = hResolMC->ProjectionY((TString("resolProjectionBin_")+=(iBin)),iBin,iBin);
 	      proj->Fit("gaus","Q","",-3*proj->GetRMS(),3*proj->GetRMS());
-	      std::cout << "Resolution result for [" << etaBins[iBin] << "," << etaBins[iBin+1] << "] = rms "
-			<< proj->GetRMS() << "\t fit "<< proj->GetFunction("gaus")->GetParameter(2) << std::endl;
+	      std::cout << "Resol result for [" << std::fixed << std::setprecision(1) 
+			<<  etaBins[iBin-1] << "," << etaBins[iBin] << "]\t= rms "
+			<< std::setprecision(4) << proj->GetRMS() << "\tfit "
+			<< proj->GetFunction("gaus")->GetParameter(2) << std::endl;
 	      proj->Write();
 	    }
 	}
@@ -361,9 +397,6 @@ int main(int argc, char* argv[]){
 	   
     }
 
-  TProfile2D pScaleDiff(*pScaleDATA);
-  
-  pScaleDiff.Add(pScaleMC,-1);
 
   for (Int_t iBinX = 1; iBinX <= hResolMC->GetNbinsX(); ++iBinX)
     {
@@ -372,13 +405,15 @@ int main(int argc, char* argv[]){
 
       for (Int_t iBinY = 1; iBinY <= hResolMC->GetNbinsY(); ++iBinY)
 	{
-	  Float_t fDiff = fabs(pScaleDiff.GetBinContent(iBinX,iBinY));
+	  Float_t fDiff = fabs(pScaleData->GetBinContent(iBinX,iBinY) - 
+			       pScaleMC->GetBinContent(iBinX,iBinY));
 	    if (fDiff>max)
 	      max = fDiff;	  
 	}
       
-      std::cout << "Scale result for [" << etaBins[iBinX-1] << "," << etaBins[iBinX] << 
-	"] = max scale deviation in phi " << " " << max << std::endl;
+      std::cout << "Scale result for [" << std::fixed << std::setprecision(1) 
+		<< etaBins[iBinX-1] << "," << etaBins[iBinX] << "]\t= max scale deviation in phi " 
+		<< std::setprecision(4) << max << std::endl;
       
     }
 
