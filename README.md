@@ -39,14 +39,18 @@ To create some ntuples :
 
 ```bash
 cd MuonPOG/Tools/test/
-python muonPogNtuples_cfg.py --print # this will give you the default input parameters of the filler. As the ntuple cfg is based on VarParsing
-                                     # you can customise the ntuple production via command line [1] or in a crab cfg [2] 
+python muonPogNtuples_cfg.py --print # this will give you the default input parameters of the filler. 
+                                     # As the ntuple cfg is based on VarParsing you can customise the
+                                     # ntuple production via command line [1] or in a crab cfg [2] 
+
+[1] 
+cmsRun muonPogNtuples_cfg.py globalTag=80X_mcRun2_asymptotic_v5 \\
+  eosInputFolder=/store/relval/CMSSW_8_0_0_patch2/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v5_refGT-v1/10000
+
+[2] 
+https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile#CRAB_configuration_parameters (find pyCfgParams)
 ```
 
-[1] cmsRun muonPogNtuples_cfg.py globalTag=80X_mcRun2_asymptotic_v5 \\
-    eosInputFolder=/store/relval/CMSSW_8_0_0_patch2/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v5_refGT-v1/10000
-
-[2] https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile#CRAB_configuration_parameters (find pyCfgParams)
 
 The ntuple producer gets loaded by :
 
