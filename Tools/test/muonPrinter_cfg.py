@@ -5,13 +5,13 @@ process = cms.Process("PRINT")
 process.source = cms.Source("PoolSource",
                             
         fileNames = cms.untracked.vstring(
-        "/store/relval/CMSSW_7_6_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v11-v1/00000/2E482387-FA7F-E511-9F8E-0025905A60A6.root"
+        "file:///afs/cern.ch/user/p/piet/public/ForMuonPOG/StaMuAtEta6_AOD.root"
              ),
         secondaryFileNames = cms.untracked.vstring()
 )
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
-process.GlobalTag.globaltag = "76X_mcRun2_asymptotic_v11"
+process.GlobalTag.globaltag = "76X_dataRun2_v5"
 
 process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 process.load("Configuration.StandardSequences.GeometryDB_cff")
@@ -32,7 +32,9 @@ process.muonEventDumper = cms.EDAnalyzer("MuonEventDumper",
                              BeamSpotTag      = cms.untracked.InputTag("offlineBeamSpot"),
                              
                              GenTag = cms.untracked.InputTag("none"),
-                             PileUpInfoTag = cms.untracked.InputTag("none")
+                             PileUpInfoTag = cms.untracked.InputTag("none"),
+
+                             AdHocTrackTag = cms.untracked.InputTag("standAloneMuons:UpdatedAtVtx:RECO")
                              )
 
 process.AOutput = cms.EndPath(process.muonEventDumper)
