@@ -65,6 +65,8 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.nEven
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 
+process.GlobalTag.globaltag = cms.string(options.globalTag)
+
 process.source = cms.Source("PoolSource",
                             
         fileNames = cms.untracked.vstring(),

@@ -1,12 +1,59 @@
 import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.VarParsing as VarParsing
 
 import subprocess
 
-runOn761 = False
-pathCut   = "all"
-filterCut = "all"
-#pathCut   = "HLT_IsoMu20_v"
-#filterCut = "hltL3crIsoL1sMu16L1f0L2f10QL3f20QL3trkIsoFiltered0p09"
+import sys
+
+options = VarParsing.VarParsing()
+
+options.register('globalTag',
+                 '74X_dataRun2_Prompt_v4', #default value
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.string,
+                 "Global Tag")
+
+options.register('nEvents',
+                 1000, #default value
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 "Maximum number of processed events")
+
+options.register('eosInputFolder',
+                 '/store/data/Run2015D/SingleMuon/AOD/PromptReco-v3/000/258/158/00000', #default value
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.string,
+                 "EOS folder with input files")
+
+options.register('ntupleName',
+                 './muonPOGNtuple_DATA_SingleMu.root', #default value
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.string,
+                 "Folder and name ame for output ntuple")
+
+options.register('runOnMC',
+                 False, #default value
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.bool,
+                 "Run on DATA or MC")
+
+options.register('hltPathFilter',
+                 "all", #default value
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.string,
+                 "Filter on paths (now only accepts all or IsoMu20)")
+
+options.parseArguments()
+
+if options.hltPathFilter == "all" :
+    pathCut   = "all"
+    filterCut = "all"
+elif options.hltPathFilter == "IsoMu20" :
+    pathCut   = "HLT_IsoMu20_v"
+    filterCut = "hltL3crIsoL1sMu16L1f0L2f10QL3f20QL3trkIsoFiltered0p09"
+else :
+    print "[" + sys.argv[0] + "]:", "hltPathFilter=", options.hltPathFilter, "is not a valid parameter!"
+    sys.exit(100)
 
 process = cms.Process("NTUPLES")
 
@@ -15,7 +62,7 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.nEvents))
 
 
 
@@ -28,16 +75,8 @@ process.source = cms.Source("PoolSource",
 
 )
 
-if runOn761 :
-    process.GlobalTag.globaltag = cms.string('76X_dataRun2_v15')
-    sourcefilesfolder = "/store/relval/CMSSW_7_6_1/DoubleMuon/MINIAOD/76X_dataRun2_v15_rerecoGT_RelVal_doubMu2015D-v1/00000"
-    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
-    process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]    
-else :
-    process.GlobalTag.globaltag = cms.string('76X_dataRun2_v10')
-    sourcefilesfolder = "/store/relval/CMSSW_7_6_0/DoubleMuon/MINIAOD/76X_dataRun2_v10_RelVal_doubMu2015D-v1/00000"
-    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
-    process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]
+files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", options.eosInputFolder ])
+process.source.fileNames = [ options.eosInputFolder+"/"+f for f in files.split() ]    
 
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
 process.load("Configuration.StandardSequences.MagneticField_38T_cff")
@@ -46,12 +85,7 @@ process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 
 from MuonPOG.Tools.MuonPogNtuples_cff import appendMuonPogNtuple
 
-if runOn761 :
-    ntupleName = "ntuples_761.root"
-else :
-    ntupleName = "ntuples_760.root"
-    
-appendMuonPogNtuple(process,False,"HLT",ntupleName,pathCut,filterCut)
+appendMuonPogNtuple(process,options.runOnMC,"HLT",options.ntupleName,pathCut,filterCut)
 
 process.MuonPogTree.MuonTag = cms.untracked.InputTag("slimmedMuons")
 process.MuonPogTree.PrimaryVertexTag = cms.untracked.InputTag("offlineSlimmedPrimaryVertices")
