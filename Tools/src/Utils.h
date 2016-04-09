@@ -1,86 +1,170 @@
 #ifndef Utils_h__
 #define Utils_h__
 
-#include "Math/Vector3D.h"
-#include "Math/Vector4D.h"
-#include <Math/VectorUtil.h>
+#include "MuonPogTree.h"
+#include "TLorentzVector.h"
+#include "TMath.h"
 
-typedef ROOT::Math::PxPyPzEVector PxPyPzEVector;
-typedef ROOT::Math::PtEtaPhiEVector PtEtaPhiEVector;
+#include <iostream>
+#include <string>
 
-
-inline double squareDouble( const double & val )
+namespace muon_pog
 {
-  return val * val;
-}
 
-template<class T>
-double MT( const T & lep, const T & neut )
-{
-  return sqrt(2*lep.pt*neut.pt*(1-cos(lep.phi-neut.phi)));
-}
+  // The names says it all
+  double deltaR(double eta1, double phi1, double eta2, double phi2)
+  {
+    double deta = eta1 - eta2;
+    double dphi = phi1 - phi2;
+    while (dphi > TMath::Pi()) dphi -= 2*TMath::Pi();
+    while (dphi <= -TMath::Pi()) dphi += 2*TMath::Pi();
 
-
-// inline double calcEoverP( const KFInParticle & part )
-// {
-//   /// |P| = Pt * cosh(eta)
-//   return ( part.energy / ( part.pt * cosh( part.eta ) ) );
-
-// }
-
-
-//
-/// theta star calculation... template for different usages
-//
-template<class T>
-std::pair<double, int>
-computeThetaStar( const T & topP4, const T & lepP4,
-		  const T & bP4, const T & wP4  )
-{
-  // 1) Boost all particles to top rest frame
-  ROOT::Math::XYZVector topRF = topP4.BoostToCM();
-
-  T muTopRF = ROOT::Math::VectorUtil::boost(lepP4, topRF);
-  T bTopRF  = ROOT::Math::VectorUtil::boost(bP4, topRF);
-  T wTopRF  = ROOT::Math::VectorUtil::boost(wP4, topRF);
-
-  // 2) Boost lepton & b to CM of W
-  ROOT::Math::XYZVector wRF = wTopRF.BoostToCM();
-
-  T muWRF = ROOT::Math::VectorUtil::boost( muTopRF, wRF );
-  T bWRF  = ROOT::Math::VectorUtil::boost( -bTopRF, wRF );
-
-  // 3) Angle between b and boosted lepton in top rest frame
-  double theta1 = ROOT::Math::VectorUtil::Angle( muWRF, bWRF ) ;
-  double theta  = ROOT::Math::VectorUtil::Angle( muWRF, wTopRF );
-
-  int bugg = 0 ;
-  if ( fabs( theta1 - theta ) > 1.e-04 ) {
-    printf("\n mmmmmm Cos theta -b: %f  W: %f \n", cos(theta1), cos(theta) );
-    bugg = 1;
+    return sqrt(deta*deta + dphi*dphi);
   }
 
-  return std::make_pair(theta, bugg);
+    
+  // Check if a muon_pog::Muon passes a given ID (embedded using official selectors)
+  // Valid IDs are GLOBAL, TRACKER, SOFT, LOOSE, MEDIUM, TIGHT, HIGHPT
+  bool hasGoodId(const muon_pog::Muon & muon, TString muId)
+  {
+    
+    if (muId == "GLOBAL")      return muon.isGlobal  == 1;
+    else if (muId == "TRACKER")return muon.isTracker == 1;
+    else if (muId == "TIGHT")  return muon.isTight   == 1;
+    else if (muId == "MEDIUM") return muon.isMedium  == 1;
+    else if (muId == "LOOSE")  return muon.isLoose   == 1;
+    else if (muId == "HIGHPT") return muon.isHighPt  == 1;
+    else if (muId == "SOFT")   return muon.isSoft == 1;
+    else
+      {
+	std::cout << "[Plotter::hasGoodId]: Invalid muon id : "
+		  << muId << std::endl;
+	exit(900);
+      }
+    
+    return 0;
+ 
+  };
 
+
+  // Returns the charge muon_pog::Muon for a given fit 
+  // Valid track fits are: PF, TUNEP, GLB, INNER 
+  Int_t chargeFromTrk(const muon_pog::Muon & muon, 
+		      const std::string & trackType)
+  {
+
+    if (trackType == "PF")         return muon.charge;
+    else if (trackType == "TUNEP") return muon.charge_tuneP;
+    else if (trackType == "GLB")   return muon.charge_global;
+    else if (trackType == "INNER") return muon.charge_tracker;
+    else
+      {
+	std::cout << "[Plotter::chargeFromTrk]: Invalid track type: "
+		  << trackType << std::endl;
+	exit(900);
+      }
+
+    return 999;
+    
+  }
+
+
+  // Return a TLorentz vector out of a given fit from muon_pog::Muon 
+  // Valid track fits are: PF, TUNEP, GLB, INNER 
+  TLorentzVector muonTk(const muon_pog::Muon & muon, 
+			const std::string & trackType)
+  {
+    
+    TLorentzVector result; 
+    if (trackType == "PF")
+      result.SetPtEtaPhiM(muon.pt,muon.eta,muon.phi,.10565);
+    else if (trackType == "TUNEP")
+      result.SetPtEtaPhiM(muon.pt_tuneP,muon.eta_tuneP,muon.phi_tuneP,.10565);
+    else if (trackType == "GLB")
+      result.SetPtEtaPhiM(muon.pt_global,muon.eta_global,muon.phi_global,.10565);
+    else if (trackType == "INNER")
+      result.SetPtEtaPhiM(muon.pt_tracker,muon.eta_tracker,muon.phi_tracker,.10565);
+    else
+      {
+	std::cout << "[Plotter::muonTk]: Invalid track type: "
+		  << trackType << std::endl;
+	exit(900);
+      }
+    
+    return result;
+    
+  }
+
+
+  // Checks if a trigger path fired using muon_pog::HLT
+  // if the path name is "none" returns always true
+  bool pathHasFired(const muon_pog::HLT  & hlt, std::string pathName)
+  {
+    
+    if (pathName == "none")
+      return true;
+    
+    for (auto path : hlt.triggers)
+      {
+	if (path.find(pathName) != std::string::npos)
+	  {
+	    return true;
+	  }
+      }
+  }
+  
+
+  // Checks if the iner track of muon_pog::Muon matches geometrically 
+  // in dR with a given muon_pog::HLT object filter
+  // if the filter name is "none" returns always true
+  bool hasFilterMatch(const muon_pog::Muon & muon,
+		      const muon_pog::HLT  & hlt,
+		      std::string & filter, Float_t dR)
+  {
+
+    if (filter == "none")
+      return true;
+    
+    TLorentzVector muTk = muonTk(muon,std::string("INNER"));
+    
+    for (auto object : hlt.objects)
+      {
+	if (object.filterTag.find(filter) != std::string::npos &&
+	    deltaR(muTk.Eta(), muTk.Phi(), object.eta, object.phi) < dR)
+	  return true;
+      }
+    
+    return false;
+    
+  }
+
+  //From Fede, the function name says it all
+  void addUnderFlow(TH1 &hist)
+  {
+    hist.SetBinContent(1, hist.GetBinContent(0) + 
+		          hist.GetBinContent(1));
+    hist.SetBinError  (1, sqrt(hist.GetBinError(0)*hist.GetBinError(0) + 
+			       hist.GetBinError(1)*hist.GetBinError(1)));
+    hist.SetBinContent(0, 0); 
+    hist.SetBinError  (0, 0);  
+  }
+
+
+
+  //From Fede, the function name says it all
+  void addOverFlow(TH1 &hist)
+  {
+    Int_t lastBin = hist.GetNbinsX(); 
+    hist.SetBinContent(lastBin, hist.GetBinContent(lastBin) + 
+		                hist.GetBinContent(lastBin+1));
+    hist.SetBinError  (lastBin, sqrt(hist.GetBinError(lastBin)*hist.GetBinError(lastBin) + 
+				     hist.GetBinError(lastBin+1)*hist.GetBinError(lastBin+1))); 
+    hist.SetBinContent(lastBin+1, 0) ; 
+    hist.SetBinError  (lastBin+1, 0) ; 
+    
+  }
+  
 }
-
-
-
-template
-std::pair<double, int>
-computeThetaStar< ROOT::Math::PxPyPzEVector >
-( const ROOT::Math::PxPyPzEVector & topP4,
-  const ROOT::Math::PxPyPzEVector & lepP4,
-  const ROOT::Math::PxPyPzEVector & bP4,
-  const ROOT::Math::PxPyPzEVector & wP4 );
-
-template
-std::pair<double, int>
-computeThetaStar< ROOT::Math::PtEtaPhiEVector >
-( const ROOT::Math::PtEtaPhiEVector & topP4,
-  const ROOT::Math::PtEtaPhiEVector & lepP4,
-  const ROOT::Math::PtEtaPhiEVector & bP4,
-  const ROOT::Math::PtEtaPhiEVector & wP4 );
 
 #endif
 
