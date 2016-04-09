@@ -14,6 +14,7 @@
 #include "TLorentzVector.h"
 
 #include "../src/MuonPogTree.h"
+#include "../src/Utils.h"
 #include "tdrstyle.C"
 
 #include <cstdlib>
@@ -23,6 +24,7 @@
 #include <iostream>
 #include <fstream> 
 #include <vector>
+#include <regex>
 #include <map>
 
 
@@ -144,17 +146,6 @@ namespace muon_pog {
     TagAndProbeConfig m_tnpConfig;
     SampleConfig m_sampleConfig;
         
-  private :
-   
-    double deltaR(double eta1, double phi1, double eta2, double phi2);
-    
-    bool hasGoodId(const muon_pog::Muon & muon,
-		   TString leg);
-    bool hasFilterMatch(const muon_pog::Muon & muon,
-			const muon_pog::HLT  & hlt);
-    Int_t chargeFromTrk(const muon_pog::Muon & muon);
-    TLorentzVector muonTk(const muon_pog::Muon & muon);    
-    
   };
   
 }
@@ -253,7 +244,7 @@ int main(int argc, char* argv[]){
       evBranch->SetAddress(&ev);
 
       // Watch number of entries
-      int nEntries = tree->GetEntriesFast();      
+      int nEntries = plotter.m_sampleConfig.nEvents > 0 ? plotter.m_sampleConfig.nEvents : tree->GetEntriesFast();
       std::cout << "[" << argv[0] << "] Number of entries = " << nEntries << std::endl;
 
       if (nEntries < plotter.m_sampleConfig.nEvents || plotter.m_sampleConfig.nEvents < 0)
@@ -621,12 +612,12 @@ void muon_pog::Plotter::book(TFile *outFile)
 
   outFile->cd(sampleTag+"/control");
   
-  m_plots[CONT]["01_invMass"] = muon_pog::Observable("invMass", sampleTag ,"mass (GeV)", "# entries", 100,0.,200., false);
-  m_plots[CONT]["02_dilepPt"] = muon_pog::Observable("dilepPt", sampleTag ,"p_{T} (GeV)", "# entries", 100,0.,200., false);
-  m_plots[CONT]["03_nVertices"] = muon_pog::Observable("nVertices", sampleTag ,"# vertices", "# entries", 60,0.,60., false);
-  m_plots[CONT]["04_runNumber"] = muon_pog::Observable("runNumber", sampleTag ,"run number", "# entries", 9000,253000.,262000., false);
+  m_plots[CONT]["01-invMass"] = muon_pog::Observable("invMass", sampleTag ,"mass (GeV)", "# entries", 100,0.,200., false);
+  m_plots[CONT]["02-dilepPt"] = muon_pog::Observable("dilepPt", sampleTag ,"p_{T} (GeV)", "# entries", 100,0.,200., false);
+  m_plots[CONT]["03-nVertices"] = muon_pog::Observable("nVertices", sampleTag ,"# vertices", "# entries", 60,0.,60., false);
+  m_plots[CONT]["04-runNumber"] = muon_pog::Observable("runNumber", sampleTag ,"run number", "# entries", 9000,253000.,262000., false);
 
-  m_plots[CONT]["99_invMassInRange"] = muon_pog::Observable("invMassInRange", sampleTag ,"mass (GeV)", "# entries", 100,0.,200., false);
+  m_plots[CONT]["99-invMassInRange"] = muon_pog::Observable("invMassInRange", sampleTag ,"mass (GeV)", "# entries", 100,0.,200., false);
 
   
   //  std::cout << sampleTag << "  End: " << m_plots.size()<< std::endl;
@@ -654,26 +645,17 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	m_plots[TIME]["STAmuonTimeEndcap"].fill(muon.muonTime,emptyTk,weight,nVtx);
     }
   
-  bool pathHasFired = false;
-  
-  for (auto path : hlt.triggers)
-    {
-      if (path.find(m_tnpConfig.hlt_path) != std::string::npos)
-	{
-	  pathHasFired = true;
-	  break;
-	}
-    }
-
-  if (!pathHasFired) return;
+  if (!muon_pog::pathHasFired(hlt,m_tnpConfig.hlt_path)) return;
 
   std::vector<const muon_pog::Muon *> tagMuons;
   
   for (auto & muon : muons)
     {
-      if (muonTk(muon).Pt() > m_tnpConfig.tag_minPt &&
-	  hasFilterMatch(muon,hlt) &&
-	  hasGoodId(muon,m_tnpConfig.tag_ID) && 
+      if (muon_pog::muonTk(muon,m_tnpConfig.muon_trackType).Pt() > 
+	  muon_pog::hasFilterMatch(muon,hlt,
+				   m_tnpConfig.tag_hltFilter,
+				   m_tnpConfig.tag_hltDrCut) &&
+	  muon_pog::hasGoodId(muon,m_tnpConfig.tag_ID) && 
 	  muon.isoPflow04 < m_tnpConfig.tag_isoCut)
 	tagMuons.push_back(&muon);
     }
@@ -688,15 +670,16 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	  const muon_pog::Muon & tagMuon = *tagMuonPointer;
 	  
 	  if ( tagMuonPointer != &muon && 
-	       chargeFromTrk(tagMuon) * chargeFromTrk(muon) == -1)
+	       muon_pog::chargeFromTrk(tagMuon,m_tnpConfig.muon_trackType) *
+	       muon_pog::chargeFromTrk(muon,m_tnpConfig.muon_trackType) == -1)
 	    {
 
 	      // General Probe Muons	      
 	      if((muon.isGlobal || muon.isTrackerArb) &&  // CB minimal cuts on potental probe 
 		 muon.pt > m_tnpConfig.probe_minPt)
 		{
-		  TLorentzVector tagMuTk(muonTk(tagMuon));
-		  TLorentzVector muTk(muonTk(muon));
+		  TLorentzVector tagMuTk(muon_pog::muonTk(tagMuon,m_tnpConfig.muon_trackType));
+		  TLorentzVector muTk(muon_pog::muonTk(muon,m_tnpConfig.muon_trackType));
 
 		  if((fabs(muon.eta) < 1.2  && muon.nHitsStandAlone > 20) || (fabs(muon.eta) >= 1.2 && muon.nHitsStandAlone > 11)) 
 		    m_plots[TIME]["UnbSTAmuonTime"].fill(muon.muonTime,muTk,weight,nVtx);
@@ -710,15 +693,15 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 		  Float_t mass = (tagMuTk+muTk).M();
 		  	  
 		  // CB Fill control plots
-		  m_plots[CONT]["01_invMass"].fill(mass,emptyTk,weight,nVtx);
+		  m_plots[CONT]["01-invMass"].fill(mass,emptyTk,weight,nVtx);
 		  if ( mass > m_tnpConfig.pair_minInvMass &&
 		       mass < m_tnpConfig.pair_maxInvMass )
 		    {
-		      m_plots[CONT]["99_invMassInRange"].fill(mass,emptyTk,weight,nVtx);
+		      m_plots[CONT]["99-invMassInRange"].fill(mass,emptyTk,weight,nVtx);
 		      
 		      Float_t dilepPt = (tagMuTk+muTk).Pt();
-		      m_plots[CONT]["02_dilepPt"].fill(dilepPt,emptyTk,weight,nVtx);
-		      m_plots[CONT]["03_nVertices"].fill(nVtx,emptyTk,weight,nVtx);
+		      m_plots[CONT]["02-dilepPt"].fill(dilepPt,emptyTk,weight,nVtx);
+		      m_plots[CONT]["03-nVertices"].fill(nVtx,emptyTk,weight,nVtx);
 		      
 		      for (auto etaBin : m_tnpConfig.probe_etaBins)
 			{
@@ -737,7 +720,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 				    m_plots[MOM]["goodMuMass" + etaTag + IDTag].fill(mass, muTk, weight, nVtx);
 				    if (mass > 86.5 && mass < 96.5)
 				      {
-					if (chargeFromTrk(muon) > 0)
+					if (chargeFromTrk(muon,m_tnpConfig.muon_trackType) > 0)
 					  m_plots[MOM]["goodMuMassPlus" + etaTag + IDTag].fill(mass, muTk, weight, nVtx);
 					else
 					  m_plots[MOM]["goodMuMassMinus" + etaTag + IDTag].fill(mass, muTk, weight, nVtx);
@@ -899,7 +882,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
   
   // m_plots[CONT]["04_nProbesVsnTags"]->Fill(tagMuons.size(),probeMuons.size());
 
-  m_plots[CONT]["04_runNumber"].fill(run,emptyTk,weight,nVtx);
+  m_plots[CONT]["04-runNumber"].fill(run,emptyTk,weight,nVtx);
 		     
   
   for (auto probeMuonPointer : probeMuons)
@@ -909,7 +892,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
       for (auto etaBin : m_tnpConfig.probe_etaBins)
 	{
 
-	  TLorentzVector probeMuTk(muonTk(probeMuon));
+	  TLorentzVector probeMuTk(muon_pog::muonTk(probeMuon,m_tnpConfig.muon_trackType));
 	  
 	  if (probeMuTk.Eta() > etaBin.first.Atof() &&
 	      probeMuTk.Eta() < etaBin.second.Atof() )
@@ -1012,119 +995,6 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 
 //Functions
 
-double muon_pog::Plotter::deltaR(double eta1, double phi1, double eta2, double phi2)
-{
-  double deta = eta1 - eta2;
-  double dphi = phi1 - phi2;
-  while (dphi > TMath::Pi()) dphi -= 2*TMath::Pi();
-  while (dphi <= -TMath::Pi()) dphi += 2*TMath::Pi();
-
-  return sqrt(deta*deta + dphi*dphi);
-}
-
-
-bool muon_pog::Plotter::hasGoodId(const muon_pog::Muon & muon, TString muId)
-{
-  //std::string & muId = leg == "tag" ? m_tnpConfig.tag_ID : m_tnpConfig.probe_ID;
-
-  if (muId == "GLOBAL")      return muon.isGlobal == 1;
-  else if (muId == "TRACKER")return muon.isTracker  == 1;
-  else if (muId == "TIGHT")  return muon.isTight  == 1;
-  else if (muId == "MEDIUM") return muon.isMedium == 1;
-  else if (muId == "LOOSE")  return muon.isLoose == 1;
-  else if (muId == "HIGHPT") return muon.isHighPt == 1;
-  else if (muId == "SOFT")   return muon.isSoft == 1;
-  else
-    {
-      std::cout << "[Plotter::hasGoodId]: Invalid muon id : "
-		<< muId << std::endl;
-      exit(900);
-    }
- 
-}
-
-
-bool muon_pog::Plotter::hasFilterMatch(const muon_pog::Muon & muon,
-				       const muon_pog::HLT  & hlt )
-{
-  std::string & filter = m_tnpConfig.tag_hltFilter;
-  TLorentzVector muTk = muonTk(muon);
-
-  for (auto object : hlt.objects)
-    {
-      if (object.filterTag.find(filter) != std::string::npos &&
-	  deltaR(muTk.Eta(), muTk.Phi(), object.eta, object.phi) < m_tnpConfig.tag_hltDrCut)
-	return true;
-    }
-
-  return false;
-}
-
-
-Int_t muon_pog::Plotter::chargeFromTrk(const muon_pog::Muon & muon)
-{
-  std::string & trackType = m_tnpConfig.muon_trackType;
-
-  if (trackType == "PF")         return muon.charge;
-  else if (trackType == "TUNEP") return muon.charge_tuneP;
-  else if (trackType == "GLB")   return muon.charge_global;
-  else if (trackType == "INNER") return muon.charge_tracker;
-  else
-    {
-      std::cout << "[Plotter::chargeFromTrk]: Invalid track type: "
-		<< trackType << std::endl;
-      exit(900);
-    }
-  
-}
-
-TLorentzVector muon_pog::Plotter::muonTk(const muon_pog::Muon & muon)
-{
-  std::string & trackType = m_tnpConfig.muon_trackType;
-
-  TLorentzVector result; 
-  if (trackType == "PF")
-    result.SetPtEtaPhiM(muon.pt,muon.eta,muon.phi,.10565);
-  else if (trackType == "TUNEP")
-    result.SetPtEtaPhiM(muon.pt_tuneP,muon.eta_tuneP,muon.phi_tuneP,.10565);
-  else if (trackType == "GLB")
-    result.SetPtEtaPhiM(muon.pt_global,muon.eta_global,muon.phi_global,.10565);
-  else if (trackType == "INNER")
-    result.SetPtEtaPhiM(muon.pt_tracker,muon.eta_tracker,muon.phi_tracker,.10565);
-  else
-    {
-      std::cout << "[Plotter::muonTk]: Invalid track type: "
-		<< trackType << std::endl;
-      exit(900);
-    }
-
-  return result;
-  
-}
-
-
-void muon_pog::addUnderFlow(TH1 &hist)
-{
-  //Add UF
-  hist.SetBinContent(1, hist.GetBinContent(0) + hist.GetBinContent(1));
-  hist.SetBinError  (1, sqrt(hist.GetBinError(0)*hist.GetBinError(0) + hist.GetBinError(1)*hist.GetBinError(1)));
-  hist.SetBinContent(0, 0); 
-  hist.SetBinError  (0, 0);  
-
-}
-
-
-void muon_pog::addOverFlow(TH1 &hist)
-{
-  //Add OF		  
-  Int_t lastBin = hist.GetNbinsX(); 
-  hist.SetBinContent(lastBin, hist.GetBinContent(lastBin) + hist.GetBinContent(lastBin+1));
-  hist.SetBinError  (lastBin, sqrt(hist.GetBinError(lastBin)*hist.GetBinError(lastBin) + hist.GetBinError(lastBin+1)*hist.GetBinError(lastBin+1))); 
-  hist.SetBinContent(lastBin+1, 0) ; 
-  hist.SetBinError  (lastBin+1, 0) ; 
-
-}
-
 void muon_pog::parseConfig(const std::string configFile, muon_pog::TagAndProbeConfig & tpConfig,
 			   std::vector<muon_pog::SampleConfig> & sampleConfigs)
 {
@@ -1168,14 +1038,6 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
   outFile->mkdir("comparison/momentum_variables");
   outFile->mkdir("comparison/efficiencies");
   
-  system("mkdir -p " + outputDir + "/comparison/control/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/timing/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/isolation/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/id_variables/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/kinematical_variables/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/momentum_variables/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/efficiencies/no_ratio");
-  
   outFile->cd("comparison");
   std::ofstream integrals(outputDir + "/Result.txt");
  
@@ -1198,6 +1060,10 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
       TString plotName = plotTypeAndName.second;
       outFile->cd(outputDirMap[plotType]);
 
+      std::stringstream sPlotName(plotName.Data());
+      std::string plotTitle;
+      std::getline(sPlotName, plotTitle, '_');
+
       std::vector<TH1 *>::size_type nPlots = plotters.at(0).m_plots[plotType][plotName].plots().size();
 
       for (std::vector<TH1 *>::size_type iPlot=0; iPlot < nPlots; ++ iPlot)
@@ -1215,6 +1081,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  TH1 * hData = 0;
 
 	  int colorMap[5] {kGreen+1, kAzure+7, kGray+1, kRed, kOrange};
+	  TString folderMap[5] {"", "/VsEta", "/VsPhi", "/VsPt", "/VsPV"};
 	 
 	  int iColor = 0;
 	  
@@ -1231,7 +1098,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 		      integralData = plot->Integral(plot->FindBin(-2.5),plot->FindBin(2.5)); 
 		    }
 		  else
-		    integralData = plotter.m_plots[Plotter::CONT]["99_invMassInRange"].plots().at(0)->Integral();
+		    integralData = plotter.m_plots[Plotter::CONT]["99-invMassInRange"].plots().at(0)->Integral();
 		}
 	      else
 		{
@@ -1243,7 +1110,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 		    }
 		  else
 		    {
-		      integralMC += (plotter.m_plots[Plotter::CONT]["99_invMassInRange"].plots().at(0)->Integral() *
+		      integralMC += (plotter.m_plots[Plotter::CONT]["99-invMassInRange"].plots().at(0)->Integral() *
 				     plotter.m_sampleConfig.cSection/plotter.m_sampleConfig.nEvents);
 		      
 		    }
@@ -1356,7 +1223,8 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  
 	  canvas->Update();
 	  canvas->Write();
-	  canvas->SaveAs(outputDir + outputDirMap[plotType] + "/no_ratio/c" + histoName + ".png");
+	  system("mkdir -p " + outputDir + outputDirMap[plotType] + "/" + plotTitle + folderMap[iPlot] +  "/no_ratio/");
+	  canvas->SaveAs(outputDir + outputDirMap[plotType] + "/" + plotTitle + folderMap[iPlot] + "/no_ratio/c" + histoName + ".png");
 	  
 	  //Canvas with ratio plots
 	  TCanvas *ratioCanvas = new TCanvas("rc"+histoName, "rc"+histoName, 500, 700);
@@ -1648,7 +1516,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  l->SetLineColor(1); 
 	  l->Draw("same"); 
       
-	  if(plotName == "03_nVertices" && !pMc)
+	  if(plotName == "03-nVertices" && !pMc)
 	    {
 	      Int_t nbins = hRatio->GetNbinsX();
 	 
@@ -1662,7 +1530,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	    }
 	        
 	  ratioCanvas->Write();
-	  ratioCanvas->SaveAs(outputDir+ outputDirMap[plotType] + "/rc" + histoName + ".png");
+	  ratioCanvas->SaveAs(outputDir+ outputDirMap[plotType] + "/" + plotTitle + folderMap[iPlot] + "/rc" + histoName + ".png");
       
 	  delete canvas;
 	  delete ratioCanvas;
