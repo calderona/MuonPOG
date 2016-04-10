@@ -1134,7 +1134,7 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 		    }
 		  
 		  Double_t stat = hData->GetEntries();	
-		  leg->AddEntry(hData,Form(plotter.m_sampleConfig.sampleName+" [%10.0f  ]",stat),"LP");  
+		  leg->AddEntry(hData,Form(plotter.m_sampleConfig.sampleName+" [%9.0f]",stat),"LP");  
 		}
 	      else
 		{
