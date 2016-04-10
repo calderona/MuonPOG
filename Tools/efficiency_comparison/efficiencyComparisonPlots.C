@@ -26,6 +26,7 @@
 #include <iostream>
 #include <fstream> 
 #include <vector>
+#include <regex>
 #include <map>
 
 
@@ -690,9 +691,8 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
       
       TLorentzVector probeMuTk(muonTk(probeMuon,m_tnpConfig.muon_trackType));
 	  
-      Bool_t tight = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
-	&& probeMuon.trkTrackerLayersWithMeas > 5 && probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dzBest) < 0.5 && fabs(probeMuon.dxyBest) < 0.2;
-	  
+      Bool_t tight = muon_pog::hasGoodId(probeMuon,"TIGHT");
+
       Bool_t generalCuts = probeMuon.isPF && probeMuon.isGlobal && probeMuon.isTracker;
 	  
       Bool_t muHits  = probeMuon.isPF && probeMuon.isGlobal && probeMuon.trkMuonMatchedStations > 1 && probeMuon.trkTrackerLayersWithMeas > 5
@@ -748,7 +748,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
       Bool_t step1 = probeMuon.isGlobal && probeMuon.glbNormChi2 < 2. && probeMuon.trkStaChi2 < 12. && probeMuon.trkKink < 20 && probeMuon.muSegmComp > 0.303; 
       Bool_t step2 = probeMuon.isTracker && probeMuon.muSegmComp > 0.451; 
       
-      Bool_t medium = step0 && ( step1 || step2);
+      Bool_t medium = muon_pog::hasGoodId(probeMuon,"MEDIUM");
       
       m_effs[MEDIUM1]["Medium"].fill(medium,probeMuTk,weight,ev);
       m_effs[MEDIUM1]["Medium_generalCuts"].fill(step0,probeMuTk,weight,ev);
@@ -824,13 +824,6 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
   outFile->mkdir("comparison/efficiencies_medium_v1");
   outFile->mkdir("comparison/efficiencies_medium_v2");
 
-  system("mkdir -p " + outputDir + "/comparison/control/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/kinematical_variables/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/efficiencies_tight_n-1/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/efficiencies_tight_tight_over_n-1/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/efficiencies_medium_v1/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/efficiencies_medium_v2/no_ratio");
-  
   outFile->cd("comparison");
   
   std::vector<std::pair<Plotter::HistoType,TString> > plotTypesAndNames;
@@ -879,6 +872,13 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	{
 	  TString plotName = isEff ? plotters.at(0).m_effs[plotType][observableName].effs().at(iPlot)->GetName() :
 	                             plotters.at(0).m_plots[plotType][observableName].plots().at(iPlot)->GetName();
+
+	  std::string base(plotName.Data());
+	  std::regex profRegEx("Vs(Eta)?(Pt)?(Phi)?(BX)?(PV)?(InstLumi)?");
+	  std::smatch profMatch;
+
+	  std::regex_search(base ,profMatch, profRegEx);
+	  std::string profTag = "/" +  profMatch.str() ;
 
 	  TLegend *leg = new TLegend(0.45,0.7,0.95,0.95);
 	  leg->SetBorderSize(0);
@@ -1029,28 +1029,33 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  
 	  canvas->Update();
 	  canvas->Write();
-	  canvas->SaveAs(outputDir + outputDirMap[plotType] + "/no_ratio/c" + plotName + ".png");
+	  system("mkdir -p " + outputDir+ outputDirMap[plotType] + profTag + "/no_ratio");
+	  canvas->SaveAs(outputDir + outputDirMap[plotType] + profTag + "/no_ratio/c" + plotName + ".png");
 
 	  ratioCanvas->cd(1);	  
 	  leg->Draw();
 	  
-	  firstPlot->GetXaxis()->SetTitle("");
-	  firstPlot->GetXaxis()->SetLabelSize(0);
+	  if (firstPlot)
+	    {
+	      firstPlot->GetXaxis()->SetTitle("");
+	      firstPlot->GetXaxis()->SetLabelSize(0);
 	      
-	  ratioCanvas->cd(1)->Update();	  
+	      ratioCanvas->cd(1)->Update();	  
 	  
-	  ratioCanvas->cd(2);
+	      ratioCanvas->cd(2);
 	      
-	  Double_t Xmax = firstPlot->GetXaxis()->GetXmax();
-	  Double_t Xmin = firstPlot->GetXaxis()->GetXmin();
+	      Double_t Xmax = firstPlot->GetXaxis()->GetXmax();
+	      Double_t Xmin = firstPlot->GetXaxis()->GetXmin();
 	  
-	  TLine *l = new TLine(Xmin,1,Xmax,1);
-	  l->SetLineColor(kRed); 
-	  l->Draw("same"); 
-	  
-	  ratioCanvas->Write();
-	  ratioCanvas->SaveAs(outputDir+ outputDirMap[plotType] + "/rc" + plotName + ".png");
-	  
+	      TLine *l = new TLine(Xmin,1,Xmax,1);
+	      l->SetLineColor(kRed); 
+	      l->Draw("same"); 
+	      
+	      ratioCanvas->Write();
+
+	      ratioCanvas->SaveAs(outputDir+ outputDirMap[plotType] + profTag + "/rc" + plotName + ".png");
+	    }
+
 	  delete canvas;
 	  delete ratioCanvas;
 	  
