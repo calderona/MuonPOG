@@ -189,8 +189,8 @@ namespace muon_pog {
 			const muon_pog::HLT  & hlt,
 			std::string & filter);
     const muon_pog::GenParticle * hasGenMatch(const muon_pog::Muon & muon,
-					const std::vector<muon_pog::GenParticle>  & gens,
-					Int_t pdgId = 0);
+					      const std::vector<muon_pog::GenParticle>  & gens,
+					      Int_t motherPdgId = 0, Int_t vetoPdgId = 0);
     Int_t chargeFromTrk(const muon_pog::Muon & muon);
     TLorentzVector muonTk(const muon_pog::Muon & muon);    
     
@@ -557,6 +557,8 @@ void muon_pog::Plotter::book(TFile *outFile)
 	      m_plots[VAR]["ProbeEta" + etaTag + ptTag + IDTag] = muon_pog::Observable("hProbeEta_" + etaTag + ptTag + IDTag, sampleTag, "#eta", "# entries", 48,-2.4, 2.4, false);
 	      m_plots[VAR]["ProbePhi" + etaTag + ptTag + IDTag] = muon_pog::Observable("hProbePhi_" + etaTag + ptTag + IDTag, sampleTag, "#phi", "# entries", 48,-TMath::Pi(),TMath::Pi(), false); 
 
+	      m_plots[VAR]["ProbeFracFSR" + etaTag + ptTag + IDTag]  = muon_pog::Observable("ProbeFracFSR" + etaTag + ptTag + IDTag, sampleTag, "postFSR p_{T} / preFSR p_{T}", "# entries", 50,0.05,1.05, false);
+
 	      m_plots[VAR]["ProbeFromTauPt" + etaTag + ptTag + IDTag]  = muon_pog::Observable("ProbeFromTauPt" + etaTag + ptTag + IDTag, sampleTag, "p_{T} (GeV)", "# entries", 150,0.,150., false);
 	      m_plots[VAR]["ProbeFromMuPt" + etaTag + ptTag + IDTag]  = muon_pog::Observable("ProbeFromMuPt" + etaTag + ptTag + IDTag, sampleTag, "p_{T} (GeV)", "# entries", 150,0.,150., false);
 	      m_plots[VAR]["ProbeFromZPt" + etaTag + ptTag + IDTag]  = muon_pog::Observable("ProbeFromZPt" + etaTag + ptTag + IDTag, sampleTag, "p_{T} (GeV)", "# entries", 150,0.,150., false);
@@ -803,6 +805,12 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 				  m_plots[CONT]["111_chHadIsoFromMu" + etaTag + ptTag + IDTag].fill(probeMuon.chargedHadronIso,emptyTk,weight, ev);
 				  m_plots[CONT]["112_neuHadIsoFromMu" + etaTag + ptTag + IDTag].fill(probeMuon.neutralHadronIso,emptyTk,weight,ev);
 				  m_plots[CONT]["113_phIsoFromMu" + etaTag + ptTag + IDTag].fill(probeMuon.photonIso,emptyTk,weight,ev);
+				  if (hasGenMatch(probeMuon,ev.genParticles,23,13))
+				    {
+				      Float_t postFsrPt = hasGenMatch(probeMuon,ev.genParticles,13)->pt;
+				      Float_t preFsrPt = hasGenMatch(probeMuon,ev.genParticles,23,13)->pt;
+				      m_plots[VAR]["ProbeFracFSR" + etaTag + ptTag + IDTag].fill(postFsrPt/preFsrPt, probeMuTk, weight, ev);
+				    }
 				}
 			      else if (hasGenMatch(probeMuon,ev.genParticles,23))
 				{
@@ -892,7 +900,7 @@ bool muon_pog::Plotter::hasFilterMatch(const muon_pog::Muon & muon,
 
 const muon_pog::GenParticle * muon_pog::Plotter::hasGenMatch(const muon_pog::Muon & muon,
 						       const std::vector<muon_pog::GenParticle>  & gens,
-						       Int_t pdgId)
+							     Int_t motherPdgId, Int_t vetoPdgId)
 {
   TLorentzVector muTk = muonTk(muon);
 
@@ -905,7 +913,8 @@ const muon_pog::GenParticle * muon_pog::Plotter::hasGenMatch(const muon_pog::Muo
       if (fabs(gen.pdgId) == 13)
 	{
 	  Float_t dr = deltaR(muTk.Eta(), muTk.Phi(), gen.eta, gen.phi);
-	  if (dr < m_tnpConfig.gen_DrCut && dr< bestDr)
+	  if (dr < m_tnpConfig.gen_DrCut && dr< bestDr && 
+	      ((vetoPdgId == 0) || !hasMother(gen,vetoPdgId)))
 	    {
 	      bestGen = &gen;
 	      bestDr = dr;
@@ -913,7 +922,7 @@ const muon_pog::GenParticle * muon_pog::Plotter::hasGenMatch(const muon_pog::Muo
 	}
     }
 
-  return ((pdgId == 0) || hasMother(*bestGen,pdgId)) ? bestGen : 0;
+  return (bestGen && ((motherPdgId == 0) || hasMother(*bestGen,motherPdgId))) ? bestGen : 0;
 }
 
 
