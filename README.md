@@ -7,7 +7,7 @@ Collection of MuonPOG related tools
 cmsrel CMSSW_7_6_3 # Just an example release, works in CMSSW >= 74X at present 
 cd CMSSW_7_6_3/src/
 
-git clone https://github.com/battibass/MuonPOG/blob/master/README.md
+git clone https://github.com/battibass/MuonPOG/
 
 cmsenv
 scramv1 b -j 5
@@ -32,14 +32,25 @@ The interface of muon Ntuples is defined in : MuonPOG/Tools/src/MuonPogTree.h
 
 The code filling ntuples is available in : MuonPOG/Tools/plugins/MuonPogTreeProducer.cc
 
-It fills HLT, GEN level, beam spot, vertex and muon information. It works both in AOD and miniAOD.
+It fills HLT, GEN level, beam spot, vertex and muon information. It works both in AOD and miniAOD (NOTE: trigger information not filled when running in miniAOD).
+
 
 To create some ntuples :
 
 ```bash
 cd MuonPOG/Tools/test/
-cmsRun muonPogNtuples_cfg.py # modify files according to your needs
+python muonPogNtuples_cfg.py --print # this will give you the default input parameters of the filler. 
+                                     # As the ntuple cfg is based on VarParsing you can customise the
+                                     # ntuple production via command line [1] or in a crab cfg [2] 
+
+[1] 
+cmsRun muonPogNtuples_cfg.py globalTag=80X_mcRun2_asymptotic_v5 \\
+  eosInputFolder=/store/relval/CMSSW_8_0_0_patch2/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v5_refGT-v1/10000
+
+[2] 
+https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile#CRAB_configuration_parameters (find pyCfgParams)
 ```
+
 
 The ntuple producer gets loaded by :
 

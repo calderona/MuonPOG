@@ -105,6 +105,10 @@ private:
   edm::EDGetTokenT<reco::GenParticleCollection> genToken_;
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> > pileUpInfoToken_;
 
+  edm::EDGetTokenT<edm::View<reco::Track> > adHocTrackToken_;
+  std::string adHocTrackLabel_;  
+  
+
 };
 
 
@@ -132,6 +136,11 @@ MuonEventDumper::MuonEventDumper( const edm::ParameterSet & cfg )
 
   tag = cfg.getUntrackedParameter<edm::InputTag>("PileUpInfoTag", edm::InputTag("pileupInfo"));
   if (tag.label() != "none") pileUpInfoToken_ = consumes<std::vector<PileupSummaryInfo> >(tag);
+
+  tag = cfg.getUntrackedParameter<edm::InputTag>("AdHocTrackTag", edm::InputTag("AdHocTracks"));
+  if (tag.label() != "none") adHocTrackToken_ = consumes<edm::View<reco::Track> >(tag);
+
+  adHocTrackLabel_ = tag.encode();
 
 }
 
@@ -196,6 +205,18 @@ void MuonEventDumper::analyze (const edm::Event & ev, const edm::EventSetup &)
   // Print muon information
   if (muons.isValid() && vertexes.isValid() && beamSpot.isValid()) 
     printMuons(muons,vertexes,beamSpot);
+
+  auto tracks = conditionalGet<edm::View<reco::Track> >(ev,adHocTrackToken_, "AdHocTracks");
+
+  std::cout << "Ad-hoc trackcollection is " + adHocTrackLabel_ + " and has size: " << tracks->size() << std::endl;
+
+  edm::View<reco::Track> ::const_iterator trackIt  = tracks->begin();
+  edm::View<reco::Track> ::const_iterator trackEnd = tracks->end();
+
+  for (; trackIt != trackEnd; ++trackIt) 
+    {
+      printTrack(&(*trackIt),adHocTrackLabel_);
+    }      
   
 }
 
@@ -370,6 +391,7 @@ void MuonEventDumper::printTrack(const reco::Track * track, const std::string & 
 	    << " , # trk layers :" << track->hitPattern().trackerLayersWithMeasurement()
 	    << " , # muon hits :" << track->hitPattern().numberOfMuonHits()
 	    << " , # muon valid hits :" << track->hitPattern().numberOfValidMuonHits()
+	    << " , # muon bad hits :" << track->hitPattern().numberOfBadMuonHits()
 	    << " , # DT valid hits :" << track->hitPattern().numberOfValidMuonDTHits()
 	    << " , # CSC valid hits :" << track->hitPattern().numberOfValidMuonCSCHits()
 	    << " , # RPC valid hits :" << track->hitPattern().numberOfValidMuonRPCHits()
@@ -388,6 +410,9 @@ void MuonEventDumper::printTrack(const reco::Track * track, const std::string & 
 	    << " , # CSC stations with any hits :" << track->hitPattern().cscStationsWithAnyHits()
 	    << " , # RPC stations with any hits :" << track->hitPattern().rpcStationsWithAnyHits()
 	    << std::endl;  
+
+  // CB compte print of the hit pattern
+  //track->hitPattern().print(reco::HitPattern::HitCategory::TRACK_HITS);
   
 }
 
@@ -477,8 +502,8 @@ void MuonEventDumper::printMuons(const edm::Handle<edm::View<reco::Muon> > & muo
 		      << " , time at IP IN->OUT :" << time.timeAtIpInOut
 		      << " , error on time at IP IN->OUT :" << time.timeAtIpInOutErr
 		      << std::endl;
-	}
-      
+	}      
+
       std::cout << "It passes the : "
 		<< (muon::isSoftMuon(mu,vertex)     ? "SOFT " : "")
 		<< (muon::isLooseMuon(mu)           ? "LOOSE " : "")

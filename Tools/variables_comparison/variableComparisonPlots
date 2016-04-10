@@ -14,7 +14,7 @@ rootcling -f MuonPogTreeDict.C -c ${BASETREEDIR}/MuonPogTree.h ${BASETREEDIR}/Mu
 
 g++ -g -std=gnu++11 -I${ROOTINCDIR} ${fileC} MuonPogTreeDict.C ${ROOTLIBS} -lX11 -lboost_system -lboost_filesystem -o ${fileEXE}
 
-echo "[invariantMassPlots]: Running with parameters $@" 
+echo "[variableComparisonPlots]: Running with parameters $@" 
 ${fileEXE} $@
 
 rm -f MuonPogTreeDict.C MuonPogTreeDict.h MuonPogTreeDict_rdict.pcm
