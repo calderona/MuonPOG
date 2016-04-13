@@ -19,7 +19,9 @@ MuonPogTree = cms.EDAnalyzer("MuonPogTreeProducer",
 
                              GenTag = cms.untracked.InputTag("prunedGenParticles"), # pruned
                              PileUpInfoTag = cms.untracked.InputTag("addPileupInfo"),
-                             GenInfoTag = cms.untracked.InputTag("generator")
+                             GenInfoTag = cms.untracked.InputTag("generator"),
+                             MinMuPtCut = cms.untracked.double(0.),
+                             MinNMuCut  = cms.untracked.int32(0)
                              )
 
 

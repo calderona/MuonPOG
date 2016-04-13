@@ -42,6 +42,18 @@ options.register('hltPathFilter',
                  VarParsing.VarParsing.varType.string,
                  "Filter on paths (now only accepts all or IsoMu20)")
 
+options.register('minMuPt',
+                 0., #default value
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.float,
+                 "Skim the ntuple counting for TRK || GLB muons with pT > of this value")
+
+options.register('minNMu',
+                 0, #default value
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 "number of TRK or GLB muons with pT > minMuPt to pass the skim")
+
 options.parseArguments()
 
 if options.hltPathFilter == "all" :
@@ -85,3 +97,8 @@ process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 from MuonPOG.Tools.MuonPogNtuples_cff import appendMuonPogNtuple
     
 appendMuonPogNtuple(process,options.runOnMC,"HLT",options.ntupleName,pathCut,filterCut)
+
+process.MuonPogTree.MinMuPtCut = cms.untracked.double(options.minMuPt)
+process.MuonPogTree.MinNMuCut  = cms.untracked.int32(options.minNMu)
+
+
