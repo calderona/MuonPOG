@@ -39,6 +39,7 @@
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/HepMCCandidate/interface/GenStatusFlags.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
 
@@ -416,6 +417,9 @@ void MuonPogTreeProducer::fillGenParticles(const edm::Handle<reco::GenParticleCo
       gensel.vy = part.vy();
       gensel.vz = part.vz();
 
+      reco::GenStatusFlags statusflags = part.statusFlags();
+      gensel.IsPrompt = statusflags.isPrompt();
+
       gensel.mothers.clear();
       unsigned int nMothers = part.numberOfMothers();
 
@@ -588,6 +592,14 @@ Int_t MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > &
 	   )
 	nGoodMuons++;
  
+      // Detector Based Isolation
+      reco::MuonIsolation DBiso03 = mu.isolationR03();
+
+      ntupleMu.trackerIso = DBiso03.sumPt;
+      ntupleMu.EMCalIso   = DBiso03.emEt;
+      ntupleMu.HCalIso    = DBiso03.hadEt;
+      
+      // PF Isolation
       reco::MuonPFIsolation iso04 = mu.pfIsolationR04();
       reco::MuonPFIsolation iso03 = mu.pfIsolationR03();
 
