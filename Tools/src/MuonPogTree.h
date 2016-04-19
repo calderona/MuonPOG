@@ -5,6 +5,9 @@
 #include "TMath.h"
 #include <vector>
 #include <string>
+#include "DataFormats/HepMCCandidate/interface/GenStatusFlags.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+
 
 namespace muon_pog {
 
@@ -19,9 +22,13 @@ namespace muon_pog {
     
     ClassDef(GenInfo,1)
   };
-
+  
   class GenParticle {
   public:
+    
+    GenParticle(){};
+    virtual ~GenParticle(){};
+    
     Int_t pdgId;  // PDG identifier
     Int_t status; // MC status
     bool IsPrompt; // GenStatusFlag: Lepton is NOT coming from hadron or tau decay 
@@ -34,8 +41,16 @@ namespace muon_pog {
     Float_t vz; // z coordinate of production vertex [cm]
     std::vector<Int_t> mothers; // vector of indices of mothers
 
-    GenParticle(){};
-    virtual ~GenParticle(){};
+    void SetFlags(reco::GenStatusFlags statusflags){
+      _flags.clear();
+      for (unsigned int fl = 0; fl < 15; fl++) 
+	_flags.push_back(statusflags.flags_[fl]);      
+    }
+    
+    bool flags( int flag ) { return _flags[flag]; }
+    
+  private:
+    std::vector<bool> _flags;    
     
     ClassDef(GenParticle,1)
   };
