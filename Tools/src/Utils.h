@@ -74,7 +74,7 @@ namespace muon_pog
   TLorentzVector muonTk(const muon_pog::Muon & muon, 
 			const std::string & trackType)
   {
-    
+
     TLorentzVector result; 
     if (trackType == "PF")
       result.SetPtEtaPhiM(muon.pt,muon.eta,muon.phi,.10565);
@@ -90,7 +90,7 @@ namespace muon_pog
 		  << trackType << std::endl;
 	exit(900);
       }
-    
+
     return result;
     
   }
@@ -137,6 +137,50 @@ namespace muon_pog
     return false;
     
   }
+
+  bool hasMother(const muon_pog::GenParticle & gen, Int_t pdgId)
+    {
+      
+      for (auto motherId : gen.mothers)
+	{
+	  if (abs(motherId) == pdgId)
+	    {
+	      return true;
+	    }
+	}
+      
+      return false;
+      
+    }
+
+
+  const muon_pog::GenParticle * hasGenMatch(const muon_pog::Muon & muon,
+					    const std::vector<muon_pog::GenParticle>  & gens,
+					    Float_t dRCut, Int_t motherPdgId = 0, Int_t vetoPdgId = 0)
+  {
+   
+    TLorentzVector muTk = muonTk(muon,std::string("INNER"));
+    
+    const muon_pog::GenParticle * bestGen = 0;
+    Float_t bestDr = 999.;
+    
+    for (auto & gen : gens)
+      {
+	if (fabs(gen.pdgId) == 13)
+	  {
+	    Float_t dr = deltaR(muTk.Eta(), muTk.Phi(), gen.eta, gen.phi);
+	    if (dr < dRCut && dr < bestDr && 
+		((vetoPdgId == 0) || !hasMother(gen,vetoPdgId)))
+	      {
+		bestGen = &gen;
+		bestDr = dr;
+	      }
+	  }
+      }
+
+    return (bestGen && ((motherPdgId == 0) || hasMother(*bestGen,motherPdgId))) ? bestGen : 0;
+  }
+
 
   //From Fede, the function name says it all
   void addUnderFlow(TH1 &hist)
