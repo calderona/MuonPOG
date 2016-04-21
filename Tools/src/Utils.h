@@ -125,8 +125,12 @@ namespace muon_pog
     if (filter == "none")
       return true;
     
+    if (!hasGoodId(muon,"GLOBAL") &&
+	!hasGoodId(muon,"TRACKER") ) 
+      return false;
+
     TLorentzVector muTk = muonTk(muon,std::string("INNER"));
-    
+
     for (auto object : hlt.objects)
       {
 	if (object.filterTag.find(filter) != std::string::npos &&
