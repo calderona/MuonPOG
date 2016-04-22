@@ -419,7 +419,7 @@ void MuonPogTreeProducer::fillGenParticles(const edm::Handle<reco::GenParticleCo
 
       // Full set of GenFlags
       reco::GenStatusFlags statusflags = part.statusFlags();
-      if(statusflags.flags_.size() == 15) gensel.SetFlags(statusflags);
+      if(statusflags.flags_.size() == 15) gensel.setFlags(statusflags);
 
       gensel.mothers.clear();
       unsigned int nMothers = part.numberOfMothers();
@@ -594,20 +594,20 @@ Int_t MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > &
 	nGoodMuons++;
  
       // Detector Based Isolation
-      reco::MuonIsolation DBiso03 = mu.isolationR03();
+      reco::MuonIsolation detIso03 = mu.isolationR03();
 
-      ntupleMu.trackerIso = DBiso03.sumPt;
-      ntupleMu.EMCalIso   = DBiso03.emEt;
-      ntupleMu.HCalIso    = DBiso03.hadEt;
+      ntupleMu.trackerIso = detIso03.sumPt;
+      ntupleMu.EMCalIso   = detIso03.emEt;
+      ntupleMu.HCalIso    = detIso03.hadEt;
       
       // PF Isolation
-      reco::MuonPFIsolation iso04 = mu.pfIsolationR04();
-      reco::MuonPFIsolation iso03 = mu.pfIsolationR03();
+      reco::MuonPFIsolation pfIso04 = mu.pfIsolationR04();
+      reco::MuonPFIsolation pfIso03 = mu.pfIsolationR03();
 
-      ntupleMu.chargedHadronIso   = iso04.sumChargedHadronPt;
-      ntupleMu.chargedHadronIsoPU = iso04.sumPUPt; 
-      ntupleMu.neutralHadronIso   = iso04.sumNeutralHadronEt;
-      ntupleMu.photonIso          = iso04.sumPhotonEt;
+      ntupleMu.chargedHadronIso   = pfIso04.sumChargedHadronPt;
+      ntupleMu.chargedHadronIsoPU = pfIso04.sumPUPt; 
+      ntupleMu.neutralHadronIso   = pfIso04.sumNeutralHadronEt;
+      ntupleMu.photonIso          = pfIso04.sumPhotonEt;
 
       ntupleMu.isGlobal     = isGlobal ? 1 : 0;	
       ntupleMu.isTracker    = isTracker ? 1 : 0;	
@@ -667,9 +667,11 @@ Int_t MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > &
       ntupleMu.dxyInner = -999; 
       ntupleMu.dzInner  = -999; 
 
-      ntupleMu.isoPflow04 = (iso04.sumChargedHadronPt+ std::max(0.,iso04.sumPhotonEt+iso04.sumNeutralHadronEt - 0.5*iso04.sumPUPt)) / mu.pt();
+      ntupleMu.isoPflow04 = (pfIso04.sumChargedHadronPt+ 
+			     std::max(0.,pfIso04.sumPhotonEt+pfIso04.sumNeutralHadronEt - 0.5*pfIso04.sumPUPt)) / mu.pt();
     
-      ntupleMu.isoPflow03 = (iso03.sumChargedHadronPt+ std::max(0.,iso03.sumPhotonEt+iso03.sumNeutralHadronEt - 0.5*iso03.sumPUPt)) / mu.pt();
+      ntupleMu.isoPflow03 = (pfIso03.sumChargedHadronPt+ 
+			     std::max(0.,pfIso03.sumPhotonEt+pfIso03.sumNeutralHadronEt - 0.5*pfIso03.sumPUPt)) / mu.pt();
 
       double dxybs = isGlobal ? mu.globalTrack()->dxy(beamSpot->position()) :
 	hasInnerTrack ? mu.innerTrack()->dxy(beamSpot->position()) : -1000;
