@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 
-def appendMuonPogNtuple(process, runOnMC, processTag="HLT", ntupleFileName="MuonPogTree.root", pathCut = "all", filterCut = "all") :
+def appendMuonPogNtuple(process, runOnMC, processTag="HLT", ntupleFileName="MuonPogTree.root") :
 
     process.load("MuonPOG.Tools.MuonPogTreeProducer_cfi")
 
@@ -23,8 +23,6 @@ def appendMuonPogNtuple(process, runOnMC, processTag="HLT", ntupleFileName="Muon
         fileName = cms.string(ntupleFileName)
     )
 
-    process.MuonPogTree.TrigPathCut = pathCut
-    process.MuonPogTree.TrigFilterCut = filterCut
     
     if hasattr(process,"AOutput") :
         print "[MuonPogNtuples]: EndPath AOutput found, appending ntuples"
@@ -32,3 +30,34 @@ def appendMuonPogNtuple(process, runOnMC, processTag="HLT", ntupleFileName="Muon
     else :
         print "[MuonPogNtuples]: EndPath AOuptput not found, creating it for ntuple sequence"
         process.AOutput = cms.EndPath(process.muonPogNtuple)
+
+def customiseHlt(process, pathCut = "all", filterCut = "all") :
+    if hasattr(process,"MuonPogTree") :
+        print "[MuonPogNtuples]: skimming HLT format using:\n" \
+            + "\tpaths : " + pathCut + "\n" \
+            + "\tfilters : " + filterCut 
+            
+        process.MuonPogTree.TrigPathCut = pathCut
+        process.MuonPogTree.TrigFilterCut = filterCut
+    else : 
+        print "[MuonPogNtuples]: muonPogTree not found, check your cfg!"
+
+def customiseMuonCuts(process, minMuPt = 0., minNMu = 0) :
+    if hasattr(process,"MuonPogTree") :
+        print "[MuonPogNtuples]: skimming ntuple selection only events with: " \
+            + "# TRK || GLB muons >= " + str(minNMu) + " with muon pT > " + str(minMuPt) 
+            
+        process.MuonPogTree.MinMuPtCut = cms.untracked.double(minMuPt)
+        process.MuonPogTree.MinNMuCut  = cms.untracked.int32(minNMu)
+
+        if hasattr(process,"prunedGenParticles") :
+            print "[MuonPogNtuples]: applying pT cut to GEN particles as well"
+            
+            process.prunedGenParticles.select = cms.vstring("drop *"
+                                                            , "++keep pdgId =  13 && pt >" + str(minMuPt) 
+                                                            , "++keep pdgId = -13 && pt >" + str(minMuPt)
+                                                            )
+
+    else :
+        print "[MuonPogNtuples]: muonPogTree not found, check your cfg!"
+
