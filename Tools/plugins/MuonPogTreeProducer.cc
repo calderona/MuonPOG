@@ -385,8 +385,7 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
   if (nGoodMuons >= m_minNMuCut)
   tree_["muPogTree"]->Fill();
 
-
-
+}
 
 void MuonPogTreeProducer::fillGenInfo(const edm::Handle<std::vector<PileupSummaryInfo> > & puInfo,
 				      const edm::Handle<GenEventInfoProduct> & gen)
@@ -518,26 +517,25 @@ void MuonPogTreeProducer::fillHlt(const edm::Handle<edm::TriggerResults> & trigg
 
 }
 
-void MuonPogTreeProducer::fillL1(const edm::Handle<std::vector<l1extra::L1MuonParticle> > &L1particules)
+void MuonPogTreeProducer::fillL1(const edm::Handle<std::vector<l1extra::L1MuonParticle> > &L1particles)
 {
-    int nbL1candidates = (*L1particules).size();
-    for (int i = 0 ; i < nbL1candidates ; i++){
+    int nbL1candidates = (*L1particles).size();
+    for (int i = 0 ; i < nbL1candidates ; ++i){
         muon_pog::L1Muon l1part;
-        const l1extra::L1MuonParticle & l1 = (*L1particules)[i];
-        std::cout << "phi=" << l1.phi() << " eta=" << l1.eta() << " pt=" << l1.pt() << " charge=" << l1.charge()<< std::endl;
+        const l1extra::L1MuonParticle & l1 = (*L1particles)[i];
+        //std::cout << "phi=" << l1.phi() << " eta=" << l1.eta() << " pt=" << l1.pt() << " charge=" << l1.charge()<< std::endl;
         l1part.pt = l1.pt();
         l1part.eta = l1.eta();
         l1part.phi = l1.phi();
-        l1part.charge = l1.charge();
+        l1part.charge = l1.gmtMuonCand().charge_valid() ? l1.charge() : 0;
 
         const L1MuGMTCand & gmt = l1.gmtMuonCand();
-        std::cout << gmt.quality() << " " <<  gmt.bx() << " " << gmt.isol() << std::endl;
+        //std::cout << gmt.quality() << " " <<  gmt.bx() << " " << std::endl;
         l1part.quality = gmt.quality();
         l1part.bx = gmt.bx();
-        l1part.isol = gmt.isol();
         
         const L1MuGMTExtendedCand & extGmt = l1.gmtMuonCand();
-        std::cout << "isFwd=" << extGmt.isFwd() << " isRPC=" << extGmt.isRPC() << std::endl;
+        //std::cout << "isFwd=" << extGmt.isFwd() << " isRPC=" << extGmt.isRPC() << std::endl;
         l1part.isFwd = extGmt.isFwd();
         l1part.isRPC = extGmt.isRPC();
         event_.l1muons.push_back(l1part);

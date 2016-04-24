@@ -234,11 +234,10 @@ namespace muon_pog {
     Float_t pt;  // pt [GeV]
     Float_t eta; // eta
     Float_t phi; // phi
-    Int_t charge; //charge
+    Int_t charge; //charge (0 if invalid)
       
     Int_t quality;
     Int_t bx;
-    Int_t isol;
       
     Int_t isFwd;
     Int_t isRPC;
@@ -313,7 +312,7 @@ namespace muon_pog {
     Event(){};
     virtual ~Event(){};
 
-    ClassDef(Event,3)
+    ClassDef(Event,4)
   };
 
 }
