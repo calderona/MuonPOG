@@ -96,7 +96,7 @@ process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 
 from MuonPOG.Tools.MuonPogNtuples_cff import appendMuonPogNtuple
     
-appendMuonPogNtuple(process,options.runOnMC,"HLT",options.ntupleName,pathCut,filterCut)
+appendMuonPogNtuple(process,options.runOnMC,"HLT",options.ntupleName)
 
 process.MuonPogTree.MinMuPtCut = cms.untracked.double(options.minMuPt)
 process.MuonPogTree.MinNMuCut  = cms.untracked.int32(options.minNMu)
