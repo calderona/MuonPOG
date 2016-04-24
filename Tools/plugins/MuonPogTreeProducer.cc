@@ -40,6 +40,7 @@
 #include "DataFormats/L1Trigger/interface/L1MuonParticle.h"
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/HepMCCandidate/interface/GenStatusFlags.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
 
@@ -80,12 +81,14 @@ private:
   
   void fillPV(const edm::Handle<std::vector<reco::Vertex> > &);
   
-  void fillMuons(const edm::Handle<edm::View<reco::Muon> > &,
-		 const edm::Handle<std::vector<reco::Vertex> > &,
-		 const edm::Handle<reco::BeamSpot> &);
+
+  Int_t fillMuons(const edm::Handle<edm::View<reco::Muon> > &,
+		  const edm::Handle<std::vector<reco::Vertex> > &,
+		  const edm::Handle<reco::BeamSpot> &);
+
   void fillL1(const edm::Handle<std::vector<l1extra::L1MuonParticle> > &);
 
-
+    
   // returns false in case the match is for a RPC chamber
   bool getMuonChamberId(DetId & id, muon_pog::MuonDetType & det, Int_t & r, Int_t & phi, Int_t & eta) const ;
   
@@ -111,6 +114,8 @@ private:
     
   edm::EDGetTokenT<std::vector<l1extra::L1MuonParticle> > l1Token_;
 
+  Float_t m_minMuPtCut;
+  Int_t m_minNMuCut;
 
   muon_pog::Event event_;
   muon_pog::EventId eventId_;
@@ -164,6 +169,9 @@ MuonPogTreeProducer::MuonPogTreeProducer( const edm::ParameterSet & cfg )
     
   tag = cfg.getUntrackedParameter<edm::InputTag>("l1MuonsTag", edm::InputTag("l1extraParticles"));
   if (tag.label() != "none") l1Token_ = consumes<std::vector<l1extra::L1MuonParticle> >(tag);
+
+  m_minMuPtCut = cfg.getUntrackedParameter<double>("MinMuPtCut", 0.);
+  m_minNMuCut  = cfg.getUntrackedParameter<int>("MinNMuCut",  0.);
 
 }
 
@@ -355,10 +363,11 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
     }
   
 
+  Int_t nGoodMuons = 0;
   // Fill muon information
   if (muons.isValid() && vertexes.isValid() && beamSpot.isValid()) 
     {
-      fillMuons(muons,vertexes,beamSpot);
+      nGoodMuons = fillMuons(muons,vertexes,beamSpot);
     }
 
     
@@ -372,9 +381,10 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
             fillL1(l1s);
         }
     }
-    tree_["muPogTree"]->Fill();
+    
+  if (nGoodMuons >= m_minNMuCut)
+  tree_["muPogTree"]->Fill();
 
-}
 
 
 
@@ -430,6 +440,13 @@ void MuonPogTreeProducer::fillGenParticles(const edm::Handle<reco::GenParticleCo
       gensel.vy = part.vy();
       gensel.vz = part.vz();
 
+      // Full set of GenFlags
+      gensel.flags.clear();
+      reco::GenStatusFlags statusflags = part.statusFlags();
+      if (statusflags.flags_.size() == 15)
+	for (unsigned int flag = 0; flag < statusflags.flags_.size(); ++flag)
+	  gensel.flags.push_back(statusflags.flags_[flag]);      
+      
       gensel.mothers.clear();
       unsigned int nMothers = part.numberOfMothers();
 
@@ -567,19 +584,22 @@ void MuonPogTreeProducer::fillPV(const edm::Handle<std::vector<reco::Vertex> > &
 }
 
 
-void MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > & muons,
-				    const edm::Handle<std::vector<reco::Vertex> > & vertexes,
-				    const edm::Handle<reco::BeamSpot> & beamSpot)
+Int_t MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > & muons,
+				     const edm::Handle<std::vector<reco::Vertex> > & vertexes,
+				     const edm::Handle<reco::BeamSpot> & beamSpot)
 {
+  
+  Int_t nGoodMuons = 0;
 
   edm::View<reco::Muon>::const_iterator muonIt  = muons->begin();
   edm::View<reco::Muon>::const_iterator muonEnd = muons->end();
-
+  
   for (; muonIt != muonEnd; ++muonIt) 
     {
       
-      const reco::Muon& mu = (*muonIt);
 
+      const reco::Muon& mu = (*muonIt);
+      
       bool isGlobal      = mu.isGlobalMuon();
       bool isTracker     = mu.isTrackerMuon();
       bool isTrackerArb  = muon::isGoodMuon(mu, muon::TrackerMuonArbitrated); 
@@ -617,13 +637,31 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > & 
       ntupleMu.phi_standalone    = isStandAlone ? mu.outerTrack()->phi() : -1000.;
       ntupleMu.charge_standalone = isStandAlone ? mu.outerTrack()->charge() : -1000.;
 
-      reco::MuonPFIsolation iso04 = mu.pfIsolationR04();
-      reco::MuonPFIsolation iso03 = mu.pfIsolationR03();
+      // asking for a TRK or GLB muon with minimal pT cut
+      // ignoring STA muons in this logic
+      if ( (isTracker || isGlobal) &&
+	   (ntupleMu.pt         > m_minMuPtCut ||
+	    ntupleMu.pt_global  > m_minMuPtCut ||
+	    ntupleMu.pt_tuneP   > m_minMuPtCut ||
+	    ntupleMu.pt_tracker > m_minMuPtCut )
+	   )
+	nGoodMuons++;
+ 
+      // Detector Based Isolation
+      reco::MuonIsolation detIso03 = mu.isolationR03();
 
-      ntupleMu.chargedHadronIso   = iso04.sumChargedHadronPt;
-      ntupleMu.chargedHadronIsoPU = iso04.sumPUPt; 
-      ntupleMu.neutralHadronIso   = iso04.sumNeutralHadronEt;
-      ntupleMu.photonIso          = iso04.sumPhotonEt;
+      ntupleMu.trackerIso = detIso03.sumPt;
+      ntupleMu.EMCalIso   = detIso03.emEt;
+      ntupleMu.HCalIso    = detIso03.hadEt;
+      
+      // PF Isolation
+      reco::MuonPFIsolation pfIso04 = mu.pfIsolationR04();
+      reco::MuonPFIsolation pfIso03 = mu.pfIsolationR03();
+
+      ntupleMu.chargedHadronIso   = pfIso04.sumChargedHadronPt;
+      ntupleMu.chargedHadronIsoPU = pfIso04.sumPUPt; 
+      ntupleMu.neutralHadronIso   = pfIso04.sumNeutralHadronEt;
+      ntupleMu.photonIso          = pfIso04.sumPhotonEt;
 
       ntupleMu.isGlobal     = isGlobal ? 1 : 0;	
       ntupleMu.isTracker    = isTracker ? 1 : 0;	
@@ -683,9 +721,11 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > & 
       ntupleMu.dxyInner = -999; 
       ntupleMu.dzInner  = -999; 
 
-      ntupleMu.isoPflow04 = (iso04.sumChargedHadronPt+ std::max(0.,iso04.sumPhotonEt+iso04.sumNeutralHadronEt - 0.5*iso04.sumPUPt)) / mu.pt();
+      ntupleMu.isoPflow04 = (pfIso04.sumChargedHadronPt+ 
+			     std::max(0.,pfIso04.sumPhotonEt+pfIso04.sumNeutralHadronEt - 0.5*pfIso04.sumPUPt)) / mu.pt();
     
-      ntupleMu.isoPflow03 = (iso03.sumChargedHadronPt+ std::max(0.,iso03.sumPhotonEt+iso03.sumNeutralHadronEt - 0.5*iso03.sumPUPt)) / mu.pt();
+      ntupleMu.isoPflow03 = (pfIso03.sumChargedHadronPt+ 
+			     std::max(0.,pfIso03.sumPhotonEt+pfIso03.sumNeutralHadronEt - 0.5*pfIso03.sumPUPt)) / mu.pt();
 
       double dxybs = isGlobal ? mu.globalTrack()->dxy(beamSpot->position()) :
 	hasInnerTrack ? mu.innerTrack()->dxy(beamSpot->position()) : -1000;
@@ -745,6 +785,8 @@ void MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > & 
       event_.muons.push_back(ntupleMu);
 
     }
+
+  return nGoodMuons;
 
 }
 

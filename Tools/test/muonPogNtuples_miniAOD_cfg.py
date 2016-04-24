@@ -43,6 +43,19 @@ options.register('hltPathFilter',
                  VarParsing.VarParsing.varType.string,
                  "Filter on paths (now only accepts all or IsoMu20)")
 
+options.register('minMuPt',
+                 0., #default value
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.float,
+                 "Skim the ntuple counting for TRK || GLB muons with pT > of this value")
+
+options.register('minNMu',
+                 0, #default value
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 "number of TRK or GLB muons with pT > minMuPt to pass the skim")
+
+
 options.parseArguments()
 
 if options.hltPathFilter == "all" :
@@ -83,9 +96,12 @@ process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 #process.load("Geometry.CommonDetUnit.globalTrackingGeometry_cfi")
 #process.load("RecoMuon.DetLayers.muonDetLayerGeometry_cfi")
 
-from MuonPOG.Tools.MuonPogNtuples_cff import appendMuonPogNtuple
+from MuonPOG.Tools.MuonPogNtuples_cff import appendMuonPogNtuple, customiseHlt, customiseMuonCuts
+    
+appendMuonPogNtuple(process,options.runOnMC,"HLT",options.ntupleName)
 
-appendMuonPogNtuple(process,options.runOnMC,"HLT",options.ntupleName,pathCut,filterCut)
+customiseHlt(process,pathCut,filterCut)
+customiseMuonCuts(process,options.minMuPt,options.minNMu)
 
 process.MuonPogTree.MuonTag = cms.untracked.InputTag("slimmedMuons")
 process.MuonPogTree.PrimaryVertexTag = cms.untracked.InputTag("offlineSlimmedPrimaryVertices")
@@ -94,5 +110,3 @@ process.MuonPogTree.TrigSummaryTag = cms.untracked.InputTag("none")
 process.MuonPogTree.PFMetTag = cms.untracked.InputTag("none")
 process.MuonPogTree.PFChMetTag = cms.untracked.InputTag("none")
 process.MuonPogTree.CaloMetTag = cms.untracked.InputTag("none")
-
-

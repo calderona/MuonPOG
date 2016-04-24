@@ -19,22 +19,27 @@ namespace muon_pog {
     
     ClassDef(GenInfo,1)
   };
-
+  
   class GenParticle {
   public:
-    Int_t pdgId; // PDG identifier
+    
+    GenParticle(){};
+    virtual ~GenParticle(){};
+    
+    Int_t pdgId;  // PDG identifier
     Int_t status; // MC status
     Float_t energy; // energy [GeV]
     Float_t pt; // pt [GeV]
     Float_t eta; // eta
     Float_t phi; // phi
     Float_t vx; // x coordinate of production vertex [cm]
-    Float_t vy;// y coordinate of production vertex [cm]
-    Float_t vz;// z coordinate of production vertex [cm]
+    Float_t vy; // y coordinate of production vertex [cm]
+    Float_t vz; // z coordinate of production vertex [cm]
     std::vector<Int_t> mothers; // vector of indices of mothers
+    std::vector<bool>  flags;   // vector of flags, in the same order of
+                                //  of "DataFormats/HepMCCandidate/interface/GenStatusFlag.h"
 
-    GenParticle(){};
-    virtual ~GenParticle(){};
+  private:
     
     ClassDef(GenParticle,1)
   };
@@ -140,6 +145,12 @@ namespace muon_pog {
     Int_t   isMedium;
     Int_t   isHighPt;
     
+    //Detector Based Isolation
+    Float_t trackerIso;
+    Float_t EMCalIso;
+    Float_t HCalIso;
+
+    // PF Isolation
     Float_t chargedHadronIso;
     Float_t chargedHadronIsoPU;
     Float_t photonIso;

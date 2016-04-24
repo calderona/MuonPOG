@@ -9,6 +9,9 @@ cd CMSSW_7_6_3/src/
 
 git clone https://github.com/battibass/MuonPOG/
 
+cd MuonPOG
+git checkout 76X
+
 cmsenv
 scramv1 b -j 5
 ```

@@ -16,6 +16,7 @@
 #include "TLorentzVector.h"
 
 #include "../src/MuonPogTree.h"
+#include "../src/Utils.h"
 #include "tdrstyle.C"
 
 #include <cstdlib>
@@ -25,6 +26,7 @@
 #include <iostream>
 #include <fstream> 
 #include <vector>
+#include <regex>
 #include <map>
 
 
@@ -172,18 +174,6 @@ namespace muon_pog {
     TagAndProbeConfig m_tnpConfig;
     SampleConfig m_sampleConfig;
         
-  private :
-   
-    double deltaR(double eta1, double phi1, double eta2, double phi2);
-    
-    bool hasGoodId(const muon_pog::Muon & muon,
-		   TString leg);
-    bool hasFilterMatch(const muon_pog::Muon & muon,
-			const muon_pog::HLT  & hlt,
-			std::string & filter);
-    Int_t chargeFromTrk(const muon_pog::Muon & muon);
-    TLorentzVector muonTk(const muon_pog::Muon & muon);    
-    
   };
   
 }
@@ -283,7 +273,7 @@ int main(int argc, char* argv[]){
       evBranch->SetAddress(&ev);
 
       // Watch number of entries
-      int nEntries = tree->GetEntriesFast();
+      int nEntries = plotter.m_sampleConfig.nEvents > 0 ? plotter.m_sampleConfig.nEvents : tree->GetEntriesFast();
       std::cout << "[" << argv[0] << "] Number of entries = " << nEntries << std::endl;
 
       int nFilteredEvents = 0;
@@ -627,26 +617,18 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
   
   TLorentzVector emptyTk;
     
-  bool pathHasFired = false;
-  
-  for (auto path : hlt.triggers)
-    {
-      if (path.find(m_tnpConfig.hlt_path) != std::string::npos)
-	{
-	  pathHasFired = true;
-	  break;
-	}
-    }
-  
-  if (!pathHasFired) return;
+  if (!muon_pog::pathHasFired(hlt,m_tnpConfig.hlt_path)) return;
 
   std::vector<const muon_pog::Muon *> tagMuons;
 
   for (auto & muon : muons)
     {
-      if (muonTk(muon).Pt() > m_tnpConfig.tag_minPt &&
-	  hasFilterMatch(muon,hlt,m_tnpConfig.tag_hltFilter) &&
-	  hasGoodId(muon,m_tnpConfig.tag_ID) && 
+      if (muon_pog::muonTk(muon,m_tnpConfig.muon_trackType).Pt() > 
+	  m_tnpConfig.tag_minPt &&
+	  muon_pog::hasFilterMatch(muon,hlt,
+				   m_tnpConfig.tag_hltFilter,
+				   m_tnpConfig.tag_hltDrCut) &&
+	  muon_pog::hasGoodId(muon,m_tnpConfig.tag_ID) && 
 	  muon.isoPflow04 < m_tnpConfig.tag_isoCut)
 	tagMuons.push_back(&muon);
     }
@@ -660,7 +642,8 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	  const muon_pog::Muon & tagMuon = *tagMuonPointer;
 	  
 	  if ( tagMuonPointer != &muon && 
-	       chargeFromTrk(tagMuon) * chargeFromTrk(muon) == -1)
+	       muon_pog::chargeFromTrk(tagMuon,m_tnpConfig.muon_trackType) *
+	       muon_pog::chargeFromTrk(muon,m_tnpConfig.muon_trackType) == -1)
 	    {
 
 	      // General Probe Muons	      
@@ -668,21 +651,21 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 		 muon.pt > m_tnpConfig.probe_minPt    &&  // FOR EFFICIENCIES INCLUDES ISO!
 		 muon.isoPflow04 < m_tnpConfig.probe_isoCut)
 		{
-		  TLorentzVector tagMuTk(muonTk(tagMuon));
-		  TLorentzVector muTk(muonTk(muon));
+		  TLorentzVector tagMuTk(muon_pog::muonTk(tagMuon,m_tnpConfig.muon_trackType));
+		  TLorentzVector muTk(muon_pog::muonTk(muon,m_tnpConfig.muon_trackType));
 		  
 		  Float_t mass = (tagMuTk+muTk).M();
 
 		  Float_t dilepPt = (tagMuTk+muTk).Pt();
 		  m_plots[CONT]["03_dilepPt"].fill(dilepPt,emptyTk,weight,ev);
 		  m_plots[CONT]["04_nVertices"].fill(ev.nVtx,emptyTk,weight,ev);
-			      
+		  
 		  for (auto fEtaBin : m_tnpConfig.probe_fEtaBins)
 		    {
 		      if (fabs(muTk.Eta()) > fEtaBin.first.Atof() &&
 			  fabs(muTk.Eta()) < fEtaBin.second.Atof() )
 			{
-	      
+			  
 			  TString etaTag = "_fEtaMin" + fEtaBin.first + "_fEtaMax" + fEtaBin.second;		  	  
 			  // CB Fill control plots
 			  m_plots[CONT]["01_invMass" +  etaTag].fill(mass,emptyTk,weight,ev);
@@ -705,95 +688,93 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
   for (auto probeMuonPointer : probeMuons)
     {
       const muon_pog::Muon & probeMuon = *probeMuonPointer;
+      
+      TLorentzVector probeMuTk(muonTk(probeMuon,m_tnpConfig.muon_trackType));
+	  
+      Bool_t tight = muon_pog::hasGoodId(probeMuon,"TIGHT");
 
+      Bool_t generalCuts = probeMuon.isPF && probeMuon.isGlobal && probeMuon.isTracker;
+	  
+      Bool_t muHits  = probeMuon.isPF && probeMuon.isGlobal && probeMuon.trkMuonMatchedStations > 1 && probeMuon.trkTrackerLayersWithMeas > 5
+	&& probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dzBest) < 0.5 && fabs(probeMuon.dxyBest) < 0.2;
+      
+      Bool_t muMatch = probeMuon.isPF && probeMuon.isGlobal && probeMuon.trkMuonMatchedStations > 1 && probeMuon.trkTrackerLayersWithMeas > 5
+	&& probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dzBest) < 0.5 && fabs(probeMuon.dxyBest) < 0.2;
+      
+      Bool_t trkLay    = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
+	&& probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dzBest) < 0.5 && fabs(probeMuon.dxyBest) < 0.2;
+      
+      Bool_t pixHit    = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
+	&& probeMuon.trkTrackerLayersWithMeas > 5 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dzBest) < 0.5 && fabs(probeMuon.dxyBest) < 0.2;
+      
+      Bool_t chi2      = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
+	&& probeMuon.trkTrackerLayersWithMeas > 5 && probeMuon.trkPixelValidHits > 0 && fabs(probeMuon.dzBest) < 0.5 && fabs(probeMuon.dxyBest) < 0.2;
+      
+      Bool_t dZ        = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
+	&& probeMuon.trkTrackerLayersWithMeas > 5 && probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dxyBest) < 0.2;
+      
+      Bool_t dXY       = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
+	&& probeMuon.trkTrackerLayersWithMeas > 5 && probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dzBest) < 0.5;   
+      
+      Bool_t muonCuts = probeMuon.isPF && probeMuon.isGlobal && fabs(probeMuon.dxyBest) < 0.2 && probeMuon.trkTrackerLayersWithMeas > 5 
+	&& probeMuon.trkPixelValidHits > 0 && fabs(probeMuon.dzBest) < 0.5;   
+      
+      Bool_t trackerCuts = probeMuon.isPF && probeMuon.isGlobal && probeMuon.trkMuonMatchedStations > 1 && probeMuon.trkMuonMatchedStations > 1;
+      
+      m_effs[TIGHT1]["Tight"].fill(tight,probeMuTk,weight,ev);
+      m_effs[TIGHT1]["Tight_generalCuts"].fill(generalCuts,probeMuTk,weight,ev);
+      m_effs[TIGHT1]["Tight_nMatchedStations"].fill(muMatch,probeMuTk,weight,ev);
+      m_effs[TIGHT1]["Tight_nTrackerLayers"].fill(trkLay,probeMuTk,weight,ev);
+      m_effs[TIGHT1]["Tight_nPixelHits"].fill(pixHit,probeMuTk,weight,ev);
+      m_effs[TIGHT1]["Tight_nMuHits"].fill(muHits,probeMuTk,weight,ev);
+      m_effs[TIGHT1]["Tight_chi2"].fill(chi2,probeMuTk,weight,ev);
+      m_effs[TIGHT1]["Tight_dZ"].fill(dZ,probeMuTk,weight,ev); 
+      m_effs[TIGHT1]["Tight_dXY"].fill(dXY,probeMuTk,weight,ev);
+      m_effs[TIGHT1]["Tight_trackerCuts"].fill(trackerCuts,probeMuTk,weight,ev);
+      m_effs[TIGHT1]["Tight_muonCuts"].fill(muonCuts,probeMuTk,weight,ev);	  
+      
+      if (muMatch) m_effs[TIGHT2]["Tight_over_nMatchedStations"].fill(tight,probeMuTk,weight,ev);
+      if (trkLay) m_effs[TIGHT2]["Tight_over_nTrackerLayers"].fill(tight,probeMuTk,weight,ev);
+      if (pixHit) m_effs[TIGHT2]["Tight_over_nPixelHits"].fill(tight,probeMuTk,weight,ev);
+      if (muHits) m_effs[TIGHT2]["Tight_over_nMuHits"].fill(tight,probeMuTk,weight,ev);
+      if (chi2) m_effs[TIGHT2]["Tight_over_chi2"].fill(tight,probeMuTk,weight,ev);
+      if (dZ) m_effs[TIGHT2]["Tight_over_dZ"].fill(tight,probeMuTk,weight,ev);
+      if (dXY) m_effs[TIGHT2]["Tight_over_dXY"].fill(tight,probeMuTk,weight,ev);
+      if (muonCuts) m_effs[TIGHT2]["Tight_over_muonCuts"].fill(tight,probeMuTk,weight,ev);
+      if (trackerCuts) m_effs[TIGHT2]["Tight_over_trackerCuts"].fill(tight,probeMuTk,weight,ev);
+      
+      
+      Bool_t step0 = probeMuon.isPF && probeMuon.isLoose && probeMuon.trkValidHitFrac > 0.8 ;
+      Bool_t step1 = probeMuon.isGlobal && probeMuon.glbNormChi2 < 2. && probeMuon.trkStaChi2 < 12. && probeMuon.trkKink < 20 && probeMuon.muSegmComp > 0.303; 
+      Bool_t step2 = probeMuon.isTracker && probeMuon.muSegmComp > 0.451; 
+      
+      Bool_t medium = muon_pog::hasGoodId(probeMuon,"MEDIUM");
+      
+      m_effs[MEDIUM1]["Medium"].fill(medium,probeMuTk,weight,ev);
+      m_effs[MEDIUM1]["Medium_generalCuts"].fill(step0,probeMuTk,weight,ev);
+      m_effs[MEDIUM1]["Medium_step1"].fill(step0 && step1,probeMuTk,weight,ev);
+      m_effs[MEDIUM1]["Medium_step2"].fill(step0 && step2,probeMuTk,weight,ev);
+      
       for (auto fEtaBin : m_tnpConfig.probe_fEtaBins)
 	{
-  
-	  TLorentzVector probeMuTk(muonTk(probeMuon));
-
-	  Bool_t tight = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
-	    && probeMuon.trkTrackerLayersWithMeas > 5 && probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dzBest) < 0.5 && fabs(probeMuon.dxyBest) < 0.2;
-	  
-	  Bool_t generalCuts = probeMuon.isPF && probeMuon.isGlobal && probeMuon.isTracker;
-	  
-	  Bool_t muHits  = probeMuon.isPF && probeMuon.isGlobal && probeMuon.trkMuonMatchedStations > 1 && probeMuon.trkTrackerLayersWithMeas > 5
-	    && probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dzBest) < 0.5 && fabs(probeMuon.dxyBest) < 0.2;
-	      
-	  Bool_t muMatch = probeMuon.isPF && probeMuon.isGlobal && probeMuon.trkMuonMatchedStations > 1 && probeMuon.trkTrackerLayersWithMeas > 5
-	    && probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dzBest) < 0.5 && fabs(probeMuon.dxyBest) < 0.2;
-	      
-	  Bool_t trkLay    = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
-	    && probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dzBest) < 0.5 && fabs(probeMuon.dxyBest) < 0.2;
-	      
-	  Bool_t pixHit    = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
-	    && probeMuon.trkTrackerLayersWithMeas > 5 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dzBest) < 0.5 && fabs(probeMuon.dxyBest) < 0.2;
-	  
-	  Bool_t chi2      = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
-	    && probeMuon.trkTrackerLayersWithMeas > 5 && probeMuon.trkPixelValidHits > 0 && fabs(probeMuon.dzBest) < 0.5 && fabs(probeMuon.dxyBest) < 0.2;
-	      
-	  Bool_t dZ        = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
-	    && probeMuon.trkTrackerLayersWithMeas > 5 && probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dxyBest) < 0.2;
-	      
-	  Bool_t dXY       = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
-	    && probeMuon.trkTrackerLayersWithMeas > 5 && probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dzBest) < 0.5;   
-	  
-	  Bool_t muonCuts = probeMuon.isPF && probeMuon.isGlobal && fabs(probeMuon.dxyBest) < 0.2 && probeMuon.trkTrackerLayersWithMeas > 5 
-	    && probeMuon.trkPixelValidHits > 0 && fabs(probeMuon.dzBest) < 0.5;   
-
-	  Bool_t trackerCuts = probeMuon.isPF && probeMuon.isGlobal && probeMuon.trkMuonMatchedStations > 1 && probeMuon.trkMuonMatchedStations > 1;
-	  
-	  m_effs[TIGHT1]["Tight"].fill(tight,probeMuTk,weight,ev);
-	  m_effs[TIGHT1]["Tight_generalCuts"].fill(generalCuts,probeMuTk,weight,ev);
-	  m_effs[TIGHT1]["Tight_nMatchedStations"].fill(muMatch,probeMuTk,weight,ev);
-	  m_effs[TIGHT1]["Tight_nTrackerLayers"].fill(trkLay,probeMuTk,weight,ev);
-	  m_effs[TIGHT1]["Tight_nPixelHits"].fill(pixHit,probeMuTk,weight,ev);
-	  m_effs[TIGHT1]["Tight_nMuHits"].fill(muHits,probeMuTk,weight,ev);
-	  m_effs[TIGHT1]["Tight_chi2"].fill(chi2,probeMuTk,weight,ev);
-	  m_effs[TIGHT1]["Tight_dZ"].fill(dZ,probeMuTk,weight,ev); 
-	  m_effs[TIGHT1]["Tight_dXY"].fill(dXY,probeMuTk,weight,ev);
-	  m_effs[TIGHT1]["Tight_trackerCuts"].fill(trackerCuts,probeMuTk,weight,ev);
-	  m_effs[TIGHT1]["Tight_muonCuts"].fill(muonCuts,probeMuTk,weight,ev);
-
-
-	  if (muMatch) m_effs[TIGHT2]["Tight_over_nMatchedStations"].fill(tight,probeMuTk,weight,ev);
-	  if (trkLay) m_effs[TIGHT2]["Tight_over_nTrackerLayers"].fill(tight,probeMuTk,weight,ev);
-	  if (pixHit) m_effs[TIGHT2]["Tight_over_nPixelHits"].fill(tight,probeMuTk,weight,ev);
-	  if (muHits) m_effs[TIGHT2]["Tight_over_nMuHits"].fill(tight,probeMuTk,weight,ev);
-	  if (chi2) m_effs[TIGHT2]["Tight_over_chi2"].fill(tight,probeMuTk,weight,ev);
-	  if (dZ) m_effs[TIGHT2]["Tight_over_dZ"].fill(tight,probeMuTk,weight,ev);
-	  if (dXY) m_effs[TIGHT2]["Tight_over_dXY"].fill(tight,probeMuTk,weight,ev);
-	  if (muonCuts) m_effs[TIGHT2]["Tight_over_muonCuts"].fill(tight,probeMuTk,weight,ev);
-	  if (trackerCuts) m_effs[TIGHT2]["Tight_over_trackerCuts"].fill(tight,probeMuTk,weight,ev);
-	  
-	  
-	  Bool_t step0 = probeMuon.isPF && probeMuon.isLoose && probeMuon.trkValidHitFrac > 0.8 ;
-	  Bool_t step1 = probeMuon.isGlobal && probeMuon.glbNormChi2 < 2. && probeMuon.trkStaChi2 < 12. && probeMuon.trkKink < 20 && probeMuon.muSegmComp > 0.303; 
-	  Bool_t step2 = probeMuon.isTracker && probeMuon.muSegmComp > 0.451; 
-	  
-	  Bool_t medium = step0 && ( step1 || step2);
-
-	  m_effs[MEDIUM1]["Medium"].fill(medium,probeMuTk,weight,ev);
-	  m_effs[MEDIUM1]["Medium_generalCuts"].fill(step0,probeMuTk,weight,ev);
-	  m_effs[MEDIUM1]["Medium_step1"].fill(step0 && step1,probeMuTk,weight,ev);
-	  m_effs[MEDIUM1]["Medium_step2"].fill(step0 && step2,probeMuTk,weight,ev);
 	  
 	  if (fabs(probeMuTk.Eta()) > fEtaBin.first.Atof() &&
 	      fabs(probeMuTk.Eta()) < fEtaBin.second.Atof() )
 	    {
 	      
 	      TString etaTag = "_fEtaMin" + fEtaBin.first + "_fEtaMax" + fEtaBin.second;
-
+	      
 	      for (auto & probe_ID : m_tnpConfig.probe_IDs)
-	      	{
-	      	  TString IDTag = "_" + probe_ID;
+		{
+		  TString IDTag = "_" + probe_ID;
 		  
-	      	  if(hasGoodId(probeMuon,probe_ID)) 
-	      	    {	 
-	      	      m_plots[KIN]["ProbePt" + etaTag + IDTag].fill(probeMuTk.Pt(), probeMuTk, weight, ev);
-	      	      m_plots[KIN]["ProbeEta" + etaTag + IDTag].fill(probeMuTk.Eta(), probeMuTk, weight, ev);
-	      	      m_plots[KIN]["ProbePhi" + etaTag + IDTag].fill(probeMuTk.Phi(), probeMuTk, weight, ev);		      
-	      	    }
-	      	}
+		  if(muon_pog::hasGoodId(probeMuon,probe_ID)) 
+		    {	 
+		      m_plots[KIN]["ProbePt" + etaTag + IDTag].fill(probeMuTk.Pt(), probeMuTk, weight, ev);
+		      m_plots[KIN]["ProbeEta" + etaTag + IDTag].fill(probeMuTk.Eta(), probeMuTk, weight, ev);
+		      m_plots[KIN]["ProbePhi" + etaTag + IDTag].fill(probeMuTk.Phi(), probeMuTk, weight, ev);		      
+		    }
+		}
 	    }
 	}
     }
@@ -801,120 +782,6 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 
 
 //Functions
-
-double muon_pog::Plotter::deltaR(double eta1, double phi1, double eta2, double phi2)
-{
-  double deta = eta1 - eta2;
-  double dphi = phi1 - phi2;
-  while (dphi > TMath::Pi()) dphi -= 2*TMath::Pi();
-  while (dphi <= -TMath::Pi()) dphi += 2*TMath::Pi();
-
-  return sqrt(deta*deta + dphi*dphi);
-}
-
-
-bool muon_pog::Plotter::hasGoodId(const muon_pog::Muon & muon, TString muId)
-{
-  //std::string & muId = leg == "tag" ? m_tnpConfig.tag_ID : m_tnpConfig.probe_ID;
-
-  if (muId == "GLOBAL")      return muon.isGlobal == 1;
-  else if (muId == "TRACKER")return muon.isTracker  == 1;
-  else if (muId == "TIGHT")  return muon.isTight  == 1;
-  else if (muId == "MEDIUM") return muon.isMedium == 1;
-  else if (muId == "LOOSE")  return muon.isLoose == 1;
-  else if (muId == "HIGHPT") return muon.isHighPt == 1;
-  else if (muId == "SOFT")   return muon.isSoft == 1;
-  else
-    {
-      std::cout << "[Plotter::hasGoodId]: Invalid muon id : "
-		<< muId << std::endl;
-      exit(900);
-    }
- 
-}
-
-
-bool muon_pog::Plotter::hasFilterMatch(const muon_pog::Muon & muon,
-				       const muon_pog::HLT  & hlt,
-				       std::string & filter)
-{
-  TLorentzVector muTk = muonTk(muon);
-
-  for (auto object : hlt.objects)
-    {
-      if (object.filterTag.find(filter) != std::string::npos &&
-	  deltaR(muTk.Eta(), muTk.Phi(), object.eta, object.phi) < m_tnpConfig.tag_hltDrCut)
-	return true;
-    }
-
-  return false;
-}
-
-
-Int_t muon_pog::Plotter::chargeFromTrk(const muon_pog::Muon & muon)
-{
-  std::string & trackType = m_tnpConfig.muon_trackType;
-
-  if (trackType == "PF")         return muon.charge;
-  else if (trackType == "TUNEP") return muon.charge_tuneP;
-  else if (trackType == "GLB")   return muon.charge_global;
-  else if (trackType == "INNER") return muon.charge_tracker;
-  else
-    {
-      std::cout << "[Plotter::chargeFromTrk]: Invalid track type: "
-		<< trackType << std::endl;
-      exit(900);
-    }
-  
-}
-
-TLorentzVector muon_pog::Plotter::muonTk(const muon_pog::Muon & muon)
-{
-  std::string & trackType = m_tnpConfig.muon_trackType;
-
-  TLorentzVector result; 
-  if (trackType == "PF")
-    result.SetPtEtaPhiM(muon.pt,muon.eta,muon.phi,.10565);
-  else if (trackType == "TUNEP")
-    result.SetPtEtaPhiM(muon.pt_tuneP,muon.eta_tuneP,muon.phi_tuneP,.10565);
-  else if (trackType == "GLB")
-    result.SetPtEtaPhiM(muon.pt_global,muon.eta_global,muon.phi_global,.10565);
-  else if (trackType == "INNER")
-    result.SetPtEtaPhiM(muon.pt_tracker,muon.eta_tracker,muon.phi_tracker,.10565);
-  else
-    {
-      std::cout << "[Plotter::muonTk]: Invalid track type: "
-		<< trackType << std::endl;
-      exit(900);
-    }
-
-  return result;
-  
-}
-
-
-void muon_pog::addUnderFlow(TH1 &hist)
-{
-  //Add UF
-  hist.SetBinContent(1, hist.GetBinContent(0) + hist.GetBinContent(1));
-  hist.SetBinError  (1, sqrt(hist.GetBinError(0)*hist.GetBinError(0) + hist.GetBinError(1)*hist.GetBinError(1)));
-  hist.SetBinContent(0, 0); 
-  hist.SetBinError  (0, 0);  
-
-}
-
-
-void muon_pog::addOverFlow(TH1 &hist)
-{
-  //Add OF		  
-  Int_t lastBin = hist.GetNbinsX(); 
-  hist.SetBinContent(lastBin, hist.GetBinContent(lastBin) + hist.GetBinContent(lastBin+1));
-  hist.SetBinError  (lastBin, sqrt(hist.GetBinError(lastBin)*hist.GetBinError(lastBin) + hist.GetBinError(lastBin+1)*hist.GetBinError(lastBin+1))); 
-  hist.SetBinContent(lastBin+1, 0) ; 
-  hist.SetBinError  (lastBin+1, 0) ; 
-
-}
-
 void muon_pog::parseConfig(const std::string configFile, muon_pog::TagAndProbeConfig & tpConfig,
 			   std::vector<muon_pog::SampleConfig> & sampleConfigs)
 {
@@ -957,13 +824,6 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
   outFile->mkdir("comparison/efficiencies_medium_v1");
   outFile->mkdir("comparison/efficiencies_medium_v2");
 
-  system("mkdir -p " + outputDir + "/comparison/control/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/kinematical_variables/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/efficiencies_tight_n-1/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/efficiencies_tight_tight_over_n-1/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/efficiencies_medium_v1/no_ratio");
-  system("mkdir -p " + outputDir + "/comparison/efficiencies_medium_v2/no_ratio");
-  
   outFile->cd("comparison");
   
   std::vector<std::pair<Plotter::HistoType,TString> > plotTypesAndNames;
@@ -1012,6 +872,13 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	{
 	  TString plotName = isEff ? plotters.at(0).m_effs[plotType][observableName].effs().at(iPlot)->GetName() :
 	                             plotters.at(0).m_plots[plotType][observableName].plots().at(iPlot)->GetName();
+
+	  std::string base(plotName.Data());
+	  std::regex profRegEx("Vs(Eta)?(Pt)?(Phi)?(BX)?(PV)?(InstLumi)?");
+	  std::smatch profMatch;
+
+	  std::regex_search(base ,profMatch, profRegEx);
+	  std::string profTag = "/" +  profMatch.str() ;
 
 	  TLegend *leg = new TLegend(0.45,0.7,0.95,0.95);
 	  leg->SetBorderSize(0);
@@ -1065,33 +932,43 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 
 		  // ratioCanvas->cd(1);
 		  // plot->Draw(firstPlot == 0 ? "" : "same");
+		  // if (plot->GetPaintedGraph())
+		  //   plot->GetPaintedGraph()->GetYaxis()->SetRangeUser(0.8,1.1);
 
 		  // ratioCanvas->Update();
 		  
 	      
-		  // if (firstGraph == 0)
+		  // if (firstPlot == 0)
 		  //   {
-		  //     firstGraph = plot->GetPaintedGraph();
+		  //     firstPlot = plot->GetPaintedGraph()->GetHistogram();
 		  //   }
-		  // else
+		  //  else
 		  //   {
-		  //     TGraphAsymmErrors *gRatio = (TH1*)plot->GetPaintedGraph()->Clone("_Clone");
-		  //     gRatio->Divide(firstGraph);
+		  //     TH1 *hRatio = (TH1*)plot->GetPaintedGraph()->GetHistogram()->Clone("_Clone");
+		  //     hRatio->Dump();
+		  //     hRatio->Divide(firstPlot);
 		  //     ratioCanvas->cd(2);
 		      
-		  //     gRatio->SetTitle(" ");
+		  //     hRatio->SetTitle(" ");
 		      
-		  //     gRatio->GetXaxis()->SetLabelSize(0.1);
-		  //     gRatio->GetXaxis()->SetTitleSize(0.1);
-		  //     gRatio->GetXaxis()->SetTitleOffset(.85);
+		  //     hRatio->GetXaxis()->SetLabelSize(0.1);
+		  //     hRatio->GetXaxis()->SetTitleSize(0.1);
+		  //     hRatio->GetXaxis()->SetTitleOffset(.85);
 		      
-		  //     gRatio->GetYaxis()->SetLabelSize(0.07);
-		  //     gRatio->GetYaxis()->SetTitleSize(0.1);
-		  //     gRatio->GetYaxis()->SetTitleOffset(.6);
-		  //     gRatio->GetYaxis()->SetTitle("ratio");
-		  //     gRatio->GetYaxis()->SetRangeUser(0.,2.);
+		  //     hRatio->GetYaxis()->SetLabelSize(0.07);
+		  //     hRatio->GetYaxis()->SetTitleSize(0.1);
+		  //     hRatio->GetYaxis()->SetTitleOffset(.6);
+		  //     hRatio->GetYaxis()->SetTitle("ratio");
+		  //     hRatio->GetYaxis()->SetRangeUser(0.5,1.5);
+
+		  //     hRatio->SetLineColor(colorMap[iColor]);
+		  //     hRatio->SetFillColor(colorMap[iColor]);
+		  //     hRatio->SetMarkerColor(colorMap[iColor]);
+		  //     hRatio->SetMarkerStyle(markerMap[iColor]);
 		      
-		  //     gRatio->Draw(iColor == 1 ? "" : "same");
+		  //     std:: cout << hRatio->Integral() << std::endl;
+		      
+		  //     hRatio->Draw(iColor == 1 ? "p" : "samep");
 		  //   } 
 		}
 	      else
@@ -1152,31 +1029,33 @@ void muon_pog::comparisonPlots(std::vector<muon_pog::Plotter> & plotters,
 	  
 	  canvas->Update();
 	  canvas->Write();
-	  canvas->SaveAs(outputDir + outputDirMap[plotType] + "/no_ratio/c" + plotName + ".png");
+	  system("mkdir -p " + outputDir+ outputDirMap[plotType] + profTag + "/no_ratio");
+	  canvas->SaveAs(outputDir + outputDirMap[plotType] + profTag + "/no_ratio/c" + plotName + ".png");
 
-	  if(!isEff)
-	    {
-	      ratioCanvas->cd(1);	  
-	      leg->Draw();
+	  ratioCanvas->cd(1);	  
+	  leg->Draw();
 	  
+	  if (firstPlot)
+	    {
 	      firstPlot->GetXaxis()->SetTitle("");
 	      firstPlot->GetXaxis()->SetLabelSize(0);
 	      
 	      ratioCanvas->cd(1)->Update();	  
-	      
+	  
 	      ratioCanvas->cd(2);
 	      
 	      Double_t Xmax = firstPlot->GetXaxis()->GetXmax();
 	      Double_t Xmin = firstPlot->GetXaxis()->GetXmin();
-	      
+	  
 	      TLine *l = new TLine(Xmin,1,Xmax,1);
 	      l->SetLineColor(kRed); 
 	      l->Draw("same"); 
 	      
 	      ratioCanvas->Write();
-	      ratioCanvas->SaveAs(outputDir+ outputDirMap[plotType] + "/rc" + plotName + ".png");
+
+	      ratioCanvas->SaveAs(outputDir+ outputDirMap[plotType] + profTag + "/rc" + plotName + ".png");
 	    }
-	  
+
 	  delete canvas;
 	  delete ratioCanvas;
 	  
