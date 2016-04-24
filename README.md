@@ -4,10 +4,13 @@ Collection of MuonPOG related tools
 ## Installation instructions
 
 ```bash
-cmsrel CMSSW_7_6_3 # Just an example release, works in CMSSW >= 74X at present 
-cd CMSSW_7_6_3/src/
+cmsrel CMSSW_8_0_4 # Just an example release, works in CMSSW >= 74X at present 
+cd CMSSW_8_0_4/src/
 
 git clone https://github.com/battibass/MuonPOG/
+
+cd MuonPOG
+git checkout 80X
 
 cmsenv
 scramv1 b -j 5
