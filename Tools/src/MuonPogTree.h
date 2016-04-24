@@ -5,9 +5,6 @@
 #include "TMath.h"
 #include <vector>
 #include <string>
-#include "DataFormats/HepMCCandidate/interface/GenStatusFlags.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
-
 
 namespace muon_pog {
 
@@ -42,14 +39,6 @@ namespace muon_pog {
     std::vector<bool>  flags;   // vector of flags, in the same order of
                                 //  of "DataFormats/HepMCCandidate/interface/GenStatusFlag.h"
 
-    void setFlags(const reco::GenStatusFlags & statusFlags)
-    {
-      flags.clear();
-      for (unsigned int flag = 0; flag < 15; flag++) 
-	flags.push_back(statusFlags.flags_[flag]);      
-    }
-    
-    
   private:
     
     ClassDef(GenParticle,1)

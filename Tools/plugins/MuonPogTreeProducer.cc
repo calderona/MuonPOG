@@ -418,9 +418,12 @@ void MuonPogTreeProducer::fillGenParticles(const edm::Handle<reco::GenParticleCo
       gensel.vz = part.vz();
 
       // Full set of GenFlags
+      gensel.flags.clear();
       reco::GenStatusFlags statusflags = part.statusFlags();
-      if(statusflags.flags_.size() == 15) gensel.setFlags(statusflags);
-
+      if (statusflags.flags_.size() == 15)
+	for (unsigned int flag = 0; flag < statusflags.flags_.size(); ++flag)
+	  gensel.flags.push_back(statusflags.flags_[flag]);      
+      
       gensel.mothers.clear();
       unsigned int nMothers = part.numberOfMothers();
 
