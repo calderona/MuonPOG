@@ -9,6 +9,7 @@
 #pragma link C++ class muon_pog::GenParticle+;
 #pragma link C++ class muon_pog::METs+;
 #pragma link C++ class muon_pog::Muon+;
+#pragma link C++ class muon_pog::L1Muon+;
 #pragma link C++ class muon_pog::HLT+;
 #pragma link C++ class muon_pog::HLTObject+;
 #pragma link C++ class muon_pog::ChambMatch+;
