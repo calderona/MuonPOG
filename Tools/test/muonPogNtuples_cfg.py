@@ -7,7 +7,7 @@ import sys
 options = VarParsing.VarParsing()
 
 options.register('globalTag',
-                 '74X_dataRun2_Prompt_v4', #default value
+                 '80X_mcRun2_asymptotic_2016_v3', #default value
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.string,
                  "Global Tag")
@@ -19,13 +19,13 @@ options.register('nEvents',
                  "Maximum number of processed events")
 
 options.register('eosInputFolder',
-                 '/store/data/Run2015D/SingleMuon/AOD/PromptReco-v3/000/258/158/00000', #default value
+                 '/store/relval/CMSSW_8_0_3/RelValZMM_13/GEN-SIM-RECO/80X_mcRun2_asymptotic_2016_v3_gs71xNewGtHcalCust-v1/00000', #default value
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.string,
                  "EOS folder with input files")
 
 options.register('ntupleName',
-                 './muonPOGNtuple_DATA_SingleMu.root', #default value
+                 './muonPOGNtuple_8_0_3_RelValZMM_13.root', #default value
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.string,
                  "Folder and name ame for output ntuple")
