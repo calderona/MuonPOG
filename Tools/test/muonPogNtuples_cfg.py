@@ -19,7 +19,7 @@ options.register('nEvents',
                  "Maximum number of processed events")
 
 options.register('eosInputFolder',
-                 '/store/relval/CMSSW_8_0_3/RelValZMM_13/GEN-SIM-RECO/80X_mcRun2_asymptotic_2016_v3_gs71xNewGtHcalCust-v1/00000', #default value
+                 '/store/relval/CMSSW_8_0_3/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_2016_v3_gs71xNewGtHcalCust-v1/00000', #default value
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.string,
                  "EOS folder with input files")
@@ -31,7 +31,7 @@ options.register('ntupleName',
                  "Folder and name ame for output ntuple")
 
 options.register('runOnMC',
-                 False, #default value
+                 True, #default value
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.bool,
                  "Run on DATA or MC")
@@ -43,13 +43,13 @@ options.register('hltPathFilter',
                  "Filter on paths (now only accepts all or IsoMu20)")
 
 options.register('minMuPt',
-                 0., #default value
+                 5., #default value
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.float,
-                 "Skim the ntuple counting for TRK || GLB muons with pT > of this value")
+                 "Skim the ntuple saving only TRK || GLB muons with pT > of this value")
 
 options.register('minNMu',
-                 0, #default value
+                 1, #default value
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "number of TRK or GLB muons with pT > minMuPt to pass the skim")
