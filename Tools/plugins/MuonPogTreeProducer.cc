@@ -586,8 +586,6 @@ Int_t MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > &
 				     const edm::Handle<reco::BeamSpot> & beamSpot)
 {
   
-  Int_t nGoodMuons = 0;
-
   edm::View<reco::Muon>::const_iterator muonIt  = muons->begin();
   edm::View<reco::Muon>::const_iterator muonEnd = muons->end();
   
@@ -634,16 +632,6 @@ Int_t MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > &
       ntupleMu.phi_standalone    = isStandAlone ? mu.outerTrack()->phi() : -1000.;
       ntupleMu.charge_standalone = isStandAlone ? mu.outerTrack()->charge() : -1000.;
 
-      // asking for a TRK or GLB muon with minimal pT cut
-      // ignoring STA muons in this logic
-      if ( (isTracker || isGlobal) &&
-	   (ntupleMu.pt         > m_minMuPtCut ||
-	    ntupleMu.pt_global  > m_minMuPtCut ||
-	    ntupleMu.pt_tuneP   > m_minMuPtCut ||
-	    ntupleMu.pt_tracker > m_minMuPtCut )
-	   )
-	nGoodMuons++;
- 
       // Detector Based Isolation
       reco::MuonIsolation detIso03 = mu.isolationR03();
 
@@ -779,11 +767,23 @@ Int_t MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > &
 	ntupleMu.muonTimeErr = -999; 
       } 
 
-      event_.muons.push_back(ntupleMu);
+      // asking for a TRK or GLB muon with minimal pT cut
+      // ignoring STA muons in this logic
+      if ( m_minMuPtCut < 0 ||
+	   (
+	    (isTracker || isGlobal || isStandAlone) &&
+	    (ntupleMu.pt            > m_minMuPtCut ||
+	     ntupleMu.pt_global     > m_minMuPtCut ||
+	     ntupleMu.pt_tuneP      > m_minMuPtCut ||
+	     ntupleMu.pt_tracker    > m_minMuPtCut ||
+	     ntupleMu.pt_standalone > m_minMuPtCut)
+	    )
+	   )
+	event_.muons.push_back(ntupleMu);
 
     }
 
-  return nGoodMuons;
+  return event_.muons.size();
 
 }
 

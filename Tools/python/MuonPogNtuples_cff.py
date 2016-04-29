@@ -44,8 +44,8 @@ def customiseHlt(process, pathCut = "all", filterCut = "all") :
 
 def customiseMuonCuts(process, minMuPt = 0., minNMu = 0) :
     if hasattr(process,"MuonPogTree") :
-        print "[MuonPogNtuples]: skimming ntuple selection only events with: " \
-            + "# TRK || GLB muons >= " + str(minNMu) + " with muon pT > " + str(minMuPt) 
+        print "[MuonPogNtuples]: skimming ntuple saving only muons that are: " \
+            + "# STA || TRK || GLB muons >= " + str(minNMu) + " with muon pT > " + str(minMuPt) 
             
         process.MuonPogTree.MinMuPtCut = cms.untracked.double(minMuPt)
         process.MuonPogTree.MinNMuCut  = cms.untracked.int32(minNMu)

@@ -47,7 +47,7 @@ options.register('minMuPt',
                  5., #default value
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.float,
-                 "Skim the ntuple selecting only TRK || GLB muons with pT > of this value")
+                 "Skim the ntuple selecting only STA || TRK || GLB muons with pT > of this value")
 
 options.register('minNMu',
                  1, #default value
