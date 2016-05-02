@@ -167,7 +167,7 @@ MuonPogTreeProducer::MuonPogTreeProducer( const edm::ParameterSet & cfg )
   tag = cfg.getUntrackedParameter<edm::InputTag>("ScalersTag", edm::InputTag("scalersRawToDigi"));
   if (tag.label() != "none") scalersToken_ = consumes<LumiScalersCollection>(tag);
     
-  tag = cfg.getUntrackedParameter<edm::InputTag>("l1MuonsTag", edm::InputTag("none"));
+  tag = cfg.getUntrackedParameter<edm::InputTag>("l1MuonsTag", edm::InputTag("gmtStage2Digis:Muon:"));
   if (tag.label() != "none") l1Token_ = consumes<l1t::MuonBxCollection>(tag);
 
   m_minMuPtCut = cfg.getUntrackedParameter<double>("MinMuPtCut", 0.);
@@ -376,7 +376,7 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
   if (!l1Token_.isUninitialized() )
     {
         if (!ev.getByToken(l1Token_, l1s))
-    edm::LogError("") << "[MuonPogTreeProducer] L1 muon bx collection does not exist !!!";
+	  edm::LogError("") << "[MuonPogTreeProducer] L1 muon bx collection does not exist !!!";
         else {
             fillL1(l1s);
         }
