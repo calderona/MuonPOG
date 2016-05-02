@@ -18,7 +18,6 @@ config.Data.unitsPerJob = 10
 config.Data.totalUnits = 10
 
 
-config.Data.outLFNDirBase    = '/store/group/phys_muon/Ntuples/2016'
-
+config.Data.outLFNDirBase    = '/store/group/phys_muon/Commissioning/Ntuples/Commissioning2016/mcSpring16/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
 
 config.Site.storageSite = 'T2_CH_CERN'
