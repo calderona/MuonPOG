@@ -767,6 +767,17 @@ Int_t MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > &
 	ntupleMu.muonTimeErr = -999; 
       } 
 
+      if(mu.rpcTime().nDof > 0) { 
+	ntupleMu.muonRpcTimeDof = mu.rpcTime().nDof; 
+	ntupleMu.muonRpcTime    = mu.rpcTime().timeAtIpInOut; 
+	ntupleMu.muonRpcTimeErr = mu.rpcTime().timeAtIpInOutErr; 
+      } 
+      else { 
+	ntupleMu.muonRpcTimeDof = -999; 
+	ntupleMu.muonRpcTime    = -999; 
+	ntupleMu.muonRpcTimeErr = -999; 
+      } 
+
       // asking for a TRK or GLB muon with minimal pT cut
       // ignoring STA muons in this logic
       if ( m_minMuPtCut < 0 ||

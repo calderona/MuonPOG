@@ -204,13 +204,18 @@ namespace muon_pog {
     Float_t muonTime; 
     Float_t muonTimeErr;
 
+    // Muon time 
+    Float_t muonRpcTimeDof; 
+    Float_t muonRpcTime; 
+    Float_t muonRpcTimeErr;
+
     std::vector<HitInfo> hits;
     std::vector<ChambMatch> matches;
 
     Muon(){};
     virtual ~Muon(){};
 
-    ClassDef(Muon,2)
+    ClassDef(Muon,3)
   };
 
   class HLTObject {
@@ -311,7 +316,7 @@ namespace muon_pog {
     Event(){};
     virtual ~Event(){};
 
-    ClassDef(Event,4)
+    ClassDef(Event,5)
   };
 
 }
