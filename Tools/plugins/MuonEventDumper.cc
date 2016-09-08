@@ -450,6 +450,9 @@ void MuonEventDumper::printMuons(const edm::Handle<edm::View<reco::Muon> > & muo
       std::cout << "With  " << mu.numberOfMatchedStations()
 		<< " matched stations" << std::endl ; 
 
+      std::cout << "With segment compatibility :" << muon::segmentCompatibility(mu)
+		<< std::endl;
+
       if (mu.isGlobalMuon())
 	std::cout << "With (dYX, dZ) for global track : ("
 		  << mu.globalTrack()->dxy() << ", "
@@ -477,8 +480,11 @@ void MuonEventDumper::printMuons(const edm::Handle<edm::View<reco::Muon> > & muo
       if (mu.isPFMuon())
 	printTrack(mu.muonBestTrack().get(),"PF");
 
-      if (!mu.innerTrack().isNull())
+      if (!mu.innerTrack().isNull()) { 
 	printTrack(mu.innerTrack().get(),"INNER");
+	bool qualitytrack =  mu.innerTrack()->quality(reco::TrackBase::highPurity);
+	std::cout << "Inner track is high purity : " << ((qualitytrack)  ? "TRUE  " : "FALSE  ") << std::endl;
+      }
 
       if (!mu.globalTrack().isNull())
 	printTrack(mu.globalTrack().get(),"GLB");
@@ -498,9 +504,25 @@ void MuonEventDumper::printMuons(const edm::Handle<edm::View<reco::Muon> > & muo
       if (mu.isTimeValid())
 	{
 	  const reco::MuonTime time = mu.time();
-	    std::cout << "[Muon TIME] : n.d.o.f. :" << time.nDof
+	  const reco::MuonTime rpcTime = mu.rpcTime();	  
+
+	  // Implement algorithm from Piotr on OOT muon rejection
+	  bool veto = 0; 
+	  bool cmbok =(time.nDof > 7);
+	  bool rpcok =(rpcTime.nDof > 1 && rpcTime.timeAtIpInOutErr==0);
+	  if (rpcok) { 
+	    if ((fabs(rpcTime.timeAtIpInOut) > 10) && !(cmbok && fabs(time.timeAtIpInOut) < 10))
+	      veto=1;
+	    else
+	      if (cmbok && (time.timeAtIpInOut > 20 || time.timeAtIpInOut < -45))
+		veto=1;
+	  }
+	  
+	  std::cout << "[Muon TIME] : n.d.o.f. :" << time.nDof
 		      << " , time at IP IN->OUT :" << time.timeAtIpInOut
 		      << " , error on time at IP IN->OUT :" << time.timeAtIpInOutErr
+	      	      << " , RPC time at IP IN->OUT:" << rpcTime.timeAtIpInOut
+		      << " , OOT veto :" << veto
 		      << std::endl;
 	}      
 
@@ -574,6 +596,7 @@ bool MuonEventDumper::isGlobalTightMuon( const reco::Muon& muon ) const
    bool isTM2DCompatibilityTight =  muon::isGoodMuon(muon,muon::TM2DCompatibilityTight);   
    int nMatches = muon.numberOfMatches();
    bool quality = nMatches > 2 || isTM2DCompatibilityTight;
+   
    
    return result && quality;
    
