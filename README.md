@@ -51,6 +51,20 @@ cmsRun muonPogNtuples_cfg.py globalTag=80X_mcRun2_asymptotic_v5 \\
 https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile#CRAB_configuration_parameters (find pyCfgParams)
 ```
 
+## Running on CRAB
+
+The CRAB client can be sourced using the command below after cmsenv.
+
+    source /cvmfs/cms.cern.ch/crab3/crab.sh
+  
+Check if you have writing permissions in the common area.
+
+    crab checkwrite --site=T2_CH_CERN --lfn=/store/group/phys_muon/Ntuples/2016/
+    
+
+
+
+
 
 The ntuple producer gets loaded by :
 
@@ -88,3 +102,4 @@ cd MuonPOG/Tools/invariant_mass/
 MuonPOG/Tools/variables_comparison/
 ./variableComparisonPlots PATH_TO_CONFIG_FILE PATH_TO_OUTPUT_DIR
 ```
+
