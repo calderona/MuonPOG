@@ -61,8 +61,18 @@ Check if you have writing permissions in the common area.
 
     crab checkwrite --site=T2_CH_CERN --lfn=/store/group/phys_muon/Ntuples/2016/
     
+Submit jobs.
 
+    python multicrab.py samples/samples_spring15_miniaodv2_25ns.py
+    python multicrab.py samples/samples_dataD_05Oct2015_25ns.py
 
+Resubmit jobs.
+
+    python multicrab.py crab_projects_21October resubmit
+
+Check status.
+
+    python multicrab.py crab_projects_21October status
 
 
 
