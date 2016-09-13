@@ -54,7 +54,8 @@ namespace muon_pog {
     Float_t cSection;
     Int_t nEvents;
     Bool_t applyReweighting;
-        
+    Float_t runNumber;    
+
     SampleConfig() {};
     
 #ifndef __MAKECINT__ // CB CINT doesn't like boost :'-(    
@@ -253,6 +254,8 @@ int main(int argc, char* argv[]){
 
       int nFilteredEvents = 0;
 
+     
+
       for (Long64_t iEvent=0; iEvent<plotter.m_sampleConfig.nEvents; ++iEvent) 
 	{
 	  if (tree->LoadTree(iEvent)<0) break;
@@ -266,7 +269,11 @@ int main(int argc, char* argv[]){
 
 	  if(plotter.m_sampleConfig.applyReweighting==true)
 	    weight *= ev->nVtx < 60 ? tnpConfig.pu_weights[ev->nVtx] : 0;
-	    
+	  
+
+	  if ( plotter.m_sampleConfig.runNumber != 0 && plotter.m_sampleConfig.runNumber != ev->runNumber ) continue;
+ 
+	  
 	  plotter.fill(ev->muons, ev->hlt, ev->nVtx, weight, ev->runNumber);
 	}
       
@@ -334,6 +341,7 @@ muon_pog::SampleConfig::SampleConfig(boost::property_tree::ptree::value_type & v
       cSection = vt.second.get<Float_t>("cSection");
       nEvents  = vt.second.get<Int_t>("nEvents");
       applyReweighting = vt.second.get<Bool_t>("applyReweighting");
+      runNumber = vt.second.get<Float_t>("runNumber");
     }
   
   catch (boost::property_tree::ptree_bad_data bd)
