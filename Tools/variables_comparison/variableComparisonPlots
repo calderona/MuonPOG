@@ -17,5 +17,3 @@ g++ -g -std=gnu++11 -I${ROOTINCDIR} ${fileC} MuonPogTreeDict.C ${ROOTLIBS} -lX11
 echo "[variableComparisonPlots]: Running with parameters $@" 
 ${fileEXE} $@
 
-rm -f MuonPogTreeDict.C MuonPogTreeDict.h MuonPogTreeDict_rdict.pcm
-rm -f ${fileEXE}

@@ -4,8 +4,15 @@
 #include "MuonPogTree.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
+#include "TChain.h"
 
 #include <iostream>
+#include <string>
+
+#include <cstdio>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
 #include <string>
 
 namespace muon_pog
@@ -211,6 +218,65 @@ namespace muon_pog
     hist.SetBinError  (lastBin+1, 0) ; 
     
   }
+
+  std::string exec(const char* cmd) {
+    char buffer[100000];
+    std::string result = "";
+    std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
+    if (!pipe) throw std::runtime_error("popen() failed!");
+    while (!feof(pipe.get())) {
+        if (fgets(buffer, 100000, pipe.get()) != NULL)
+            result += buffer;
+    }
+    return result;
+  }
+  
+  TChain * openFileOrDir(std::string path) {
+     
+     bool isDir = false;
+     if(path.find(".root") == std::string::npos) isDir = true;
+     bool isEOS = false;
+     if (path.find("/eos/cms/store/") != std::string::npos) isEOS = true;
+
+     TChain *muonChain = new TChain("MuonPogTree/MUONPOGTREE", "MUONPOGTREE");
+     std::vector<std::string> files;
+     if(isDir && !isEOS) {
+       std::string output = exec(("ls " + path + " | grep .root").c_str());
+       std::string suboutput = output;
+       while(suboutput.find(".root") != std::string::npos) {
+          std::string theoutput = suboutput.substr(0, suboutput.find(".root")+5);
+          suboutput = suboutput.substr(suboutput.find(".root") + 6, suboutput.size());
+          if(path.at(path.size()-1) != '/') path = path + "/"; 
+          std::string theeosoutput = path + theoutput;
+          std::cout << "Adding file " << theeosoutput << std::endl;
+          files.push_back(theeosoutput); 
+       } 
+     } else if (isDir && isEOS) {
+       std::string output = exec(("/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select ls " + path + " | grep .root").c_str());
+       std::string suboutput = output;
+       while(suboutput.find(".root") != std::string::npos) {
+          std::string theoutput = suboutput.substr(0, suboutput.find(".root")+5);
+          suboutput = suboutput.substr(suboutput.find(".root") + 6, suboutput.size());
+          if(path.at(path.size()-1) != '/') path = path + "/"; 
+          std::string theeosoutput = "root://eoscms/" + path + theoutput;
+          std::cout << "Adding file " << theeosoutput << std::endl;
+          files.push_back(theeosoutput); 
+       }
+     } else if (!isDir && !isEOS) {
+          files.push_back(path);
+          std::cout << "Adding file " << path << std::endl;
+     } else {
+          files.push_back("root://eoscms/" + path);
+          std::cout << "Adding file " << "root://eoscms/" << path << std::endl;
+     }
+     for(size_t i = 0; i < files.size(); i++) muonChain->Add(files[i].c_str());
+
+     return muonChain;
+  }
+
+
+  
+
   
 }
 

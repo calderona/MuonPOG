@@ -54,8 +54,9 @@ namespace muon_pog {
     Float_t cSection;
     Int_t nEvents;
     Bool_t applyReweighting;
-    Float_t runNumber;    
-
+    Bool_t noTrigger;
+    std::vector<int> runs;
+ 
     SampleConfig() {};
     
 #ifndef __MAKECINT__ // CB CINT doesn't like boost :'-(    
@@ -63,6 +64,9 @@ namespace muon_pog {
 #endif
 
     ~SampleConfig() {};
+
+ private:
+    std::vector<int> toArray(const std::string & entries);
     
   };
 
@@ -232,20 +236,19 @@ int main(int argc, char* argv[]){
       // Initialize pointers to summary and full event structure
 
       muon_pog::Event* ev = new muon_pog::Event();
-      TTree* tree;
+      TChain* tree;
       TBranch* evBranch;
 
       // Open file, get tree, set branches
+      //TFile* inputFile = TFile::Open(fileName,"READONLY");
+      //tree = (TTree*)inputFile->Get("MUONPOGTREE");
+      //if (!tree) inputFile->GetObject("MuonPogTree/MUONPOGTREE",tree);
+      tree = openFileOrDir(fileName.Data());
 
-      TFile* inputFile = TFile::Open(fileName,"READONLY");
-      tree = (TTree*)inputFile->Get("MUONPOGTREE");
-      if (!tree) inputFile->GetObject("MuonPogTree/MUONPOGTREE",tree);
-
-      evBranch = tree->GetBranch("event");
-      evBranch->SetAddress(&ev);
+      tree->SetBranchAddress("event", &ev);
 
       // Watch number of entries
-      int nEntries = plotter.m_sampleConfig.nEvents > 0 ? plotter.m_sampleConfig.nEvents : tree->GetEntriesFast();
+      int nEntries = plotter.m_sampleConfig.nEvents > 0 ? plotter.m_sampleConfig.nEvents : tree->GetEntries();
       std::cout << "[" << argv[0] << "] Number of entries = " << nEntries << std::endl;
 
       if (nEntries < plotter.m_sampleConfig.nEvents || plotter.m_sampleConfig.nEvents < 0)
@@ -253,32 +256,23 @@ int main(int argc, char* argv[]){
       std::cout << "[" << argv[0] << "] Number of entries that will be processed = " << plotter.m_sampleConfig.nEvents << std::endl;
 
       int nFilteredEvents = 0;
-
-     
-
       for (Long64_t iEvent=0; iEvent<plotter.m_sampleConfig.nEvents; ++iEvent) 
 	{
 	  if (tree->LoadTree(iEvent)<0) break;
-
-	  if (iEvent % 25000 == 0 )
-	    std::cout << "[" << argv[0] << "] processing event : " << iEvent << "\r" << std::flush;	  
-
-	  evBranch->GetEntry(iEvent);
+          if (iEvent % 25000 == 0 )
+            std::cout << "[" << argv[0] << "] processing event : " << iEvent << "\r" << std::flush;
+          tree->GetEvent(iEvent); 
 	  float weight = ev->genInfos.size() > 0 ?
-	    ev->genInfos[0].genWeight/fabs(ev->genInfos[0].genWeight) : 1.;
+          ev->genInfos[0].genWeight/fabs(ev->genInfos[0].genWeight) : 1.;
 
 	  if(plotter.m_sampleConfig.applyReweighting==true)
 	    weight *= ev->nVtx < 60 ? tnpConfig.pu_weights[ev->nVtx] : 0;
-	  
-
-	  if ( plotter.m_sampleConfig.runNumber != 0 && plotter.m_sampleConfig.runNumber != ev->runNumber ) continue;
- 
-	  
+	    
 	  plotter.fill(ev->muons, ev->hlt, ev->nVtx, weight, ev->runNumber);
 	}
       
       delete ev;
-      inputFile->Close();
+      //inputFile->Close();
     }
   
   muon_pog::comparisonPlots(plotters,outputFile,dirName);
@@ -341,7 +335,8 @@ muon_pog::SampleConfig::SampleConfig(boost::property_tree::ptree::value_type & v
       cSection = vt.second.get<Float_t>("cSection");
       nEvents  = vt.second.get<Int_t>("nEvents");
       applyReweighting = vt.second.get<Bool_t>("applyReweighting");
-      runNumber = vt.second.get<Float_t>("runNumber");
+      runs = toArray(vt.second.get<std::string>("runs"));
+      noTrigger    = vt.second.get<Bool_t>("noTrigger");
     }
   
   catch (boost::property_tree::ptree_bad_data bd)
@@ -351,6 +346,20 @@ muon_pog::SampleConfig::SampleConfig(boost::property_tree::ptree::value_type & v
       throw std::runtime_error("Bad INI variables");
     }
   
+}
+
+
+
+std::vector<int> muon_pog::SampleConfig::toArray(const std::string& entries)
+{
+
+  std::vector<int> result;
+  std::stringstream sentries(entries);
+  std::string item;
+  while(std::getline(sentries, item, ','))
+    result.push_back(atoi(item.c_str()));
+  return result;
+
 }
 
 
@@ -634,11 +643,22 @@ void muon_pog::Plotter::book(TFile *outFile)
 }
 
 void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
-			     const muon_pog::HLT & hlt, int nVtx, float weight, Int_t run)
+			     const muon_pog::HLT & hlt, int nVtx, float weight, Int_t run_)
 {
   
   TLorentzVector emptyTk;
-    
+  
+  bool isGoodRun = false; 
+
+  for (auto run :m_sampleConfig.runs)
+    {
+      if (run == 0 || run == run_)
+        {
+          isGoodRun = true;
+          break;
+        }
+    }
+   
   //muon timing only
   for (auto & muon : muons)
     {
@@ -652,18 +672,22 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
       if (muon.isStandAlone && fabs(muon.eta) > 1.2  && muon.nHitsStandAlone > 11)
 	m_plots[TIME]["STAmuonTimeEndcap"].fill(muon.muonTime,emptyTk,weight,nVtx);
     }
-  
-  if (!muon_pog::pathHasFired(hlt,m_tnpConfig.hlt_path)) return;
+
+  if (!muon_pog::pathHasFired(hlt,m_tnpConfig.hlt_path) && !m_sampleConfig.noTrigger) return;
+  //if (!muon_pog::pathHasFired(hlt,m_tnpConfig.hlt_path)) return;
 
   std::vector<const muon_pog::Muon *> tagMuons;
   
   for (auto & muon : muons)
     {
       if (muon_pog::hasGoodId(muon,m_tnpConfig.tag_ID) && 
-	  muon_pog::muonTk(muon,m_tnpConfig.muon_trackType).Pt() > 
-	  muon_pog::hasFilterMatch(muon,hlt,
-				   m_tnpConfig.tag_hltFilter,
-				   m_tnpConfig.tag_hltDrCut) &&
+	  muon_pog::muonTk(muon,m_tnpConfig.muon_trackType).Pt() > m_tnpConfig.tag_minPt &&
+          (m_sampleConfig.noTrigger || muon_pog::hasFilterMatch(muon,hlt,
+                                   m_tnpConfig.tag_hltFilter,
+                                   m_tnpConfig.tag_hltDrCut)) &&
+          //(muon_pog::hasFilterMatch(muon,hlt,
+          //                       m_tnpConfig.tag_hltFilter,
+          //                       m_tnpConfig.tag_hltDrCut)) &&
 	  muon.isoPflow04 < m_tnpConfig.tag_isoCut)
 	tagMuons.push_back(&muon);
     }
@@ -890,7 +914,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
   
   // m_plots[CONT]["04_nProbesVsnTags"]->Fill(tagMuons.size(),probeMuons.size());
 
-  m_plots[CONT]["04-runNumber"].fill(run,emptyTk,weight,nVtx);
+  m_plots[CONT]["04-runNumber"].fill(run_,emptyTk,weight,nVtx);
 		     
   
   for (auto probeMuonPointer : probeMuons)

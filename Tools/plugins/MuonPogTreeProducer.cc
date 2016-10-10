@@ -37,6 +37,7 @@
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
+#include "DataFormats/L1Trigger/interface/Muon.h"
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenStatusFlags.h"
@@ -80,10 +81,14 @@ private:
   
   void fillPV(const edm::Handle<std::vector<reco::Vertex> > &);
   
+
   Int_t fillMuons(const edm::Handle<edm::View<reco::Muon> > &,
 		  const edm::Handle<std::vector<reco::Vertex> > &,
 		  const edm::Handle<reco::BeamSpot> &);
 
+  void fillL1(const edm::Handle<l1t::MuonBxCollection> &);
+
+    
   // returns false in case the match is for a RPC chamber
   bool getMuonChamberId(DetId & id, muon_pog::MuonDetType & det, Int_t & r, Int_t & phi, Int_t & eta) const ;
   
@@ -106,6 +111,8 @@ private:
   edm::EDGetTokenT<GenEventInfoProduct> genInfoToken_;
 
   edm::EDGetTokenT<LumiScalersCollection> scalersToken_;
+    
+  edm::EDGetTokenT<l1t::MuonBxCollection> l1Token_;
 
   Float_t m_minMuPtCut;
   Int_t m_minNMuCut;
@@ -158,7 +165,10 @@ MuonPogTreeProducer::MuonPogTreeProducer( const edm::ParameterSet & cfg )
   if (tag.label() != "none") genInfoToken_ = consumes<GenEventInfoProduct>(tag);  
 
   tag = cfg.getUntrackedParameter<edm::InputTag>("ScalersTag", edm::InputTag("scalersRawToDigi"));
-  if (tag.label() != "none") scalersToken_ = consumes<LumiScalersCollection>(tag);  
+  if (tag.label() != "none") scalersToken_ = consumes<LumiScalersCollection>(tag);
+    
+  tag = cfg.getUntrackedParameter<edm::InputTag>("l1MuonsTag", edm::InputTag("gmtStage2Digis:Muon:"));
+  if (tag.label() != "none") l1Token_ = consumes<l1t::MuonBxCollection>(tag);
 
   m_minMuPtCut = cfg.getUntrackedParameter<double>("MinMuPtCut", 0.);
   m_minNMuCut  = cfg.getUntrackedParameter<int>("MinNMuCut",  0.);
@@ -198,6 +208,7 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
   // and setting default values
   event_.hlt.triggers.clear();
   event_.hlt.objects.clear();
+  event_.l1muons.clear();
 
   event_.genParticles.clear();
   event_.genInfos.clear();
@@ -359,11 +370,22 @@ void MuonPogTreeProducer::analyze (const edm::Event & ev, const edm::EventSetup 
       nGoodMuons = fillMuons(muons,vertexes,beamSpot);
     }
 
-  if (nGoodMuons >= m_minNMuCut) 
-    tree_["muPogTree"]->Fill();
-  
-}
+    
+  //Fill L1 informations
+  edm::Handle<l1t::MuonBxCollection> l1s;
+  if (!l1Token_.isUninitialized() )
+    {
+        if (!ev.getByToken(l1Token_, l1s))
+	  edm::LogError("") << "[MuonPogTreeProducer] L1 muon bx collection does not exist !!!";
+        else {
+            fillL1(l1s);
+        }
+    }
+    
+  if (nGoodMuons >= m_minNMuCut)
+  tree_["muPogTree"]->Fill();
 
+}
 
 void MuonPogTreeProducer::fillGenInfo(const edm::Handle<std::vector<PileupSummaryInfo> > & puInfo,
 				      const edm::Handle<GenEventInfoProduct> & gen)
@@ -495,6 +517,32 @@ void MuonPogTreeProducer::fillHlt(const edm::Handle<edm::TriggerResults> & trigg
 
 }
 
+void MuonPogTreeProducer::fillL1(const edm::Handle<l1t::MuonBxCollection> & l1MuonBxColl)
+{
+
+  for (int ibx = l1MuonBxColl->getFirstBX(); ibx <= l1MuonBxColl->getLastBX(); ++ibx) 
+    {
+      for (auto l1MuIt = l1MuonBxColl->begin(ibx); l1MuIt != l1MuonBxColl->end(ibx); ++l1MuIt)
+	{
+
+	  muon_pog::L1Muon l1part;
+	  l1part.pt = l1MuIt->pt();
+	  l1part.eta = l1MuIt->eta();
+	  l1part.phi = l1MuIt->phi();
+	  l1part.charge = l1MuIt->hwChargeValid() ? l1MuIt->charge() : 0;
+	  
+	  l1part.quality = l1MuIt->hwQual();
+	  l1part.bx = ibx;
+	  
+	  l1part.tfIndex = l1MuIt->tfMuonIndex();
+	  
+	  event_.l1muons.push_back(l1part);
+	  
+	}
+    }
+}
+
+
 
 void MuonPogTreeProducer::fillPV(const edm::Handle<std::vector<reco::Vertex> > & vertexes)
 {
@@ -538,8 +586,6 @@ Int_t MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > &
 				     const edm::Handle<reco::BeamSpot> & beamSpot)
 {
   
-  Int_t nGoodMuons = 0;
-
   edm::View<reco::Muon>::const_iterator muonIt  = muons->begin();
   edm::View<reco::Muon>::const_iterator muonEnd = muons->end();
   
@@ -586,16 +632,6 @@ Int_t MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > &
       ntupleMu.phi_standalone    = isStandAlone ? mu.outerTrack()->phi() : -1000.;
       ntupleMu.charge_standalone = isStandAlone ? mu.outerTrack()->charge() : -1000.;
 
-      // asking for a TRK or GLB muon with minimal pT cut
-      // ignoring STA muons in this logic
-      if ( (isTracker || isGlobal) &&
-	   (ntupleMu.pt         > m_minMuPtCut ||
-	    ntupleMu.pt_global  > m_minMuPtCut ||
-	    ntupleMu.pt_tuneP   > m_minMuPtCut ||
-	    ntupleMu.pt_tracker > m_minMuPtCut )
-	   )
-	nGoodMuons++;
- 
       // Detector Based Isolation
       reco::MuonIsolation detIso03 = mu.isolationR03();
 
@@ -731,11 +767,34 @@ Int_t MuonPogTreeProducer::fillMuons(const edm::Handle<edm::View<reco::Muon> > &
 	ntupleMu.muonTimeErr = -999; 
       } 
 
-      event_.muons.push_back(ntupleMu);
+      if(mu.rpcTime().nDof > 0) { 
+	ntupleMu.muonRpcTimeDof = mu.rpcTime().nDof; 
+	ntupleMu.muonRpcTime    = mu.rpcTime().timeAtIpInOut; 
+	ntupleMu.muonRpcTimeErr = mu.rpcTime().timeAtIpInOutErr; 
+      } 
+      else { 
+	ntupleMu.muonRpcTimeDof = -999; 
+	ntupleMu.muonRpcTime    = -999; 
+	ntupleMu.muonRpcTimeErr = -999; 
+      } 
+
+      // asking for a TRK or GLB muon with minimal pT cut
+      // ignoring STA muons in this logic
+      if ( m_minMuPtCut < 0 ||
+	   (
+	    (isTracker || isGlobal || isStandAlone) &&
+	    (ntupleMu.pt            > m_minMuPtCut ||
+	     ntupleMu.pt_global     > m_minMuPtCut ||
+	     ntupleMu.pt_tuneP      > m_minMuPtCut ||
+	     ntupleMu.pt_tracker    > m_minMuPtCut ||
+	     ntupleMu.pt_standalone > m_minMuPtCut)
+	    )
+	   )
+	event_.muons.push_back(ntupleMu);
 
     }
 
-  return nGoodMuons;
+  return event_.muons.size();
 
 }
 

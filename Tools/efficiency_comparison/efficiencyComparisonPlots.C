@@ -55,6 +55,7 @@ namespace muon_pog {
     TString sampleName;  
     Float_t cSection;
     Float_t nEvents;
+    Bool_t  noTrigger;
     Bool_t applyReweighting;
     std::vector<int> runs;
         
@@ -221,6 +222,8 @@ int main(int argc, char* argv[]){
   std::cout << "[" << argv[0] << "] Using config file " << configFile << std::endl;
 
   // Output directory
+
+
   TString dirName = argv[2];
   system("mkdir -p " + dirName);
   TFile* outputFile = TFile::Open(dirName + "/results.root","RECREATE"); // CB find a better name for output file  
@@ -260,20 +263,20 @@ int main(int argc, char* argv[]){
 
       muon_pog::Event*   ev   = new muon_pog::Event();
 
-      TTree* tree;
+      TChain* tree;
       TBranch* evBranch;
 
       // Open file, get tree, set branches
 
-      TFile* inputFile = TFile::Open(fileName,"READONLY");
-      tree = (TTree*)inputFile->Get("MUONPOGTREE");
-      if (!tree) inputFile->GetObject("MuonPogTree/MUONPOGTREE",tree);
+      //TFile* inputFile = TFile::Open(fileName,"READONLY");
+      //tree = (TTree*)inputFile->Get("MUONPOGTREE");
+      //if (!tree) inputFile->GetObject("MuonPogTree/MUONPOGTREE",tree);
+      tree = openFileOrDir(fileName.Data()); 
 
-      evBranch = tree->GetBranch("event");
-      evBranch->SetAddress(&ev);
+      tree->SetBranchAddress("event", &ev);
 
       // Watch number of entries
-      int nEntries = plotter.m_sampleConfig.nEvents > 0 ? plotter.m_sampleConfig.nEvents : tree->GetEntriesFast();
+      int nEntries = plotter.m_sampleConfig.nEvents > 0 ? plotter.m_sampleConfig.nEvents : tree->GetEntries();
       std::cout << "[" << argv[0] << "] Number of entries = " << nEntries << std::endl;
 
       int nFilteredEvents = 0;
@@ -284,10 +287,9 @@ int main(int argc, char* argv[]){
 
 	  if (iEvent % 25000 == 0 )
 	    std::cout << "[" << argv[0] << "] processing event : " << iEvent << "\r" << std::flush;
-	    
-	  evBranch->GetEntry(iEvent);
+          tree->GetEvent(iEvent);
 	  float weight = ev->genInfos.size() > 0 ?
-	    ev->genInfos[0].genWeight/fabs(ev->genInfos[0].genWeight) : 1.;
+	  ev->genInfos[0].genWeight/fabs(ev->genInfos[0].genWeight) : 1.;
 	 
 	  // CB to be fixed when kown what to do for MC !!!
 
@@ -298,7 +300,7 @@ int main(int argc, char* argv[]){
 	}
       
       delete ev;
-      inputFile->Close();
+      //inputFile->Close();
       std::cout << std::endl;
 	   
     }
@@ -363,6 +365,7 @@ muon_pog::SampleConfig::SampleConfig(boost::property_tree::ptree::value_type & v
       nEvents = vt.second.get<Float_t>("nEvents"); //CB do we really need this? can't we take nEvents from the file itself?
       applyReweighting = vt.second.get<Bool_t>("applyReweighting");
       runs = toArray(vt.second.get<std::string>("runs"));
+      noTrigger    = vt.second.get<Bool_t>("noTrigger"); 
     }
   
   catch (boost::property_tree::ptree_bad_data bd)
@@ -602,6 +605,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 			     const muon_pog::HLT & hlt, const muon_pog::Event & ev, float weight)
 {
 
+
   bool isGoodRun = false;
 
   for (auto run :m_sampleConfig.runs)
@@ -617,7 +621,8 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
   
   TLorentzVector emptyTk;
     
-  if (!muon_pog::pathHasFired(hlt,m_tnpConfig.hlt_path)) return;
+  if (!muon_pog::pathHasFired(hlt,m_tnpConfig.hlt_path) && !m_sampleConfig.noTrigger) return;
+  //if (!muon_pog::pathHasFired(hlt,m_tnpConfig.hlt_path)) return;
 
   std::vector<const muon_pog::Muon *> tagMuons;
 
@@ -625,12 +630,16 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
     {
       if (muon_pog::muonTk(muon,m_tnpConfig.muon_trackType).Pt() > 
 	  m_tnpConfig.tag_minPt &&
-	  muon_pog::hasFilterMatch(muon,hlt,
-				   m_tnpConfig.tag_hltFilter,
-				   m_tnpConfig.tag_hltDrCut) &&
+	  (m_sampleConfig.noTrigger || muon_pog::hasFilterMatch(muon,hlt,
+	         		   m_tnpConfig.tag_hltFilter,
+	  			   m_tnpConfig.tag_hltDrCut)) &&
+	  //(muon_pog::hasFilterMatch(muon,hlt,
+	  //			   m_tnpConfig.tag_hltFilter,
+          //			   m_tnpConfig.tag_hltDrCut)) &&
 	  muon_pog::hasGoodId(muon,m_tnpConfig.tag_ID) && 
-	  muon.isoPflow04 < m_tnpConfig.tag_isoCut)
-	tagMuons.push_back(&muon);
+	  muon.isoPflow04 < m_tnpConfig.tag_isoCut) {
+          tagMuons.push_back(&muon); 
+          }
     }
   
   std::vector<const muon_pog::Muon *> probeMuons;
