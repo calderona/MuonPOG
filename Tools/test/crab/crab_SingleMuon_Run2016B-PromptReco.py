@@ -14,8 +14,8 @@ config.JobType.pyCfgParams = ['globalTag=80X_dataRun2_Prompt_v9',
                               'nEvents=-1',
                               'runOnMC=False',
                               'hltPathFilter=all',
-                              'minMuPt=0.0',
-                              'minNMu=0'
+                              'minMuPt=10.0',
+                              'minNMu=2'
                ]
 config.JobType.allowUndistributedCMSSW = True  # To fix cmssw releases
 
