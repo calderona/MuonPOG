@@ -1,24 +1,38 @@
 # What does the varables_comparison macro do?
 It compares some ID and isolation variables in data and MC, using a cut and count tag and probe method.
 It selects a tag muon matched to the trigger and a set of probes that fall in the Z mass peak range, then computes histogram for a set of variables of such probes.
-It runs on DATA and on a programmable set of MC samles and overlays the DATA histograms to SHStacks from the sum of themontecarlo sample.
+It runs on DATA vs DATA and on a programmable set of DATA vs MC samples and overlays the DATA histograms to SHStacks from the sum of the montecarlo sample.
 
 ## How do I run it?
 Simply by something like:
 
-./variableComparisonPlots config_z/config.ini myResult
+    ./variableComparisonPlots config_z/config.ini myResult
+
+Where: 
+1. config_z/config.ini is the configuration file passing as a input. 
+2. myResult is the name of the output folder where to store all the plots
 
 The code will compile, pharse the cfg, run and produce the results in a rootfile in the output directory.
 
-## How do I configure it?
+## How do I configure it for DATA vs DATA ? 
 Using an INI file like the one in config_z/config.ini .
 The cfg is rather self explanatory, it consist in different parts:
 
 1. A TagAndProbe section, defining the cuts on the tag, the probe eta binning and the cuts on the probe for isolation studies, as well as the Z mass window used for the study.
 
-2. 
-A sample section where ones has to specify the sample name (in the name of the section), where the ntuple of such sample is located, and the MC process corss section.
-One can add as many samples as needed, the one with name [Data] is of course recognised and used differently, there the cross section value exist but is ignored.
+2. A sample section where ones has to specify: 
+- the sample name directory, where the ntuple files of such sample are located
+- 
+
+and the MC process corss section. One can add as many samples as needed, the one with name [Data] is of course recognised and used differently, there the cross section value exist but is ignored.
+
+## How do I configure it for DATA vs MC ? 
+Using an INI file like the one in config_z/config.ini .
+The cfg is rather self explanatory, it consist in different parts:
+
+1. A TagAndProbe section, defining the cuts on the tag, the probe eta binning and the cuts on the probe for isolation studies, as well as the Z mass window used for the study.
+
+2. A sample section where ones has to specify the sample name (in the name of the section), where the ntuple of such sample is located, and the MC process corss section. One can add as many samples as needed, the one with name [Data] is of course recognised and used differently, there the cross section value exist but is ignored.
 
 ## How do I add a variable to be monitored?
 To add a variable to be monitored you should:
