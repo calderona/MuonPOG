@@ -80,20 +80,16 @@ whit the configuration pset parameters:
                                   'minMuPt=10.0',
                                   'minNMu=2' ]
 
-
-The ntuple producer gets loaded by :
-
-```python
-from MuonPOG.Tools.MuonPogNtuples_cff import appendMuonPogNtuple
-appendMuonPogNtuple(process,False,"HLT","MY_NTUPLE_NAME.root")
-```
-
 Where arguments are :
 
-1. The CMS configuration process
+1. The global tag for the cconditions
+2. Name of the output ntuple
+3. Number of events you want to run
 2. A bool to say whether you are running on MC
 3. The label of the process giving HLT results
-4. The name of the output ntuple
+4. The minimum pt on the muons
+5. The minimum number of muons per event. 
+
 
 ## List of macros running on ntuples
 
