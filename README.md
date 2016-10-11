@@ -7,7 +7,7 @@ Collection of MuonPOG related tools
 cmsrel CMSSW_8_0_20 # Just an example release, works in CMSSW >= 74X at present 
 cd CMSSW_8_0_20/src/
 
-git clone https://github.com/calderona/MuonPOG/
+git clone https://github.com/calderona/MuonPOG/ -b 80X-23SepReReco
 
 cmsenv
 scramv1 b -j 5
@@ -53,27 +53,31 @@ https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile#CRAB_confi
 
 ## Running on CRAB
 
+For running trhough crab you can go to: 
+
+    MuonPOG/Tools/test/crab/
+
 The CRAB client can be sourced using the command below after cmsenv.
 
     source /cvmfs/cms.cern.ch/crab3/crab.sh
   
-Check if you have writing permissions in the common area.
+Check if you have writing permissions in the common area if you already asked for that. 
 
-    crab checkwrite --site=T2_CH_CERN --lfn=/store/group/phys_muon/Ntuples/2016/
-    
-Submit jobs.
+    crab checkwrite --site=T2_CH_CERN --lfn=/store/group/phys_muon/
 
-    python multicrab.py samples/samples_spring15_miniaodv2_25ns.py
-    python multicrab.py samples/samples_dataD_05Oct2015_25ns.py
+For running on the most recent re-reco data you can open file example: 
 
-Resubmit jobs.
+    crab_SingleMuon_Run2016B-23SepReReco_Run273158.py    
 
-    python multicrab.py crab_projects_21October resubmit
+whit the configuration pset parameters: 
 
-Check status.
-
-    python multicrab.py crab_projects_21October status
-
+    config.JobType.pyCfgParams = ['globalTag=80X_dataRun2_2016SeptRepro_v3',
+                                  'ntupleName=muonPOGNtuple_SingleMuonRun2016B_23SepReReco.root',
+                                  'nEvents=-1',
+                                  'runOnMC=False',
+                                  'hltPathFilter=all',
+                                  'minMuPt=10.0',
+                                  'minNMu=2' ]
 
 
 The ntuple producer gets loaded by :
