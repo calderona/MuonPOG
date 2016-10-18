@@ -3,7 +3,7 @@ config = Configuration()
 
 config.section_('General')
 config.General.transferOutputs = True
-config.General.requestName = 'SingleMuonRun2016B_23SepReReco_Run273158'
+config.General.requestName = 'SingleMuonRun2016B_23SepReReco_Run274388'
 
 config.section_('JobType')
 config.JobType.pluginName  = 'Analysis'
@@ -22,7 +22,7 @@ config.JobType.allowUndistributedCMSSW = True  # To fix cmssw releases
 config.section_('Data')
 config.Data.inputDataset = '/SingleMuon/Run2016B-23Sep2016-v2/AOD'
 
-config.Data.runRange = '273158'
+config.Data.runRange = '274388'
 #config.Data.allowNonValidInputDataset = True
 
 config.Data.splitting    = 'LumiBased'
