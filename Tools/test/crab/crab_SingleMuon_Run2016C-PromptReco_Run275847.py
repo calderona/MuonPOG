@@ -28,7 +28,7 @@ config.Data.runRange = '275847'
 config.Data.splitting    = 'LumiBased'
 config.Data.unitsPerJob  = 150  # Since files based, 10 files per job
 config.Data.inputDBS     = 'https://cmsweb.cern.ch/dbs/prod/global/DBSReader/'
-config.Data.outLFNDirBase  = '/store/group/phys_muon/calderon/NTuplesMuonPOG/
+config.Data.outLFNDirBase  = '/store/group/phys_muon/calderon/NTuplesMuonPOG/'
 
 config.section_('Site')
 config.Site.storageSite = 'T2_CH_CERN'
