@@ -20,7 +20,7 @@ config.JobType.pyCfgParams = ['globalTag=80X_dataRun2_2016SeptRepro_v3',
 config.JobType.allowUndistributedCMSSW = True  # To fix cmssw releases
 
 config.section_('Data')
-config.Data.inputDataset = '/SingleMuon/Run2016C-23Sep2016-v2/AOD'
+config.Data.inputDataset = '/SingleMuon/Run2016C-23Sep2016-v1/AOD'
 
 config.Data.runRange = '275847'
 #config.Data.allowNonValidInputDataset = True
