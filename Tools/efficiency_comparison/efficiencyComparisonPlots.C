@@ -122,7 +122,7 @@ namespace muon_pog {
     Observable() {};
 
     Observable(TString hName, TString sampleTag, TString xTitle, TString yTitle,
-	       Int_t nBins, Float_t min, Float_t max, bool kinPlots);
+	       Int_t nBins, Float_t min, Float_t max, bool kinPlots, Float_t lmin=0.0, Float_t lmax=5000.0);
     
     ~Observable() { m_plots.clear(); };
 
@@ -369,7 +369,7 @@ muon_pog::SampleConfig::SampleConfig(boost::property_tree::ptree::value_type & v
       runs = toArray(vt.second.get<std::string>("runs"));
       noTrigger    = vt.second.get<Bool_t>("noTrigger"); 
       lmin = vt.second.get<Float_t>("lmin");
-      lmin = vt.second.get<Float_t>("lmax");
+      lmax = vt.second.get<Float_t>("lmax");
     }
   
   catch (boost::property_tree::ptree_bad_data bd)
@@ -429,7 +429,7 @@ std::vector<std::pair<TString,TString> > muon_pog::TagAndProbeConfig::toPairArra
 }
 
 muon_pog::Observable::Observable(TString hName, TString sampleTag, TString xTitle, TString yTitle,
-				 Int_t nBins, Float_t min, Float_t max, bool kinPlots)
+				 Int_t nBins, Float_t min, Float_t max, bool kinPlots, Float_t lmin, Float_t lmax)
 {
   m_plots.push_back(new TH1F("h" + hName + "_" + sampleTag, hName + " ;" + xTitle + ";" + yTitle, nBins, min, max));
   if (kinPlots)
