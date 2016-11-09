@@ -1,0 +1,48 @@
+[TagAndProbe]
+pair_minInvMass  = 86
+pair_maxInvMass  = 106
+
+hlt_path=HLT_IsoMu22_v
+
+;tag_hltFilter=hltL3crIsoL1sMu16L1f0L2f10QL3f20QL3trkIsoFiltered0p09
+tag_hltFilter=hltL3crIsoL1sMu20L1f0L2f10QL3f22QL3trkIsoFiltered0p09
+tag_hltDrCut=0.15
+tag_minPt=22
+tag_isoCut=0.15
+tag_muonID = TIGHT
+;GLOBAL, SOFT, LOOSE, MEDIUM, TIGHT, HIGHPT
+
+muon_trackType=PF
+;INNER, GLB, TUNEP, PF
+
+probe_minPt=20
+probe_isoCut=0.15
+
+; fEtaMin and fEtaMax are vectors,
+; every column corresponds to one bin range
+
+probe_fEtaMin = 0.0,2.1,1.2,0.9,0.0
+probe_fEtaMax = 2.4,2.4,2.1,1.2,0.9
+
+probe_muonIDs = TIGHT
+;Only applied to isolation and kinematic variables studies, for IDs use is TRK OR GLB
+;GLOBAL, SOFT, LOOSE, MEDIUM, TIGHT, HIGHPT
+
+; Files to be used for the analysis
+
+[Data_Run2016C_Run275847]
+fileName =/eos/cms/store/group/phys_muon/llinwei/SingleMuon/crab_SingleMuonRun2016C_PromptReco_Run275847/161026_064439/0001/
+cSection = 1.
+nEvents = -1
+applyReweighting = false
+runs = 275847
+noTrigger = true
+
+[ReReco_2016C_Run275847]
+fileName = /eos/cms/store/group/phys_muon/llinwei/SingleMuon/crab_SingleMuonRun2016C_23SepReReco_Run275847/161025_132409/0001/
+cSection = 1.
+nEvents = -1
+applyReweighting = false
+runs = 275847
+noTrigger = true
+

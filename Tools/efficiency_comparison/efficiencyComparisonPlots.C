@@ -55,6 +55,8 @@ namespace muon_pog {
     TString sampleName;  
     Float_t cSection;
     Float_t nEvents;
+    Float_t lmin;
+    Float_t lmax;
     Bool_t  noTrigger;
     Bool_t applyReweighting;
     std::vector<int> runs;
@@ -366,6 +368,8 @@ muon_pog::SampleConfig::SampleConfig(boost::property_tree::ptree::value_type & v
       applyReweighting = vt.second.get<Bool_t>("applyReweighting");
       runs = toArray(vt.second.get<std::string>("runs"));
       noTrigger    = vt.second.get<Bool_t>("noTrigger"); 
+      lmin = vt.second.get<Float_t>("lmin");
+      lmin = vt.second.get<Float_t>("lmax");
     }
   
   catch (boost::property_tree::ptree_bad_data bd)
@@ -436,7 +440,9 @@ muon_pog::Observable::Observable(TString hName, TString sampleTag, TString xTitl
       m_plots.push_back(new TProfile("h" + hName + "VsPhiMinus_" + sampleTag, hName + " vs #phi for #eta -;  #phi;" + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));
       m_plots.push_back(new TProfile("h" + hName + "VsPt_"       + sampleTag, hName + " vs p_{T};   p_{T} (GeV);"   + xTitle, 50,  0., 150., min, max));
       m_plots.push_back(new TProfile("h" + hName + "VsPV_"       + sampleTag, hName + " vs PV;      # of PV;"       + xTitle, 60,  0., 60., min, max));
-      m_plots.push_back(new TProfile("h" + hName + "VsInstLumi_" + sampleTag, hName + " vs Inst. Lumi. ; Inst. Lumi. [10E30];"       + xTitle, 50,  0., 5000., min, max));
+      //m_plots.push_back(new TProfile("h" + hName + "VsInstLumi_" + sampleTag, hName + " vs Inst. Lumi. ; Inst. Lumi. [10E30];"       + xTitle, 50,  0., 5000., min, max));
+      m_plots.push_back(new TProfile("h" + hName + "VsInstLumi_" + sampleTag, hName + " vs Inst. Lumi. ; Inst. Lumi. [10E30];"       + xTitle, 50,  lmin, lmax, min, max));
+
       m_plots.push_back(new TProfile("h" + hName + "VsBX_"       + sampleTag, hName + " vs BX; BX in orbit;"       + xTitle, 360,  0.5, 3600.5, min, max));
       
     }
