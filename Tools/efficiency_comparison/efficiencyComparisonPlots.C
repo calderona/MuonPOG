@@ -55,8 +55,6 @@ namespace muon_pog {
     TString sampleName;  
     Float_t cSection;
     Float_t nEvents;
-    Float_t lmin;
-    Float_t lmax;
     Bool_t  noTrigger;
     Bool_t applyReweighting;
     std::vector<int> runs;
@@ -122,7 +120,7 @@ namespace muon_pog {
     Observable() {};
 
     Observable(TString hName, TString sampleTag, TString xTitle, TString yTitle,
-	       Int_t nBins, Float_t min, Float_t max, bool kinPlots, Float_t lmin=0.0, Float_t lmax=5000.0);
+	       Int_t nBins, Float_t min, Float_t max, bool kinPlots);
     
     ~Observable() { m_plots.clear(); };
 
@@ -368,8 +366,6 @@ muon_pog::SampleConfig::SampleConfig(boost::property_tree::ptree::value_type & v
       applyReweighting = vt.second.get<Bool_t>("applyReweighting");
       runs = toArray(vt.second.get<std::string>("runs"));
       noTrigger    = vt.second.get<Bool_t>("noTrigger"); 
-      lmin = vt.second.get<Float_t>("lmin");
-      lmax = vt.second.get<Float_t>("lmax");
     }
   
   catch (boost::property_tree::ptree_bad_data bd)
@@ -429,7 +425,7 @@ std::vector<std::pair<TString,TString> > muon_pog::TagAndProbeConfig::toPairArra
 }
 
 muon_pog::Observable::Observable(TString hName, TString sampleTag, TString xTitle, TString yTitle,
-				 Int_t nBins, Float_t min, Float_t max, bool kinPlots, Float_t lmin, Float_t lmax)
+				 Int_t nBins, Float_t min, Float_t max, bool kinPlots)
 {
   m_plots.push_back(new TH1F("h" + hName + "_" + sampleTag, hName + " ;" + xTitle + ";" + yTitle, nBins, min, max));
   if (kinPlots)
@@ -440,9 +436,8 @@ muon_pog::Observable::Observable(TString hName, TString sampleTag, TString xTitl
       m_plots.push_back(new TProfile("h" + hName + "VsPhiMinus_" + sampleTag, hName + " vs #phi for #eta -;  #phi;" + xTitle, 24, -TMath::Pi(),TMath::Pi(), min, max));
       m_plots.push_back(new TProfile("h" + hName + "VsPt_"       + sampleTag, hName + " vs p_{T};   p_{T} (GeV);"   + xTitle, 50,  0., 150., min, max));
       m_plots.push_back(new TProfile("h" + hName + "VsPV_"       + sampleTag, hName + " vs PV;      # of PV;"       + xTitle, 60,  0., 60., min, max));
-      //m_plots.push_back(new TProfile("h" + hName + "VsInstLumi_" + sampleTag, hName + " vs Inst. Lumi. ; Inst. Lumi. [10E30];"       + xTitle, 50,  0., 5000., min, max));
-      m_plots.push_back(new TProfile("h" + hName + "VsInstLumi_" + sampleTag, hName + " vs Inst. Lumi. ; Inst. Lumi. [10E30];"       + xTitle, 50,  lmin, lmax, min, max));
-
+      m_plots.push_back(new TProfile("h" + hName + "VsInstLumi_" + sampleTag, hName + " vs Inst. Lumi. ; Inst. Lumi. [10E30];"       + xTitle, 50,  0., 5000., min, max));
+     
       m_plots.push_back(new TProfile("h" + hName + "VsBX_"       + sampleTag, hName + " vs BX; BX in orbit;"       + xTitle, 360,  0.5, 3600.5, min, max));
       
     }
@@ -485,7 +480,7 @@ muon_pog::EffObservable::EffObservable(TString hName, TString sampleTag)
   m_effs.push_back(new TEfficiency("h" + hName + "VsPhi_"      + sampleTag, hName + " vs #phi;    #phi;"          , 24, -TMath::Pi(),TMath::Pi()));     
   m_effs.push_back(new TEfficiency("h" + hName + "VsPt_"       + sampleTag, hName + " vs p_{T};   p_{T} (GeV);"   , 50,  0., 150.));
   m_effs.push_back(new TEfficiency("h" + hName + "VsPV_"       + sampleTag, hName + " vs PV;      # of PV;"       , 60,  0., 60.));
-  m_effs.push_back(new TEfficiency("h" + hName + "VsInstLumi_" + sampleTag, hName + " vs Inst. Lumi. ; Inst. Lumi. [10E30];" , 50,  0., 5000.));
+  m_effs.push_back(new TEfficiency("h" + hName + "VsInstLumi_" + sampleTag, hName + " vs Inst. Lumi. ; Inst. Lumi. [10E30];" , 50,  0, 5000));
   m_effs.push_back(new TEfficiency("h" + hName + "VsBX_"       + sampleTag, hName + " vs BX; BX in orbit;"        , 360,  0.5, 3600.5));
   m_effs.push_back(new TEfficiency("h" + hName + "VsPhi_HighEta_"      + sampleTag, hName + " vs #phi;    #phi;"       , 24, -TMath::Pi(),TMath::Pi()));     
   m_effs.push_back(new TEfficiency("h" + hName + "VsPt_HighEta_"       + sampleTag, hName + " vs p_{T};   p_{T} (GeV);"   , 50,  0., 150.));
@@ -585,6 +580,11 @@ void muon_pog::Plotter::book(TFile *outFile)
   m_effs[TIGHT1]["Tight_dXY"]  = muon_pog::EffObservable("Tight_dXY", sampleTag);
   m_effs[TIGHT1]["Tight_dZ"]   = muon_pog::EffObservable("Tight_dZ", sampleTag);
 
+  m_effs[TIGHT1]["Tight_dXYdZ"]  = muon_pog::EffObservable("Tight_dXYdZ", sampleTag);
+  m_effs[TIGHT1]["Tight_dXYdZChi2"]  = muon_pog::EffObservable("Tight_dXYdZChi2", sampleTag);
+  m_effs[TIGHT1]["Tight_muonCutsChi2"]  = muon_pog::EffObservable("Tight_muonCutsChi2", sampleTag);
+
+
   m_effs[TIGHT2]["Tight_over_generalCuts"] = muon_pog::EffObservable("Tight_over_generalCuts", sampleTag);
   m_effs[TIGHT2]["Tight_over_trackerCuts"] = muon_pog::EffObservable("Tight_over_trackerCuts", sampleTag);
   m_effs[TIGHT2]["Tight_over_muonCuts"] = muon_pog::EffObservable("Tight_over_muonCuts", sampleTag);
@@ -598,6 +598,10 @@ void muon_pog::Plotter::book(TFile *outFile)
   m_effs[TIGHT2]["Tight_over_chi2"] = muon_pog::EffObservable("Tight_over_chi2", sampleTag);
   m_effs[TIGHT2]["Tight_over_dXY"]  = muon_pog::EffObservable("Tight_over_dXY", sampleTag);
   m_effs[TIGHT2]["Tight_over_dZ"]   = muon_pog::EffObservable("Tight_over_dZ", sampleTag);
+
+  m_effs[TIGHT2]["Tight_over_dXYdZ"]  = muon_pog::EffObservable("Tight_over_dXYdZ", sampleTag);
+  m_effs[TIGHT2]["Tight_over_dXYdZChi2"]  = muon_pog::EffObservable("Tight_over_dXYdZChi2", sampleTag);
+  m_effs[TIGHT2]["Tight_over_muonCutsChi2"]  = muon_pog::EffObservable("Tight_over_muonCutsChi2", sampleTag);
 
   outFile->cd(sampleTag+"/control");
   
@@ -703,7 +707,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
   for (auto probeMuonPointer : probeMuons)
     {
       const muon_pog::Muon & probeMuon = *probeMuonPointer;
-      
+   
       TLorentzVector probeMuTk(muonTk(probeMuon,m_tnpConfig.muon_trackType));
 	  
       Bool_t tight = muon_pog::hasGoodId(probeMuon,"TIGHT");
@@ -731,11 +735,21 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
       Bool_t dXY       = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
 	&& probeMuon.trkTrackerLayersWithMeas > 5 && probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10. && fabs(probeMuon.dzBest) < 0.5;   
       
+      Bool_t dXYdZ       = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
+	&& probeMuon.trkTrackerLayersWithMeas > 5 && probeMuon.trkPixelValidHits > 0 && probeMuon.glbNormChi2 < 10.; 
+
+      Bool_t dXYdZChi2  = probeMuon.isPF && probeMuon.isGlobal && probeMuon.glbMuonValidHits > 0 && probeMuon.trkMuonMatchedStations > 1
+	&& probeMuon.trkTrackerLayersWithMeas > 5 && probeMuon.trkPixelValidHits > 0 ; 
+
+      Bool_t muonCutsChi2 = probeMuon.isPF && probeMuon.isGlobal && fabs(probeMuon.dxyBest) < 0.2 && probeMuon.trkTrackerLayersWithMeas > 5 
+	&& probeMuon.trkPixelValidHits > 0 && fabs(probeMuon.dzBest) < 0.5  && probeMuon.glbNormChi2 < 10.; 
+
       Bool_t muonCuts = probeMuon.isPF && probeMuon.isGlobal && fabs(probeMuon.dxyBest) < 0.2 && probeMuon.trkTrackerLayersWithMeas > 5 
 	&& probeMuon.trkPixelValidHits > 0 && fabs(probeMuon.dzBest) < 0.5;   
       
       Bool_t trackerCuts = probeMuon.isPF && probeMuon.isGlobal && probeMuon.trkMuonMatchedStations > 1 && probeMuon.trkMuonMatchedStations > 1;
-      
+
+
       m_effs[TIGHT1]["Tight"].fill(tight,probeMuTk,weight,ev);
       m_effs[TIGHT1]["Tight_generalCuts"].fill(generalCuts,probeMuTk,weight,ev);
       m_effs[TIGHT1]["Tight_nMatchedStations"].fill(muMatch,probeMuTk,weight,ev);
@@ -747,7 +761,11 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
       m_effs[TIGHT1]["Tight_dXY"].fill(dXY,probeMuTk,weight,ev);
       m_effs[TIGHT1]["Tight_trackerCuts"].fill(trackerCuts,probeMuTk,weight,ev);
       m_effs[TIGHT1]["Tight_muonCuts"].fill(muonCuts,probeMuTk,weight,ev);	  
-      
+      m_effs[TIGHT1]["Tight_muonCutsChi2"].fill(muonCutsChi2,probeMuTk,weight,ev);
+      m_effs[TIGHT1]["Tight_dXYdZ"].fill(dXYdZ,probeMuTk,weight,ev);	  	  
+      m_effs[TIGHT1]["Tight_dXYdZChi2"].fill(dXYdZChi2,probeMuTk,weight,ev);	  
+
+
       if (muMatch) m_effs[TIGHT2]["Tight_over_nMatchedStations"].fill(tight,probeMuTk,weight,ev);
       if (trkLay) m_effs[TIGHT2]["Tight_over_nTrackerLayers"].fill(tight,probeMuTk,weight,ev);
       if (pixHit) m_effs[TIGHT2]["Tight_over_nPixelHits"].fill(tight,probeMuTk,weight,ev);
@@ -757,9 +775,11 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
       if (dXY) m_effs[TIGHT2]["Tight_over_dXY"].fill(tight,probeMuTk,weight,ev);
       if (muonCuts) m_effs[TIGHT2]["Tight_over_muonCuts"].fill(tight,probeMuTk,weight,ev);
       if (trackerCuts) m_effs[TIGHT2]["Tight_over_trackerCuts"].fill(tight,probeMuTk,weight,ev);
+      if (muonCutsChi2) m_effs[TIGHT2]["Tight_over_muonCutsChi2"].fill(tight,probeMuTk,weight,ev);      
+      if (dXYdZ) m_effs[TIGHT2]["Tight_over_dXYdZ"].fill(tight,probeMuTk,weight,ev);
+      if (dXYdZChi2) m_effs[TIGHT2]["Tight_over_dXYdZChi2"].fill(tight,probeMuTk,weight,ev);
       
-      
-      Bool_t step0 = probeMuon.isPF && probeMuon.isLoose && probeMuon.trkValidHitFrac > 0.8 ;
+      Bool_t step0 = probeMuon.isPF && probeMuon.isLoose && probeMuon.trkValidHitFrac > 0.8;
       Bool_t step1 = probeMuon.isGlobal && probeMuon.glbNormChi2 < 2. && probeMuon.trkStaChi2 < 12. && probeMuon.trkKink < 20 && probeMuon.muSegmComp > 0.303; 
       Bool_t step2 = probeMuon.isTracker && probeMuon.muSegmComp > 0.451; 
       
