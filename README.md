@@ -7,7 +7,7 @@ Collection of MuonPOG related tools
 cmsrel CMSSW_8_0_20 # Just an example release, works in CMSSW >= 74X at present 
 cd CMSSW_8_0_20/src/
 
-git clone https://github.com/calderona/MuonPOG/ -b 80X-23SepReReco
+git clone https://github.com/calderona/MuonPOG
 
 cmsenv
 scramv1 b -j 5
