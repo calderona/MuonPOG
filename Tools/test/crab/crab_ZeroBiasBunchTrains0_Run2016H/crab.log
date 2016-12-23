@@ -1,0 +1,1118 @@
+# Conditions read from  CMS_CONDITIONS  via FrontierProd 
+[MuonPogNtuples]: EndPath AOuptput not found, creating it for ntuple sequence
+[MuonPogNtuples]: skimming HLT format using:
+	paths : all
+	filters : all
+[MuonPogNtuples]: skimming ntuple saving only muons that are: # STA || TRK || GLB muons >= 1 with muon pT > 5.0
+DEBUG 2016-12-05 17:04:11,311: 	 Executing command: 'submit'
+DEBUG 2016-12-05 17:04:11,311: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-05 17:04:11,319: 	 Checking credentials
+DEBUG 2016-12-05 17:04:11,320: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-05 17:04:11,320: 	 Getting proxy life time left
+DEBUG 2016-12-05 17:04:12,028: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 80010
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:04:12,648: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 80009
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:04:12,649: 	 Proxy valid for 22:13:30 hours
+INFO 2016-12-05 17:04:12,649: 	 Will use CRAB configuration file crab_ZeroBiasBunchTrains_Run2016H.py
+DEBUG 2016-12-05 17:04:12,649: 	 Loading CRAB configuration file.
+DEBUG 2016-12-05 17:04:12,681: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2016-12-05 17:04:12,810: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:04:12,811: 	 Checking credentials
+DEBUG 2016-12-05 17:04:12,811: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-05 17:04:12,811: 	 Getting proxy life time left
+DEBUG 2016-12-05 17:04:13,417: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 80008
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:04:13,924: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 80008
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:04:13,924: 	 Proxy valid for 22:13:28 hours
+DEBUG 2016-12-05 17:04:14,433: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u15250 voms-proxy-info -fqan
+ output : /cms/Role=NULL/Capability=NULL
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:04:14,831: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-05 17:04:14,943: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:04:14,943: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-05 17:04:14,943: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-05 17:04:15,247: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 718:13:43  (29.9 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:04:15,248: 	 Myproxy is valid: 2585623
+DEBUG 2016-12-05 17:04:15,248: 	 Command use: submit
+DEBUG 2016-12-05 17:04:15,248: 	 Options use: ['-c', 'crab_ZeroBiasBunchTrains_Run2016H.py']
+DEBUG 2016-12-05 17:04:15,602: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-05 17:04:15,603: 	 Instance is prod
+DEBUG 2016-12-05 17:04:15,603: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-05 17:04:15,603: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-05 17:04:15,603: 	 Started submission
+DEBUG 2016-12-05 17:04:15,603: 	 Working on /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H
+DEBUG 2016-12-05 17:04:16,075: 	 Loading required information from the environment
+DEBUG 2016-12-05 17:04:16,075: 	 Found CMSSW_8_0_20 for slc6_amd64_gcc530 with base /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20
+DEBUG 2016-12-05 17:04:16,076: 	 Loading required information from the environment
+DEBUG 2016-12-05 17:04:16,076: 	 Found CMSSW_8_0_20 for slc6_amd64_gcc530 with base /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20
+DEBUG 2016-12-05 17:04:16,101: 	 UNIQUE NAME: tarUUID 8662eaf4-a153-4051-8f63-29abb87f0737 
+DEBUG 2016-12-05 17:04:16,101: 	 self.config: from WMCore.Configuration import Configuration
+config = Configuration()
+config.section_('General')
+config.General.transferOutputs = True
+config.General.requestName = 'ZeroBiasBunchTrains0_Run2016H'
+config.section_('JobType')
+config.JobType.psetName = '../muonPogNtuples_cfg.py'
+config.JobType.pluginName = 'Analysis'
+config.JobType.pyCfgParams = ['globalTag=80X_dataRun2_SPECIALHIGHPUFILL_v0', 'ntupleName=muonPOGNtuple_ZeroBiasBunchTrains0_Run2016H.root', 'nEvents=-1', 'runOnMC=False', 'hltPathFilter=all']
+config.JobType.allowUndistributedCMSSW = True
+config.section_('Data')
+config.Data.inputDataset = '/ZeroBiasBunchTrains0/Run2016H-09Nov2016-v1/AOD'
+config.Data.unitsPerJob = 150
+config.Data.outLFNDirBase = '/store/group/phys_muon/calderon/NTuplesMuonPOG/'
+config.Data.splitting = 'LumiBased'
+config.Data.inputDBS = 'https://cmsweb.cern.ch/dbs/prod/global/DBSReader/'
+config.section_('Site')
+config.Site.storageSite = 'T2_CH_CERN'
+
+DEBUG 2016-12-05 17:04:16,101: 	 self.config.JobType.psetName: ../muonPogNtuples_cfg.py
+INFO 2016-12-05 17:04:16,103: 	 Importing CMSSW configuration ../muonPogNtuples_cfg.py
+DEBUG 2016-12-05 17:04:16,103: 	 Additional parameters for the CMSSW configuration are: ['globalTag=80X_dataRun2_SPECIALHIGHPUFILL_v0', 'ntupleName=muonPOGNtuple_ZeroBiasBunchTrains0_Run2016H.root', 'nEvents=-1', 'runOnMC=False', 'hltPathFilter=all']
+INFO 2016-12-05 17:04:16,814: 	 Finished importing CMSSW configuration ../muonPogNtuples_cfg.py
+DEBUG 2016-12-05 17:04:16,814: 	 Writing CMSSW configuration to /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/inputs/PSet.py
+DEBUG 2016-12-05 17:04:16,866: 	 The following EDM output files will be collected: []
+DEBUG 2016-12-05 17:04:16,866: 	 The following TFile output files will be collected: ['muonPOGNtuple_ZeroBiasBunchTrains0_Run2016H.root']
+DEBUG 2016-12-05 17:04:16,866: 	 The following user output files will be collected: []
+DEBUG 2016-12-05 17:04:16,866: 	 Loading required information from the environment
+DEBUG 2016-12-05 17:04:16,867: 	 Found CMSSW_8_0_20 for slc6_amd64_gcc530 with base /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20
+DEBUG 2016-12-05 17:04:16,867: 	 Making tarball in /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/inputs/8662eaf4-a153-4051-8f63-29abb87f0737default.tgz
+DEBUG 2016-12-05 17:04:16,914: 	 Checking directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/lib
+DEBUG 2016-12-05 17:04:16,914: 	 Adding directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/lib to tarball
+DEBUG 2016-12-05 17:04:18,231: 	 Checking directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/biglib
+DEBUG 2016-12-05 17:04:18,231: 	 Adding directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/biglib to tarball
+DEBUG 2016-12-05 17:04:18,233: 	 Checking directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/module
+DEBUG 2016-12-05 17:04:19,384: 	 Adding data directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonAnalysis/MuonAssociators/interface to tarball
+DEBUG 2016-12-05 17:04:19,491: 	 Adding data directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonAnalysis/TagAndProbe/interface to tarball
+DEBUG 2016-12-05 17:04:19,699: 	 Adding data directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/PhysicsTools/TagAndProbe/interface to tarball
+DEBUG 2016-12-05 17:04:20,356: 	 Uploading archive /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/inputs/8662eaf4-a153-4051-8f63-29abb87f0737default.tgz to the CRAB cache. Using URI https://cmsweb.cern.ch/crabcache
+DEBUG 2016-12-05 17:04:21,096: 	 Loading required information from the environment
+DEBUG 2016-12-05 17:04:21,096: 	 Found CMSSW_8_0_20 for slc6_amd64_gcc530 with base /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20
+DEBUG 2016-12-05 17:04:21,096: 	 Making tarball in /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/inputs/debugFiles.tgz
+DEBUG 2016-12-05 17:04:21,112: 	 Uploading archive /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/inputs/debugFiles.tgz to the CRAB cache. Using URI https://cmsweb.cern.ch/crabcache
+DEBUG 2016-12-05 17:04:21,432: 	 Result uploading input files: 7d26c08f252332f764bb911afa0730be2feafefae8a43a25353bd8b53b5f926e.tar.gz 
+WARNING 2016-12-05 17:04:21,432: 	 Warning: The following output files will not be published, as they are not EDM files: ['muonPOGNtuple_ZeroBiasBunchTrains0_Run2016H.root']
+INFO 2016-12-05 17:04:21,433: 	 Sending the request to the server
+DEBUG 2016-12-05 17:04:21,433: 	 Submitting {'maxjobruntime': 1250, 'extrajdl': [], 'ignorelocality': 0, 'savelogsflag': 0, 'useparent': 0, 'asyncdest': 'T2_CH_CERN', 'algoargs': 150, 'cachefilename': '7d26c08f252332f764bb911afa0730be2feafefae8a43a25353bd8b53b5f926e.tar.gz', 'numcores': 1, 'addoutputfiles': [], 'generator': 'pythia', 'maxmemory': 2000, 'publishdbsurl': 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter', 'priority': 10, 'jobsw': 'CMSSW_8_0_20', 'edmoutfiles': [], 'userfiles': [], 'primarydataset': '', 'inputdata': '/ZeroBiasBunchTrains0/Run2016H-09Nov2016-v1/AOD', 'lfn': '/store/group/phys_muon/calderon/NTuplesMuonPOG/', 'dryrun': 0, 'workflow': 'crab_ZeroBiasBunchTrains0_Run2016H', 'adduserfiles': [], 'nonprodsw': 1, 'tfileoutfiles': ['muonPOGNtuple_ZeroBiasBunchTrains0_Run2016H.root'], 'oneEventMode': 0, 'debugfilename': '3001b6dc24ba32cb1abf03629a1879a0891033d731e0d2f5d53ccf3fee30c57d.tar.gz', 'cacheurl': u'https://cmsweb.cern.ch/crabcache', 'saveoutput': 1, 'publication': 1, 'jobarch': 'slc6_amd64_gcc530', 'totalunits': 0, 'splitalgo': 'LumiBased', 'ignoreglobalblacklist': 0, 'nonvaliddata': 0, 'dbsurl': 'https://cmsweb.cern.ch/dbs/prod/global/DBSReader', 'publishgroupname': 0, 'jobtype': 'Analysis', 'publishname2': ''} 
+DEBUG 2016-12-05 17:04:21,433: 	 Encoded submit request: maxjobruntime=1250&ignorelocality=0&savelogsflag=0&useparent=0&asyncdest=T2_CH_CERN&algoargs=150&cachefilename=7d26c08f252332f764bb911afa0730be2feafefae8a43a25353bd8b53b5f926e.tar.gz&numcores=1&generator=pythia&maxmemory=2000&publishdbsurl=https%3A%2F%2Fcmsweb.cern.ch%2Fdbs%2Fprod%2Fphys03%2FDBSWriter&priority=10&jobsw=CMSSW_8_0_20&primarydataset=&inputdata=%2FZeroBiasBunchTrains0%2FRun2016H-09Nov2016-v1%2FAOD&lfn=%2Fstore%2Fgroup%2Fphys_muon%2Fcalderon%2FNTuplesMuonPOG%2F&dryrun=0&workflow=crab_ZeroBiasBunchTrains0_Run2016H&nonprodsw=1&oneEventMode=0&debugfilename=3001b6dc24ba32cb1abf03629a1879a0891033d731e0d2f5d53ccf3fee30c57d.tar.gz&cacheurl=https%3A%2F%2Fcmsweb.cern.ch%2Fcrabcache&saveoutput=1&publication=1&jobarch=slc6_amd64_gcc530&totalunits=0&splitalgo=LumiBased&ignoreglobalblacklist=0&nonvaliddata=0&dbsurl=https%3A%2F%2Fcmsweb.cern.ch%2Fdbs%2Fprod%2Fglobal%2FDBSReader&publishgroupname=0&jobtype=Analysis&publishname2=&tfileoutfiles=muonPOGNtuple_ZeroBiasBunchTrains0_Run2016H.root
+DEBUG 2016-12-05 17:04:21,783: 	 Result: {u'result': [{u'RequestName': u'161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H'}]}
+INFO 2016-12-05 17:04:21,787: 	 Success: Your task has been delivered to the CRAB3 server.
+INFO 2016-12-05 17:04:21,787: 	 Task name: 161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-05 17:04:21,787: 	 Please use 'crab status' to check how the submission process proceeds.
+DEBUG 2016-12-05 17:04:21,787: 	 About to return
+INFO 2016-12-05 17:04:21,790: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/crab.log
+DEBUG 2016-12-05 17:06:32,444: 	 Executing command: 'status'
+DEBUG 2016-12-05 17:06:32,445: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-05 17:06:32,458: 	 Checking credentials
+DEBUG 2016-12-05 17:06:32,459: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-05 17:06:32,459: 	 Getting proxy life time left
+DEBUG 2016-12-05 17:06:33,271: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 79868
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:33,887: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 79868
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:33,888: 	 Proxy valid for 22:11:08 hours
+DEBUG 2016-12-05 17:06:34,121: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:34,122: 	 Checking credentials
+DEBUG 2016-12-05 17:06:34,124: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-05 17:06:34,124: 	 Getting proxy life time left
+DEBUG 2016-12-05 17:06:34,734: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 79867
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:35,453: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 79866
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:35,454: 	 Proxy valid for 22:11:07 hours
+DEBUG 2016-12-05 17:06:35,845: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-05 17:06:35,959: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:35,960: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-05 17:06:35,960: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-05 17:06:36,165: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 718:11:22  (29.9 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:36,166: 	 Myproxy is valid: 2585482
+DEBUG 2016-12-05 17:06:36,166: 	 Command use: status
+DEBUG 2016-12-05 17:06:36,166: 	 Options use: ['crab_ZeroBiasBunchTrains0_Run2016H']
+DEBUG 2016-12-05 17:06:36,660: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-05 17:06:36,660: 	 Instance is prod
+DEBUG 2016-12-05 17:06:36,660: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-05 17:06:36,660: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-05 17:06:36,661: 	 Looking up detailed status of task 161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+DEBUG 2016-12-05 17:06:37,275: 	 {u'status': u'NEW', u'username': u'calderon', u'totalJobdefs': 0, u'jobsPerStatus': {}, u'taskWarningMsg': [], u'schedd': u'', u'statusFailureMsg': u'', u'taskFailureMsg': u'', u'failedJobdefs': 0, u'command': u'SUBMIT', u'submissionTime': 1480953861, u'jobdefErrors': [], u'collector': u'cmsgwms-collector-global.cern.ch,cmssrv221.fnal.gov', u'jobList': []}
+INFO 2016-12-05 17:06:37,275: 	 CRAB project directory:		/afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-05 17:06:37,275: 	 Task name:			161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-05 17:06:37,275: 	 Task status:			NEW on command SUBMIT
+INFO 2016-12-05 17:06:37,275: 	 
+No jobs created yet!
+INFO 2016-12-05 17:06:37,282: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/crab.log
+DEBUG 2016-12-05 17:06:51,237: 	 Executing command: 'status'
+DEBUG 2016-12-05 17:06:51,238: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-05 17:06:51,245: 	 Checking credentials
+DEBUG 2016-12-05 17:06:51,245: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-05 17:06:51,245: 	 Getting proxy life time left
+DEBUG 2016-12-05 17:06:51,957: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 79850
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:52,563: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 79849
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:52,563: 	 Proxy valid for 22:10:50 hours
+DEBUG 2016-12-05 17:06:52,743: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:52,743: 	 Checking credentials
+DEBUG 2016-12-05 17:06:52,743: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-05 17:06:52,743: 	 Getting proxy life time left
+DEBUG 2016-12-05 17:06:53,350: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 79848
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:53,857: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 79848
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:53,857: 	 Proxy valid for 22:10:48 hours
+DEBUG 2016-12-05 17:06:54,806: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-05 17:06:54,917: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:54,917: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-05 17:06:54,917: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-05 17:06:55,125: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 718:11:03  (29.9 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:06:55,126: 	 Myproxy is valid: 2585463
+DEBUG 2016-12-05 17:06:55,126: 	 Command use: status
+DEBUG 2016-12-05 17:06:55,126: 	 Options use: ['crab_ZeroBiasBunchTrains0_Run2016H']
+DEBUG 2016-12-05 17:06:55,463: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-05 17:06:55,463: 	 Instance is prod
+DEBUG 2016-12-05 17:06:55,463: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-05 17:06:55,463: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-05 17:06:55,463: 	 Looking up detailed status of task 161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+DEBUG 2016-12-05 17:06:56,341: 	 {u'status': u'NEW', u'username': u'calderon', u'totalJobdefs': 0, u'jobsPerStatus': {}, u'taskWarningMsg': [], u'schedd': u'', u'statusFailureMsg': u'', u'taskFailureMsg': u'', u'failedJobdefs': 0, u'command': u'SUBMIT', u'submissionTime': 1480953861, u'jobdefErrors': [], u'collector': u'cmsgwms-collector-global.cern.ch,cmssrv221.fnal.gov', u'jobList': []}
+INFO 2016-12-05 17:06:56,341: 	 CRAB project directory:		/afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-05 17:06:56,341: 	 Task name:			161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-05 17:06:56,341: 	 Task status:			NEW on command SUBMIT
+INFO 2016-12-05 17:06:56,341: 	 
+No jobs created yet!
+INFO 2016-12-05 17:06:56,343: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/crab.log
+DEBUG 2016-12-05 17:10:59,778: 	 Executing command: 'status'
+DEBUG 2016-12-05 17:10:59,778: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-05 17:10:59,788: 	 Checking credentials
+DEBUG 2016-12-05 17:10:59,789: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-05 17:10:59,789: 	 Getting proxy life time left
+DEBUG 2016-12-05 17:11:01,325: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 79600
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:11:02,038: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 79600
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:11:02,039: 	 Proxy valid for 22:06:40 hours
+DEBUG 2016-12-05 17:11:02,176: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:11:02,176: 	 Checking credentials
+DEBUG 2016-12-05 17:11:02,176: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-05 17:11:02,177: 	 Getting proxy life time left
+DEBUG 2016-12-05 17:11:02,885: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 79599
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:11:03,597: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 79598
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:11:03,598: 	 Proxy valid for 22:06:39 hours
+DEBUG 2016-12-05 17:11:03,956: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-05 17:11:04,073: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:11:04,073: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-05 17:11:04,073: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-05 17:11:04,379: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 718:06:54  (29.9 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:11:04,380: 	 Myproxy is valid: 2585214
+DEBUG 2016-12-05 17:11:04,381: 	 Command use: status
+DEBUG 2016-12-05 17:11:04,381: 	 Options use: ['crab_ZeroBiasBunchTrains0_Run2016H']
+DEBUG 2016-12-05 17:11:04,754: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-05 17:11:04,754: 	 Instance is prod
+DEBUG 2016-12-05 17:11:04,754: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-05 17:11:04,754: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-05 17:11:04,754: 	 Looking up detailed status of task 161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+DEBUG 2016-12-05 17:11:05,158: 	 {u'status': u'NEW', u'username': u'calderon', u'totalJobdefs': 0, u'jobsPerStatus': {}, u'taskWarningMsg': [], u'schedd': u'', u'statusFailureMsg': u'', u'taskFailureMsg': u'', u'failedJobdefs': 0, u'command': u'SUBMIT', u'submissionTime': 1480953861, u'jobdefErrors': [], u'collector': u'cmsgwms-collector-global.cern.ch,cmssrv221.fnal.gov', u'jobList': []}
+INFO 2016-12-05 17:11:05,158: 	 CRAB project directory:		/afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-05 17:11:05,158: 	 Task name:			161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-05 17:11:05,158: 	 Task status:			NEW on command SUBMIT
+INFO 2016-12-05 17:11:05,158: 	 
+No jobs created yet!
+INFO 2016-12-05 17:11:05,163: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/crab.log
+DEBUG 2016-12-05 17:53:43,488: 	 Executing command: 'status'
+DEBUG 2016-12-05 17:53:43,489: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-05 17:53:43,505: 	 Checking credentials
+DEBUG 2016-12-05 17:53:43,506: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-05 17:53:43,506: 	 Getting proxy life time left
+DEBUG 2016-12-05 17:53:44,422: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 77037
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:53:45,140: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 77036
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:53:45,140: 	 Proxy valid for 21:23:57 hours
+DEBUG 2016-12-05 17:53:45,276: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:53:45,276: 	 Checking credentials
+DEBUG 2016-12-05 17:53:45,277: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-05 17:53:45,277: 	 Getting proxy life time left
+DEBUG 2016-12-05 17:53:46,081: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 77035
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:53:46,892: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 77035
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:53:46,893: 	 Proxy valid for 21:23:55 hours
+DEBUG 2016-12-05 17:53:48,023: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-05 17:53:48,134: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:53:48,134: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-05 17:53:48,135: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-05 17:53:48,439: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 717:24:10  (29.9 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 17:53:48,441: 	 Myproxy is valid: 2582650
+DEBUG 2016-12-05 17:53:48,441: 	 Command use: status
+DEBUG 2016-12-05 17:53:48,441: 	 Options use: ['crab_ZeroBiasBunchTrains0_Run2016H']
+DEBUG 2016-12-05 17:53:48,878: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-05 17:53:48,878: 	 Instance is prod
+DEBUG 2016-12-05 17:53:48,878: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-05 17:53:48,878: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-05 17:53:48,878: 	 Looking up detailed status of task 161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+DEBUG 2016-12-05 17:53:49,338: 	 {u'status': u'NEW', u'username': u'calderon', u'totalJobdefs': 0, u'jobsPerStatus': {}, u'taskWarningMsg': [], u'schedd': u'', u'statusFailureMsg': u'', u'taskFailureMsg': u'', u'failedJobdefs': 0, u'command': u'SUBMIT', u'submissionTime': 1480953861, u'jobdefErrors': [], u'collector': u'cmsgwms-collector-global.cern.ch,cmssrv221.fnal.gov', u'jobList': []}
+INFO 2016-12-05 17:53:49,338: 	 CRAB project directory:		/afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-05 17:53:49,338: 	 Task name:			161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-05 17:53:49,338: 	 Task status:			NEW on command SUBMIT
+INFO 2016-12-05 17:53:49,339: 	 
+No jobs created yet!
+INFO 2016-12-05 17:53:49,361: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/crab.log
+DEBUG 2016-12-05 19:21:39,082: 	 Executing command: 'status'
+DEBUG 2016-12-05 19:21:39,084: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-05 19:21:39,125: 	 Checking credentials
+DEBUG 2016-12-05 19:21:39,126: 	 Proxy file /tmp/x509up_u15250 not found
+DEBUG 2016-12-05 19:21:39,126: 	 Creating new proxy for 24:00 hours with VO group '' and VO role 'NULL'.
+DEBUG 2016-12-05 19:22:03,508: 	 Executing : 
+ command : voms-proxy-init -voms cms:/cms -valid 24:00 -rfc
+ output : None
+ error: None
+ retcode : 0
+DEBUG 2016-12-05 19:22:04,013: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 86399
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 19:22:04,524: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 86397
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 19:22:05,132: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u15250 voms-proxy-info -fqan
+ output : /cms/Role=NULL/Capability=NULL
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 19:22:05,132: 	 Proxy created.
+DEBUG 2016-12-05 19:22:05,264: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 19:22:05,265: 	 Checking credentials
+DEBUG 2016-12-05 19:22:05,265: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-05 19:22:05,265: 	 Getting proxy life time left
+DEBUG 2016-12-05 19:22:05,774: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 86397
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 19:22:06,279: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 86395
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 19:22:06,279: 	 Proxy valid for 23:59:57 hours
+DEBUG 2016-12-05 19:22:09,688: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-05 19:22:09,798: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 19:22:09,798: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-05 19:22:09,798: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-05 19:22:10,103: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 715:55:48  (29.8 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-05 19:22:10,104: 	 Myproxy is valid: 2577348
+DEBUG 2016-12-05 19:22:10,105: 	 Command use: status
+DEBUG 2016-12-05 19:22:10,105: 	 Options use: ['crab_ZeroBiasBunchTrains0_Run2016H']
+DEBUG 2016-12-05 19:22:10,679: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-05 19:22:10,679: 	 Instance is prod
+DEBUG 2016-12-05 19:22:10,680: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-05 19:22:10,680: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-05 19:22:10,680: 	 Looking up detailed status of task 161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+DEBUG 2016-12-05 19:22:11,009: 	 {u'status': u'NEW', u'username': u'calderon', u'totalJobdefs': 0, u'jobsPerStatus': {}, u'taskWarningMsg': [], u'schedd': u'', u'statusFailureMsg': u'', u'taskFailureMsg': u'', u'failedJobdefs': 0, u'command': u'SUBMIT', u'submissionTime': 1480953861, u'jobdefErrors': [], u'collector': u'cmsgwms-collector-global.cern.ch,cmssrv221.fnal.gov', u'jobList': []}
+INFO 2016-12-05 19:22:11,009: 	 CRAB project directory:		/afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-05 19:22:11,009: 	 Task name:			161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-05 19:22:11,009: 	 Task status:			NEW on command SUBMIT
+INFO 2016-12-05 19:22:11,009: 	 
+No jobs created yet!
+INFO 2016-12-05 19:22:11,078: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/crab.log
+DEBUG 2016-12-07 08:15:15,779: 	 Executing command: 'status'
+DEBUG 2016-12-07 08:15:15,780: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-07 08:15:15,805: 	 Checking credentials
+DEBUG 2016-12-07 08:15:15,806: 	 Proxy file /tmp/x509up_u15250 not found
+DEBUG 2016-12-07 08:15:15,806: 	 Creating new proxy for 24:00 hours with VO group '' and VO role 'NULL'.
+DEBUG 2016-12-07 08:15:25,735: 	 Executing : 
+ command : voms-proxy-init -voms cms:/cms -valid 24:00 -rfc
+ output : None
+ error: None
+ retcode : 0
+DEBUG 2016-12-07 08:15:26,242: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 86398
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:15:26,952: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 86398
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:15:27,460: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u15250 voms-proxy-info -fqan
+ output : /cms/Role=NULL/Capability=NULL
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:15:27,460: 	 Proxy created.
+DEBUG 2016-12-07 08:15:27,599: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:15:27,599: 	 Checking credentials
+DEBUG 2016-12-07 08:15:27,600: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-07 08:15:27,600: 	 Getting proxy life time left
+DEBUG 2016-12-07 08:15:28,105: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 86396
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:15:28,611: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 86396
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:15:28,611: 	 Proxy valid for 23:59:56 hours
+DEBUG 2016-12-07 08:15:29,615: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-07 08:15:29,725: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:15:29,725: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-07 08:15:29,725: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-07 08:15:30,029: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 679:02:28  (28.3 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:15:30,030: 	 Myproxy is valid: 2444548
+DEBUG 2016-12-07 08:15:30,031: 	 Command use: status
+DEBUG 2016-12-07 08:15:30,031: 	 Options use: ['crab_ZeroBiasBunchTrains0_Run2016H']
+DEBUG 2016-12-07 08:15:30,767: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-07 08:15:30,767: 	 Instance is prod
+DEBUG 2016-12-07 08:15:30,768: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-07 08:15:30,768: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-07 08:15:30,768: 	 Looking up detailed status of task 161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+DEBUG 2016-12-07 08:15:40,345: 	 {u'status': u'FAILED', u'username': u'calderon', u'jobsPerStatus': {u'failed': 3, u'finished': 1}, u'jobs': {u'1': {u'State': u'failed', u'Error': [8028, u"CmsRunFailure\nCMSSW error message follows.\nFatal Exception\nAn exception of category 'FallbackFileOpenError' occurred while\n   [0] Calling InputSource::readFile_\n   [1] Calling RootFileSequenceBase::initTheFile()\n   [2] Calling StorageFactory::open()\n   [3] Calling XrdFile::open()\nException Message:\nFailed to open the file 'root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root?source=glow'\n   Additional Info:\n      [a] XrdCl::File::Open(name='root://cmsxrootd.hep.wisc.edu//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root', flags=0x10, permissions=0660) => error '[ERROR] Server responded with an error: [3011] Unable to open /store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root; no such file or directory\n' (errno=3011, code=400)\n      [b] Last URL tried: root://g28n24.hep.wisc.edu:31094//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root?tried=\n      [c] Problematic data server: g28n24.hep.wisc.edu:31094\n      [d] Disabled source: g29n10.hep.wisc.edu:31094\n      [e] Disabled source: g28n33.hep.wisc.edu:31094\n      [f] Disabled source: g28n01.hep.wisc.edu:31094\n      [g] Disabled source: g28n03.hep.wisc.edu:31094\n      [h] Input file root://cmsxrootd.hep.wisc.edu//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root could not be opened.\nFallback Input file root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root?source=glow also could not be opened.\nOriginal exception info is above; fallback exception info is below.\n      [i] XrdCl::File::Open(name='root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root?source=glow', flags=0x10, permissions=0660) => error '[ERROR] Server responded with an error: [3011] No servers are available to read the file.\n' (errno=3011, code=400). No additional data servers were found.\n      [j] Last URL tried: root://cms-xrd-transit.cern.ch:1094//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root?source=glow&tried=+1098xrdcmsglobal02.cern.ch,+1213cmsxrootd1.fnal.gov1213xrootd.unl.edu,\n      [k] Problematic data server: cms-xrd-transit.cern.ch:1094\n      [l] Disabled source: cms-xrd-transit.cern.ch:1094\n", {u'type': u'Fatal Exception', u'details': u"An exception of category 'FallbackFileOpenError' occurred while\n   [0] Calling InputSource::readFile_\n   [1] Calling RootFileSequenceBase::initTheFile()\n   [2] Calling StorageFactory::open()\n   [3] Calling XrdFile::open()\nException Message:\nFailed to open the file 'root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root?source=glow'\n   Additional Info:\n      [a] XrdCl::File::Open(name='root://cmsxrootd.hep.wisc.edu//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root', flags=0x10, permissions=0660) => error '[ERROR] Server responded with an error: [3011] Unable to open /store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root; no such file or directory\n' (errno=3011, code=400)\n      [b] Last URL tried: root://g28n24.hep.wisc.edu:31094//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root?tried=\n      [c] Problematic data server: g28n24.hep.wisc.edu:31094\n      [d] Disabled source: g29n10.hep.wisc.edu:31094\n      [e] Disabled source: g28n33.hep.wisc.edu:31094\n      [f] Disabled source: g28n01.hep.wisc.edu:31094\n      [g] Disabled source: g28n03.hep.wisc.edu:31094\n      [h] Input file root://cmsxrootd.hep.wisc.edu//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root could not be opened.\nFallback Input file root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root?source=glow also could not be opened.\nOriginal exception info is above; fallback exception info is below.\n      [i] XrdCl::File::Open(name='root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root?source=glow', flags=0x10, permissions=0660) => error '[ERROR] Server responded with an error: [3011] No servers are available to read the file.\n' (errno=3011, code=400). No additional data servers were found.\n      [j] Last URL tried: root://cms-xrd-transit.cern.ch:1094//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/E8A7518F-D0A8-E611-9B9F-E41D2D08DF80.root?source=glow&tried=+1098xrdcmsglobal02.cern.ch,+1213cmsxrootd1.fnal.gov1213xrootd.unl.edu,\n      [k] Problematic data server: cms-xrd-transit.cern.ch:1094\n      [l] Disabled source: cms-xrd-transit.cern.ch:1094", u'exitCode': u'8028'}]}, u'3': {u'State': u'failed', u'Error': [8028, u"CmsRunFailure\nCMSSW error message follows.\nFatal Exception\nAn exception of category 'FallbackFileOpenError' occurred while\n   [0] Calling InputSource::readFile_\n   [1] Calling RootFileSequenceBase::initTheFile()\n   [2] Calling StorageFactory::open()\n   [3] Calling XrdFile::open()\nException Message:\nFailed to open the file 'root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/3A48BE16-90A8-E611-8D3C-C4346BBF3E78.root'\n   Additional Info:\n      [a] open() failed with system error 'No such file or directory' (error code 2)\n      [b] Input file /cms/store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/3A48BE16-90A8-E611-8D3C-C4346BBF3E78.root could not be opened.\nFallback Input file root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/3A48BE16-90A8-E611-8D3C-C4346BBF3E78.root also could not be opened.\nOriginal exception info is above; fallback exception info is below.\n      [c] XrdCl::File::Open(name='root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/3A48BE16-90A8-E611-8D3C-C4346BBF3E78.root', flags=0x10, permissions=0660) => error '[ERROR] Server responded with an error: [3011] Too many attempts to gain dfs read access to the file\n' (errno=3011, code=400). No additional data servers were found.\n      [d] Last URL tried: root://xrootd2.ihepa.ufl.edu:1094//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/3A48BE16-90A8-E611-8D3C-C4346BBF3E78.root?tried=\n      [e] Problematic data server: xrootd2.ihepa.ufl.edu:1094\n      [f] Disabled source: cmsio6.rc.ufl.edu:1094\n      [g] Disabled source: cmsio8.rc.ufl.edu:1094\n      [h] Disabled source: xrootd2.ihepa.ufl.edu:1094\n", {u'type': u'Fatal Exception', u'details': u"An exception of category 'FallbackFileOpenError' occurred while\n   [0] Calling InputSource::readFile_\n   [1] Calling RootFileSequenceBase::initTheFile()\n   [2] Calling StorageFactory::open()\n   [3] Calling XrdFile::open()\nException Message:\nFailed to open the file 'root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/3A48BE16-90A8-E611-8D3C-C4346BBF3E78.root'\n   Additional Info:\n      [a] open() failed with system error 'No such file or directory' (error code 2)\n      [b] Input file /cms/store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/3A48BE16-90A8-E611-8D3C-C4346BBF3E78.root could not be opened.\nFallback Input file root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/3A48BE16-90A8-E611-8D3C-C4346BBF3E78.root also could not be opened.\nOriginal exception info is above; fallback exception info is below.\n      [c] XrdCl::File::Open(name='root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/3A48BE16-90A8-E611-8D3C-C4346BBF3E78.root', flags=0x10, permissions=0660) => error '[ERROR] Server responded with an error: [3011] Too many attempts to gain dfs read access to the file\n' (errno=3011, code=400). No additional data servers were found.\n      [d] Last URL tried: root://xrootd2.ihepa.ufl.edu:1094//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/3A48BE16-90A8-E611-8D3C-C4346BBF3E78.root?tried=\n      [e] Problematic data server: xrootd2.ihepa.ufl.edu:1094\n      [f] Disabled source: cmsio6.rc.ufl.edu:1094\n      [g] Disabled source: cmsio8.rc.ufl.edu:1094\n      [h] Disabled source: xrootd2.ihepa.ufl.edu:1094", u'exitCode': u'8028'}]}, u'2': {u'State': u'failed', u'Error': [8028, u"CmsRunFailure\nCMSSW error message follows.\nFatal Exception\nAn exception of category 'FallbackFileOpenError' occurred while\n   [0] Calling InputSource::readFile_\n   [1] Calling RootFileSequenceBase::initTheFile()\n   [2] Calling StorageFactory::open()\n   [3] Calling XrdFile::open()\nException Message:\nFailed to open the file 'root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/A47D5A96-CAA8-E611-A05E-002590A7A2E0.root'\n   Additional Info:\n      [a] open() failed with system error 'No such file or directory' (error code 2)\n      [b] Input file /cms/store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/A47D5A96-CAA8-E611-A05E-002590A7A2E0.root could not be opened.\nFallback Input file root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/A47D5A96-CAA8-E611-A05E-002590A7A2E0.root also could not be opened.\nOriginal exception info is above; fallback exception info is below.\n      [c] XrdCl::File::Open(name='root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/A47D5A96-CAA8-E611-A05E-002590A7A2E0.root', flags=0x10, permissions=0660) => error '[FATAL] Socket timeout' (errno=0, code=103). No additional data servers were found.\n      [d] Last URL tried: root://cmsio10.rc.ufl.edu:1094//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/A47D5A96-CAA8-E611-A05E-002590A7A2E0.root?tried=\n      [e] Problematic data server: cmsio10.rc.ufl.edu:1094\n      [f] Disabled source: cmsio7.rc.ufl.edu:1094\n      [g] Disabled source: xrootd2.ihepa.ufl.edu:1094\n      [h] Disabled source: cmsio10.rc.ufl.edu:1094\n", {u'type': u'Fatal Exception', u'details': u"An exception of category 'FallbackFileOpenError' occurred while\n   [0] Calling InputSource::readFile_\n   [1] Calling RootFileSequenceBase::initTheFile()\n   [2] Calling StorageFactory::open()\n   [3] Calling XrdFile::open()\nException Message:\nFailed to open the file 'root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/A47D5A96-CAA8-E611-A05E-002590A7A2E0.root'\n   Additional Info:\n      [a] open() failed with system error 'No such file or directory' (error code 2)\n      [b] Input file /cms/store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/A47D5A96-CAA8-E611-A05E-002590A7A2E0.root could not be opened.\nFallback Input file root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/A47D5A96-CAA8-E611-A05E-002590A7A2E0.root also could not be opened.\nOriginal exception info is above; fallback exception info is below.\n      [c] XrdCl::File::Open(name='root://cmsxrootd.fnal.gov//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/A47D5A96-CAA8-E611-A05E-002590A7A2E0.root', flags=0x10, permissions=0660) => error '[FATAL] Socket timeout' (errno=0, code=103). No additional data servers were found.\n      [d] Last URL tried: root://cmsio10.rc.ufl.edu:1094//store/data/Run2016H/ZeroBiasBunchTrains0/AOD/09Nov2016-v1/110000/A47D5A96-CAA8-E611-A05E-002590A7A2E0.root?tried=\n      [e] Problematic data server: cmsio10.rc.ufl.edu:1094\n      [f] Disabled source: cmsio7.rc.ufl.edu:1094\n      [g] Disabled source: xrootd2.ihepa.ufl.edu:1094\n      [h] Disabled source: cmsio10.rc.ufl.edu:1094", u'exitCode': u'8028'}]}, u'4': {u'State': u'finished'}}, u'publication': {}, u'taskWarningMsg': [], u'schedd': u'crab3@vocms0198.cern.ch', u'publicationFailures': {}, u'outdatasets': None, u'statusFailureMsg': u'', u'taskFailureMsg': u'', u'failedJobdefs': 0, u'ASOURL': u'https://cmsweb.cern.ch/couchdb2', u'command': u'SUBMIT', u'totalJobdefs': 0, u'submissionTime': 1480953861, u'jobdefErrors': [], u'collector': u'cmsgwms-collector-global.cern.ch,cmssrv221.fnal.gov', u'jobList': [[u'failed', 1], [u'failed', 3], [u'failed', 2], [u'finished', 4]]}
+INFO 2016-12-07 08:15:40,345: 	 CRAB project directory:		/afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-07 08:15:40,345: 	 Task name:			161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-07 08:15:40,345: 	 Grid scheduler:			crab3@vocms0198.cern.ch
+INFO 2016-12-07 08:15:40,345: 	 Task status:			FAILED
+INFO 2016-12-07 08:15:40,345: 	 Dashboard monitoring URL:	http://dashb-cms-job.cern.ch/dashboard/templates/task-analysis/#user=calderon&table=Mains&pattern=161205_160421%3Acalderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-07 08:15:40,346: 	 
+Jobs status:			failed         75.0% (3/4)
+INFO 2016-12-07 08:15:40,346: 	 				finished       25.0% (1/4)
+INFO 2016-12-07 08:15:40,346: 	 
+No publication information available yet
+INFO 2016-12-07 08:15:40,346: 	 
+Error Summary: (use crab status --verboseErrors for details about the errors)
+
+3 jobs failed with exit code 8028
+
+Have a look at https://twiki.cern.ch/twiki/bin/viewauth/CMSPublic/JobExitCodes for a description of the exit codes.
+INFO 2016-12-07 08:15:44,935: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/crab.log
+DEBUG 2016-12-07 08:19:46,537: 	 Executing command: 'resubmit'
+DEBUG 2016-12-07 08:19:46,537: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-07 08:19:46,547: 	 Checking credentials
+DEBUG 2016-12-07 08:19:46,548: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-07 08:19:46,548: 	 Getting proxy life time left
+DEBUG 2016-12-07 08:19:47,154: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 86137
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:19:48,665: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 86136
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:19:48,667: 	 Proxy valid for 23:55:37 hours
+DEBUG 2016-12-07 08:19:48,786: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:19:48,787: 	 Checking credentials
+DEBUG 2016-12-07 08:19:48,788: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-07 08:19:48,788: 	 Getting proxy life time left
+DEBUG 2016-12-07 08:19:49,294: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 86135
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:19:49,800: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 86135
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:19:49,801: 	 Proxy valid for 23:55:35 hours
+DEBUG 2016-12-07 08:20:22,268: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-07 08:20:22,381: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:20:22,381: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-07 08:20:22,381: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-07 08:20:22,685: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 678:57:36  (28.3 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:20:22,686: 	 Myproxy is valid: 2444256
+DEBUG 2016-12-07 08:20:22,687: 	 Command use: resubmit
+DEBUG 2016-12-07 08:20:22,687: 	 Options use: ['crab_ZeroBiasBunchTrains0_Run2016H']
+DEBUG 2016-12-07 08:20:23,520: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-07 08:20:23,520: 	 Instance is prod
+DEBUG 2016-12-07 08:20:23,520: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-07 08:20:23,520: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-07 08:20:23,520: 	 Requesting resubmission of failed jobs in task 161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-07 08:20:23,520: 	 Sending resubmit request to the server.
+DEBUG 2016-12-07 08:20:23,520: 	 Submitting {'publication': 0, 'force': 0, 'subresource': 'resubmit', 'workflow': u'161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H'} 
+DEBUG 2016-12-07 08:20:23,521: 	 Encoded resubmit request: publication=0&force=0&subresource=resubmit&workflow=161205_160421%3Acalderon_crab_ZeroBiasBunchTrains0_Run2016H
+DEBUG 2016-12-07 08:20:25,019: 	 Result: {u'result': [{u'result': u'ok'}], u'desc': {u'columns': [u'tm_site_blacklist', u'tm_site_whitelist', u'tm_maxjobruntime', u'tm_maxmemory', u'tm_numcores', u'tm_priority']}}
+INFO 2016-12-07 08:20:25,019: 	 Resubmit request sent to the server.
+INFO 2016-12-07 08:20:25,019: 	 Please use 'crab status' to check how the resubmission process proceeds.
+Notice it may take a couple of minutes for the resubmission to get fully processed.
+INFO 2016-12-07 08:20:25,022: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/crab.log
+DEBUG 2016-12-07 08:32:36,078: 	 Executing command: 'status'
+DEBUG 2016-12-07 08:32:36,079: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-07 08:32:36,090: 	 Checking credentials
+DEBUG 2016-12-07 08:32:36,091: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-07 08:32:36,091: 	 Getting proxy life time left
+DEBUG 2016-12-07 08:32:36,695: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 85368
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:32:37,203: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 85367
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:32:37,203: 	 Proxy valid for 23:42:48 hours
+DEBUG 2016-12-07 08:32:37,326: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:32:37,326: 	 Checking credentials
+DEBUG 2016-12-07 08:32:37,330: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-07 08:32:37,330: 	 Getting proxy life time left
+DEBUG 2016-12-07 08:32:37,835: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 85367
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:32:38,340: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 85366
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:32:38,340: 	 Proxy valid for 23:42:47 hours
+INFO 2016-12-07 08:33:44,890: 	 The server answered with an error.
+INFO 2016-12-07 08:33:44,891: 	 It seems the CMSWEB frontend is not responding. Please check: https://twiki.cern.ch/twiki/bin/viewauth/CMS/ScheduledInterventions
+DEBUG 2016-12-07 08:33:44,892: 	 ERROR: Service Unavailable (503):  '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+ <head>
+ <title>CMSWEB Error: Service unavailable</title>
+ <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+ <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+ <link rel="stylesheet" type="text/css" media="screen" href="/css/cmsweb.css" />
+</head>
+<body>
+ <div id="main">
+  <div id="top">
+   <div class="boxTitle"><img src="/img/title.gif" alt="CMSWEB (title)" /></div>
+  </div>
+  <div id="middle">
+   <div class="boxLinkContainer">
+    <h2>Service unavailable</h2>
+    <p>The site you requested is not available.</p><p>CMS <a href='https://twiki.cern.ch/twiki/bin/view/CMS/ScheduledInterventions'>scheduled interventions page</a> lists planned CMS and CERN service downtimes and known site-wide computing system incidents. Planned updates are notified on the <a href='https://hypernews.cern.ch/HyperNews/CMS/get/cernCompAnnounce.html'>CERN computing announcements</a> forum.</p><p>Would you please be so kind and <a href='https://ggus.eu/?mode=ticket_cms'>create a ticket</a> to"CMS Web Tools" support unit</a> if this interruption was unexpected?</p>
+   </div>
+  </div>
+  <div id="bottom">
+   <div class="boxFooter">&nbsp;</div>
+  </div>
+ </div>
+</body>
+</html>
+'
+DEBUG 2016-12-07 08:33:44,892: 	 Command failed with URI: https://cmsweb.cern.ch/crabserver/prod/info
+DEBUG 2016-12-07 08:33:44,892: 	      Input data: {'subresource': 'delegatedn'}
+DEBUG 2016-12-07 08:33:44,892: 	      Request headers: {'Date': 'Wed, 07 Dec 2016 07:32:41 GMT', 'Connection': 'close', 'Content-Type': 'text/html', 'CMS-Server-Time': 'D=63007958 t=1481095961875684', 'Server': 'Apache'}
+ERROR 2016-12-07 08:33:44,892: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1611-comp2/bin/crab", line 160, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1611-comp2/bin/crab", line 146, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1611-comp2/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 339, in __init__
+    self.handleProxy(proxyOptsSetPlace)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1611-comp2/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 414, in handleProxy
+    all_task_workers_dns = server_info('delegatedn', self.serverurl, self.proxyfilename, baseurl)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1611-comp2/lib/python2.7/site-packages/CRABClient/ClientUtilities.py", line 664, in server_info
+    dictresult, dummyStatus, dummyReason = server.get(baseurl, requestdict)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1611-comp2/lib/python2.7/site-packages/RESTInteractions.py", line 79, in get
+    return self.makeRequest(uri = uri, data = data, verb = 'GET')
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1611-comp2/lib/python2.7/site-packages/RESTInteractions.py", line 128, in makeRequest
+    capath=caCertPath)#, verbose=True)# for debug
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1611-comp2/lib/python2.7/site-packages/WMCore/Services/pycurl_manager.py", line 207, in request
+    raise exc
+HTTPException: url=https://cmsweb.cern.ch/crabserver/prod/info, code=503, reason=Service Unavailable, headers={'Date': 'Wed, 07 Dec 2016 07:32:41 GMT', 'Connection': 'close', 'Content-Type': 'text/html', 'CMS-Server-Time': 'D=63007958 t=1481095961875684', 'Server': 'Apache'}
+DEBUG 2016-12-07 08:34:09,618: 	 Executing command: 'status'
+DEBUG 2016-12-07 08:34:09,618: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-07 08:34:09,626: 	 Checking credentials
+DEBUG 2016-12-07 08:34:09,627: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-07 08:34:09,627: 	 Getting proxy life time left
+DEBUG 2016-12-07 08:34:10,234: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 85274
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:34:10,638: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 85274
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:34:10,638: 	 Proxy valid for 23:41:14 hours
+DEBUG 2016-12-07 08:34:10,754: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:34:10,755: 	 Checking credentials
+DEBUG 2016-12-07 08:34:10,755: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-07 08:34:10,755: 	 Getting proxy life time left
+DEBUG 2016-12-07 08:34:11,259: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 85273
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:34:11,664: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 85273
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:34:11,664: 	 Proxy valid for 23:41:13 hours
+DEBUG 2016-12-07 08:34:12,081: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-07 08:34:12,190: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:34:12,191: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-07 08:34:12,191: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-07 08:34:12,495: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 678:43:46  (28.3 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 08:34:12,496: 	 Myproxy is valid: 2443426
+DEBUG 2016-12-07 08:34:12,496: 	 Command use: status
+DEBUG 2016-12-07 08:34:12,496: 	 Options use: ['crab_ZeroBiasBunchTrains0_Run2016H/']
+DEBUG 2016-12-07 08:34:13,002: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-07 08:34:13,002: 	 Instance is prod
+DEBUG 2016-12-07 08:34:13,002: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-07 08:34:13,002: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-07 08:34:13,002: 	 Looking up detailed status of task 161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+DEBUG 2016-12-07 08:34:15,773: 	 {u'status': u'SUBMITTED', u'username': u'calderon', u'jobsPerStatus': {u'idle': 3, u'finished': 1}, u'jobs': {u'1': {u'State': u'idle'}, u'3': {u'State': u'idle'}, u'2': {u'State': u'idle'}, u'4': {u'State': u'finished'}}, u'publication': {}, u'taskWarningMsg': [], u'schedd': u'crab3@vocms0198.cern.ch', u'publicationFailures': {}, u'outdatasets': None, u'statusFailureMsg': u'', u'taskFailureMsg': u'', u'failedJobdefs': 0, u'ASOURL': u'https://cmsweb.cern.ch/couchdb2', u'command': u'', u'totalJobdefs': 0, u'submissionTime': 1480953861, u'jobdefErrors': [], u'collector': u'cmsgwms-collector-global.cern.ch,cmssrv221.fnal.gov', u'jobList': [[u'idle', 1], [u'idle', 3], [u'idle', 2], [u'finished', 4]]}
+INFO 2016-12-07 08:34:15,773: 	 CRAB project directory:		/afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-07 08:34:15,774: 	 Task name:			161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-07 08:34:15,774: 	 Grid scheduler:			crab3@vocms0198.cern.ch
+INFO 2016-12-07 08:34:15,774: 	 Task status:			SUBMITTED
+INFO 2016-12-07 08:34:15,774: 	 Dashboard monitoring URL:	http://dashb-cms-job.cern.ch/dashboard/templates/task-analysis/#user=calderon&table=Mains&pattern=161205_160421%3Acalderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-07 08:34:15,774: 	 
+Jobs status:			finished       25.0% (1/4)
+INFO 2016-12-07 08:34:15,775: 	 				idle           75.0% (3/4)
+INFO 2016-12-07 08:34:15,775: 	 
+No publication information available yet
+INFO 2016-12-07 08:34:15,776: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/crab.log
+DEBUG 2016-12-07 18:17:46,226: 	 Executing command: 'status'
+DEBUG 2016-12-07 18:17:46,228: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-07 18:17:46,264: 	 Checking credentials
+DEBUG 2016-12-07 18:17:46,265: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-07 18:17:46,265: 	 Getting proxy life time left
+DEBUG 2016-12-07 18:17:47,580: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 0
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 18:17:47,580: 	 Proxy valid for 00:00:00 hours
+DEBUG 2016-12-07 18:17:47,580: 	 Creating new proxy for 24:00 hours with VO group '' and VO role 'NULL'.
+DEBUG 2016-12-07 18:18:10,689: 	 Executing : 
+ command : voms-proxy-init -voms cms:/cms -valid 24:00 -rfc
+ output : None
+ error: None
+ retcode : 0
+DEBUG 2016-12-07 18:18:11,699: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 86398
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 18:18:12,615: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 86396
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 18:18:13,730: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u15250 voms-proxy-info -fqan
+ output : /cms/Role=NULL/Capability=NULL
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 18:18:13,731: 	 Proxy created.
+DEBUG 2016-12-07 18:18:13,891: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 18:18:13,891: 	 Checking credentials
+DEBUG 2016-12-07 18:18:13,892: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-07 18:18:13,892: 	 Getting proxy life time left
+DEBUG 2016-12-07 18:18:14,806: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 86395
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 18:18:15,817: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 86393
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 18:18:15,817: 	 Proxy valid for 23:59:55 hours
+DEBUG 2016-12-07 18:18:16,298: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-07 18:18:16,412: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 18:18:16,412: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-07 18:18:16,412: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-07 18:18:16,819: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 668:59:42  (27.9 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 18:18:16,820: 	 Myproxy is valid: 2408382
+DEBUG 2016-12-07 18:18:16,820: 	 Command use: status
+DEBUG 2016-12-07 18:18:16,820: 	 Options use: ['crab_ZeroBiasBunchTrains0_Run2016H']
+DEBUG 2016-12-07 18:18:17,441: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-07 18:18:17,442: 	 Instance is prod
+DEBUG 2016-12-07 18:18:17,442: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-07 18:18:17,442: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-07 18:18:17,442: 	 Looking up detailed status of task 161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+DEBUG 2016-12-07 18:18:18,934: 	 {u'status': u'SUBMITTED', u'username': u'calderon', u'jobsPerStatus': {u'running': 3, u'finished': 1}, u'jobs': {u'1': {u'State': u'running'}, u'3': {u'State': u'running'}, u'2': {u'State': u'running'}, u'4': {u'State': u'finished'}}, u'publication': {}, u'taskWarningMsg': [], u'schedd': u'crab3@vocms0198.cern.ch', u'publicationFailures': {}, u'outdatasets': None, u'statusFailureMsg': u'', u'taskFailureMsg': u'', u'failedJobdefs': 0, u'ASOURL': u'https://cmsweb.cern.ch/couchdb2', u'command': u'', u'totalJobdefs': 0, u'submissionTime': 1480953861, u'jobdefErrors': [], u'collector': u'cmsgwms-collector-global.cern.ch,cmssrv221.fnal.gov', u'jobList': [[u'running', 1], [u'running', 3], [u'running', 2], [u'finished', 4]]}
+INFO 2016-12-07 18:18:18,934: 	 CRAB project directory:		/afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-07 18:18:18,934: 	 Task name:			161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-07 18:18:18,934: 	 Grid scheduler:			crab3@vocms0198.cern.ch
+INFO 2016-12-07 18:18:18,934: 	 Task status:			SUBMITTED
+INFO 2016-12-07 18:18:18,934: 	 Dashboard monitoring URL:	http://dashb-cms-job.cern.ch/dashboard/templates/task-analysis/#user=calderon&table=Mains&pattern=161205_160421%3Acalderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-07 18:18:18,934: 	 
+Jobs status:			finished       25.0% (1/4)
+INFO 2016-12-07 18:18:18,935: 	 				running        75.0% (3/4)
+INFO 2016-12-07 18:18:18,935: 	 
+No publication information available yet
+INFO 2016-12-07 18:18:19,024: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/crab.log
+DEBUG 2016-12-07 19:48:28,927: 	 Executing command: 'status'
+DEBUG 2016-12-07 19:48:28,928: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-07 19:48:28,948: 	 Checking credentials
+DEBUG 2016-12-07 19:48:28,949: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-07 19:48:28,949: 	 Getting proxy life time left
+DEBUG 2016-12-07 19:48:29,554: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 80980
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 19:48:30,161: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 80978
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 19:48:30,161: 	 Proxy valid for 22:29:40 hours
+DEBUG 2016-12-07 19:48:30,301: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 19:48:30,301: 	 Checking credentials
+DEBUG 2016-12-07 19:48:30,302: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-07 19:48:30,302: 	 Getting proxy life time left
+DEBUG 2016-12-07 19:48:30,808: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 80979
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 19:48:31,314: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 80977
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 19:48:31,315: 	 Proxy valid for 22:29:39 hours
+DEBUG 2016-12-07 19:48:34,123: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-07 19:48:34,232: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 19:48:34,233: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-07 19:48:34,233: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-07 19:48:34,537: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 667:29:24  (27.8 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-07 19:48:34,538: 	 Myproxy is valid: 2402964
+DEBUG 2016-12-07 19:48:34,538: 	 Command use: status
+DEBUG 2016-12-07 19:48:34,538: 	 Options use: ['crab_ZeroBiasBunchTrains0_Run2016H/']
+DEBUG 2016-12-07 19:48:35,679: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-07 19:48:35,679: 	 Instance is prod
+DEBUG 2016-12-07 19:48:35,679: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-07 19:48:35,679: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-07 19:48:35,679: 	 Looking up detailed status of task 161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+DEBUG 2016-12-07 19:48:38,778: 	 {u'status': u'SUBMITTED', u'username': u'calderon', u'jobsPerStatus': {u'running': 3, u'finished': 1}, u'jobs': {u'1': {u'State': u'running'}, u'3': {u'State': u'running'}, u'2': {u'State': u'running'}, u'4': {u'State': u'finished'}}, u'publication': {}, u'taskWarningMsg': [], u'schedd': u'crab3@vocms0198.cern.ch', u'publicationFailures': {}, u'outdatasets': None, u'statusFailureMsg': u'', u'taskFailureMsg': u'', u'failedJobdefs': 0, u'ASOURL': u'https://cmsweb.cern.ch/couchdb2', u'command': u'', u'totalJobdefs': 0, u'submissionTime': 1480953861, u'jobdefErrors': [], u'collector': u'cmsgwms-collector-global.cern.ch,cmssrv221.fnal.gov', u'jobList': [[u'running', 1], [u'running', 3], [u'running', 2], [u'finished', 4]]}
+INFO 2016-12-07 19:48:38,778: 	 CRAB project directory:		/afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-07 19:48:38,780: 	 Task name:			161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-07 19:48:38,780: 	 Grid scheduler:			crab3@vocms0198.cern.ch
+INFO 2016-12-07 19:48:38,781: 	 Task status:			SUBMITTED
+INFO 2016-12-07 19:48:38,781: 	 Dashboard monitoring URL:	http://dashb-cms-job.cern.ch/dashboard/templates/task-analysis/#user=calderon&table=Mains&pattern=161205_160421%3Acalderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-07 19:48:38,783: 	 
+Jobs status:			finished       25.0% (1/4)
+INFO 2016-12-07 19:48:38,783: 	 				running        75.0% (3/4)
+INFO 2016-12-07 19:48:38,783: 	 
+No publication information available yet
+INFO 2016-12-07 19:48:38,847: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/crab.log
+DEBUG 2016-12-08 09:41:59,150: 	 Executing command: 'status'
+DEBUG 2016-12-08 09:41:59,150: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-08 09:41:59,157: 	 Checking credentials
+DEBUG 2016-12-08 09:41:59,157: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-08 09:41:59,157: 	 Getting proxy life time left
+DEBUG 2016-12-08 09:41:59,662: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 86382
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-08 09:42:00,268: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 86368
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-08 09:42:00,268: 	 Proxy valid for 23:59:42 hours
+DEBUG 2016-12-08 09:42:00,402: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-08 09:42:00,402: 	 Checking credentials
+DEBUG 2016-12-08 09:42:00,402: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-08 09:42:00,402: 	 Getting proxy life time left
+DEBUG 2016-12-08 09:42:01,007: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 86381
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-08 09:42:01,515: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 86367
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-08 09:42:01,515: 	 Proxy valid for 23:59:41 hours
+DEBUG 2016-12-08 09:42:01,913: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-08 09:42:02,022: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-08 09:42:02,022: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-08 09:42:02,022: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-08 09:42:02,227: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 653:35:56  (27.2 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-08 09:42:02,229: 	 Myproxy is valid: 2352956
+DEBUG 2016-12-08 09:42:02,229: 	 Command use: status
+DEBUG 2016-12-08 09:42:02,229: 	 Options use: ['crab_ZeroBiasBunchTrains0_Run2016H']
+DEBUG 2016-12-08 09:42:02,595: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-08 09:42:02,595: 	 Instance is prod
+DEBUG 2016-12-08 09:42:02,595: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-08 09:42:02,595: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-08 09:42:02,595: 	 Looking up detailed status of task 161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+DEBUG 2016-12-08 09:42:03,492: 	 {u'status': u'COMPLETED', u'username': u'calderon', u'jobsPerStatus': {u'finished': 4}, u'jobs': {u'1': {u'State': u'finished'}, u'3': {u'State': u'finished'}, u'2': {u'State': u'finished'}, u'4': {u'State': u'finished'}}, u'publication': {}, u'taskWarningMsg': [], u'schedd': u'crab3@vocms0198.cern.ch', u'publicationFailures': {}, u'outdatasets': None, u'statusFailureMsg': u'', u'taskFailureMsg': u'', u'failedJobdefs': 0, u'ASOURL': u'https://cmsweb.cern.ch/couchdb2', u'command': u'', u'totalJobdefs': 0, u'submissionTime': 1480953861, u'jobdefErrors': [], u'collector': u'cmsgwms-collector-global.cern.ch,cmssrv221.fnal.gov', u'jobList': [[u'finished', 1], [u'finished', 3], [u'finished', 2], [u'finished', 4]]}
+INFO 2016-12-08 09:42:03,492: 	 CRAB project directory:		/afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-08 09:42:03,492: 	 Task name:			161205_160421:calderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-08 09:42:03,492: 	 Grid scheduler:			crab3@vocms0198.cern.ch
+INFO 2016-12-08 09:42:03,493: 	 Task status:			COMPLETED
+INFO 2016-12-08 09:42:03,493: 	 Dashboard monitoring URL:	http://dashb-cms-job.cern.ch/dashboard/templates/task-analysis/#user=calderon&table=Mains&pattern=161205_160421%3Acalderon_crab_ZeroBiasBunchTrains0_Run2016H
+INFO 2016-12-08 09:42:03,493: 	 
+Jobs status:			finished      100.0% (4/4)
+INFO 2016-12-08 09:42:03,494: 	 
+No publication information available yet
+INFO 2016-12-08 09:42:03,520: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_ZeroBiasBunchTrains0_Run2016H/crab.log

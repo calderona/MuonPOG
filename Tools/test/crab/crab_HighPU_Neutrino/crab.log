@@ -1,0 +1,232 @@
+# Conditions read from  CMS_CONDITIONS  via FrontierProd 
+[MuonPogNtuples]: EndPath AOuptput not found, creating it for ntuple sequence
+[MuonPogNtuples]: skimming HLT format using:
+	paths : all
+	filters : all
+[MuonPogNtuples]: skimming ntuple saving only muons that are: # STA || TRK || GLB muons >= 1 with muon pT > 5.0
+[MuonPogNtuples]: applying pT cut to GEN particles as well
+DEBUG 2016-12-13 10:37:58,116: 	 Executing command: 'submit'
+DEBUG 2016-12-13 10:37:58,117: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-13 10:37:58,155: 	 Checking credentials
+DEBUG 2016-12-13 10:37:58,156: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-13 10:37:58,156: 	 Getting proxy life time left
+DEBUG 2016-12-13 10:37:59,405: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 83178
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-13 10:38:00,229: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 83177
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-13 10:38:00,230: 	 Proxy valid for 23:06:18 hours
+INFO 2016-12-13 10:38:00,230: 	 Will use CRAB configuration file crab_HighPU_neutrino.py
+DEBUG 2016-12-13 10:38:00,230: 	 Loading CRAB configuration file.
+DEBUG 2016-12-13 10:38:00,232: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2016-12-13 10:38:00,366: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-13 10:38:00,366: 	 Checking credentials
+DEBUG 2016-12-13 10:38:00,367: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-13 10:38:00,367: 	 Getting proxy life time left
+DEBUG 2016-12-13 10:38:01,184: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 83176
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-13 10:38:02,008: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 83176
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-13 10:38:02,008: 	 Proxy valid for 23:06:16 hours
+DEBUG 2016-12-13 10:38:02,820: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u15250 voms-proxy-info -fqan
+ output : /cms/Role=NULL/Capability=NULL
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-13 10:38:03,456: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-13 10:38:03,579: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-13 10:38:03,580: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-13 10:38:03,580: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-13 10:38:03,884: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 532:39:55  (22.2 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-13 10:38:03,885: 	 Myproxy is valid: 1917595
+DEBUG 2016-12-13 10:38:03,886: 	 Command use: submit
+DEBUG 2016-12-13 10:38:03,886: 	 Options use: ['crab_HighPU_neutrino.py']
+DEBUG 2016-12-13 10:38:04,308: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-13 10:38:04,308: 	 Instance is prod
+DEBUG 2016-12-13 10:38:04,308: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-13 10:38:04,308: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-13 10:38:04,308: 	 Started submission
+DEBUG 2016-12-13 10:38:04,309: 	 Working on /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_HighPU_Neutrino
+DEBUG 2016-12-13 10:38:05,125: 	 Loading required information from the environment
+DEBUG 2016-12-13 10:38:05,125: 	 Found CMSSW_8_0_20 for slc6_amd64_gcc530 with base /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20
+DEBUG 2016-12-13 10:38:05,125: 	 Loading required information from the environment
+DEBUG 2016-12-13 10:38:05,125: 	 Found CMSSW_8_0_20 for slc6_amd64_gcc530 with base /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20
+DEBUG 2016-12-13 10:38:05,171: 	 UNIQUE NAME: tarUUID 4b11ed62-58b2-45a2-bc76-6e48483755d7 
+DEBUG 2016-12-13 10:38:05,172: 	 self.config: from WMCore.Configuration import Configuration
+config = Configuration()
+config.section_('General')
+config.General.transferOutputs = True
+config.General.requestName = 'HighPU_Neutrino'
+config.section_('JobType')
+config.JobType.psetName = '../muonPogNtuples_cfg.py'
+config.JobType.pluginName = 'ANALYSIS'
+config.JobType.pyCfgParams = ['globalTag=80X_mcRun2_asymptotic_2016_TrancheIV_v6', 'ntupleName=muonPOGNtuple_highPU_Neutrino.root', 'nEvents=-1', 'runOnMC=True', 'hltPathFilter=all']
+config.JobType.allowUndistributedCMSSW = True
+config.section_('Data')
+config.Data.inputDataset = '/SingleNeutrino/RunIIHighPUTrainsDR-HighPUTrains_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM'
+config.Data.unitsPerJob = 150
+config.Data.outLFNDirBase = '/store/group/phys_muon/calderon/NTuplesMuonPOG/'
+config.Data.splitting = 'LumiBased'
+config.Data.inputDBS = 'https://cmsweb.cern.ch/dbs/prod/global/DBSReader/'
+config.section_('Site')
+config.Site.storageSite = 'T2_CH_CERN'
+
+DEBUG 2016-12-13 10:38:05,172: 	 self.config.JobType.psetName: ../muonPogNtuples_cfg.py
+INFO 2016-12-13 10:38:05,173: 	 Importing CMSSW configuration ../muonPogNtuples_cfg.py
+DEBUG 2016-12-13 10:38:05,174: 	 Additional parameters for the CMSSW configuration are: ['globalTag=80X_mcRun2_asymptotic_2016_TrancheIV_v6', 'ntupleName=muonPOGNtuple_highPU_Neutrino.root', 'nEvents=-1', 'runOnMC=True', 'hltPathFilter=all']
+INFO 2016-12-13 10:38:06,323: 	 Finished importing CMSSW configuration ../muonPogNtuples_cfg.py
+DEBUG 2016-12-13 10:38:06,323: 	 Writing CMSSW configuration to /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_HighPU_Neutrino/inputs/PSet.py
+DEBUG 2016-12-13 10:38:06,386: 	 The following EDM output files will be collected: []
+DEBUG 2016-12-13 10:38:06,387: 	 The following TFile output files will be collected: ['muonPOGNtuple_highPU_Neutrino.root']
+DEBUG 2016-12-13 10:38:06,387: 	 The following user output files will be collected: []
+DEBUG 2016-12-13 10:38:06,387: 	 Loading required information from the environment
+DEBUG 2016-12-13 10:38:06,387: 	 Found CMSSW_8_0_20 for slc6_amd64_gcc530 with base /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20
+DEBUG 2016-12-13 10:38:06,387: 	 Making tarball in /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_HighPU_Neutrino/inputs/4b11ed62-58b2-45a2-bc76-6e48483755d7default.tgz
+DEBUG 2016-12-13 10:38:06,496: 	 Checking directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/lib
+DEBUG 2016-12-13 10:38:06,496: 	 Adding directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/lib to tarball
+DEBUG 2016-12-13 10:38:08,293: 	 Checking directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/biglib
+DEBUG 2016-12-13 10:38:08,293: 	 Adding directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/biglib to tarball
+DEBUG 2016-12-13 10:38:08,300: 	 Checking directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/module
+DEBUG 2016-12-13 10:38:10,786: 	 Adding data directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonAnalysis/MuonAssociators/interface to tarball
+DEBUG 2016-12-13 10:38:11,125: 	 Adding data directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonAnalysis/TagAndProbe/interface to tarball
+DEBUG 2016-12-13 10:38:15,679: 	 Adding data directory /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/PhysicsTools/TagAndProbe/interface to tarball
+DEBUG 2016-12-13 10:38:17,286: 	 Uploading archive /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_HighPU_Neutrino/inputs/4b11ed62-58b2-45a2-bc76-6e48483755d7default.tgz to the CRAB cache. Using URI https://cmsweb.cern.ch/crabcache
+DEBUG 2016-12-13 10:38:18,359: 	 Loading required information from the environment
+DEBUG 2016-12-13 10:38:18,360: 	 Found CMSSW_8_0_20 for slc6_amd64_gcc530 with base /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20
+DEBUG 2016-12-13 10:38:18,360: 	 Making tarball in /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_HighPU_Neutrino/inputs/debugFiles.tgz
+DEBUG 2016-12-13 10:38:18,391: 	 Uploading archive /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_HighPU_Neutrino/inputs/debugFiles.tgz to the CRAB cache. Using URI https://cmsweb.cern.ch/crabcache
+DEBUG 2016-12-13 10:38:18,957: 	 Result uploading input files: 89b7cbdbf0ef2c890fbed343f20963960fd382b0d3638091a2e8ccfd9329e53d.tar.gz 
+WARNING 2016-12-13 10:38:18,958: 	 Warning: The following output files will not be published, as they are not EDM files: ['muonPOGNtuple_highPU_Neutrino.root']
+INFO 2016-12-13 10:38:18,958: 	 Sending the request to the server
+DEBUG 2016-12-13 10:38:18,958: 	 Submitting {'maxjobruntime': 1250, 'extrajdl': [], 'ignorelocality': 0, 'savelogsflag': 0, 'useparent': 0, 'asyncdest': 'T2_CH_CERN', 'algoargs': 150, 'cachefilename': '89b7cbdbf0ef2c890fbed343f20963960fd382b0d3638091a2e8ccfd9329e53d.tar.gz', 'numcores': 1, 'addoutputfiles': [], 'generator': 'pythia', 'maxmemory': 2000, 'publishdbsurl': 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter', 'priority': 10, 'jobsw': 'CMSSW_8_0_20', 'edmoutfiles': [], 'userfiles': [], 'primarydataset': '', 'inputdata': '/SingleNeutrino/RunIIHighPUTrainsDR-HighPUTrains_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 'lfn': '/store/group/phys_muon/calderon/NTuplesMuonPOG/', 'dryrun': 0, 'workflow': 'crab_HighPU_Neutrino', 'adduserfiles': [], 'nonprodsw': 1, 'tfileoutfiles': ['muonPOGNtuple_highPU_Neutrino.root'], 'oneEventMode': 0, 'debugfilename': 'c895b19d577e7d28bb08d559b30b9ba988c67266e48b914912192e86c6660288.tar.gz', 'cacheurl': u'https://cmsweb.cern.ch/crabcache', 'saveoutput': 1, 'publication': 1, 'jobarch': 'slc6_amd64_gcc530', 'totalunits': 0, 'splitalgo': 'LumiBased', 'ignoreglobalblacklist': 0, 'nonvaliddata': 0, 'dbsurl': 'https://cmsweb.cern.ch/dbs/prod/global/DBSReader', 'publishgroupname': 0, 'jobtype': 'Analysis', 'publishname2': ''} 
+DEBUG 2016-12-13 10:38:18,959: 	 Encoded submit request: maxjobruntime=1250&ignorelocality=0&savelogsflag=0&useparent=0&asyncdest=T2_CH_CERN&algoargs=150&cachefilename=89b7cbdbf0ef2c890fbed343f20963960fd382b0d3638091a2e8ccfd9329e53d.tar.gz&numcores=1&generator=pythia&maxmemory=2000&publishdbsurl=https%3A%2F%2Fcmsweb.cern.ch%2Fdbs%2Fprod%2Fphys03%2FDBSWriter&priority=10&jobsw=CMSSW_8_0_20&primarydataset=&inputdata=%2FSingleNeutrino%2FRunIIHighPUTrainsDR-HighPUTrains_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1%2FAODSIM&lfn=%2Fstore%2Fgroup%2Fphys_muon%2Fcalderon%2FNTuplesMuonPOG%2F&dryrun=0&workflow=crab_HighPU_Neutrino&nonprodsw=1&oneEventMode=0&debugfilename=c895b19d577e7d28bb08d559b30b9ba988c67266e48b914912192e86c6660288.tar.gz&cacheurl=https%3A%2F%2Fcmsweb.cern.ch%2Fcrabcache&saveoutput=1&publication=1&jobarch=slc6_amd64_gcc530&totalunits=0&splitalgo=LumiBased&ignoreglobalblacklist=0&nonvaliddata=0&dbsurl=https%3A%2F%2Fcmsweb.cern.ch%2Fdbs%2Fprod%2Fglobal%2FDBSReader&publishgroupname=0&jobtype=Analysis&publishname2=&tfileoutfiles=muonPOGNtuple_highPU_Neutrino.root
+DEBUG 2016-12-13 10:38:20,702: 	 Result: {u'result': [{u'RequestName': u'161213_093819:calderon_crab_HighPU_Neutrino'}]}
+INFO 2016-12-13 10:38:20,705: 	 Success: Your task has been delivered to the CRAB3 server.
+INFO 2016-12-13 10:38:20,705: 	 Task name: 161213_093819:calderon_crab_HighPU_Neutrino
+INFO 2016-12-13 10:38:20,705: 	 Please use 'crab status' to check how the submission process proceeds.
+DEBUG 2016-12-13 10:38:20,706: 	 About to return
+INFO 2016-12-13 10:38:20,709: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_HighPU_Neutrino/crab.log
+DEBUG 2016-12-14 15:06:50,960: 	 Executing command: 'status'
+DEBUG 2016-12-14 15:06:50,960: 	 Found CRAB cache file /afs/cern.ch/user/c/calderon/.crab3
+DEBUG 2016-12-14 15:06:50,987: 	 Checking credentials
+DEBUG 2016-12-14 15:06:50,988: 	 Proxy file /tmp/x509up_u15250 not found
+DEBUG 2016-12-14 15:06:50,988: 	 Creating new proxy for 24:00 hours with VO group '' and VO role 'NULL'.
+DEBUG 2016-12-14 15:06:57,355: 	 Executing : 
+ command : voms-proxy-init -voms cms:/cms -valid 24:00 -rfc
+ output : None
+ error: None
+ retcode : 0
+DEBUG 2016-12-14 15:06:58,061: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 86399
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-14 15:06:58,867: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 86397
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-14 15:06:59,498: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u15250 voms-proxy-info -fqan
+ output : /cms/Role=NULL/Capability=NULL
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-14 15:06:59,498: 	 Proxy created.
+DEBUG 2016-12-14 15:06:59,661: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-14 15:06:59,662: 	 Checking credentials
+DEBUG 2016-12-14 15:06:59,662: 	 Found proxy file /tmp/x509up_u15250
+DEBUG 2016-12-14 15:06:59,662: 	 Getting proxy life time left
+DEBUG 2016-12-14 15:07:00,375: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -timeleft
+ output : 86396
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-14 15:07:00,983: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u15250 -actimeleft
+ output : 86395
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-14 15:07:00,983: 	 Proxy valid for 23:59:56 hours
+DEBUG 2016-12-14 15:07:01,379: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+DEBUG 2016-12-14 15:07:01,490: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-14 15:07:01,490: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2016-12-14 15:07:01,490: 	 Calculating hash of /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon_cmsweb.cern.ch for credential name
+DEBUG 2016-12-14 15:07:01,801: 	 Executing : 
+ command : myproxy-info -l 05162609e2b2f4bf9da215d9d271987f01b8af73 -s myproxy.cern.ch
+ output : username: 05162609e2b2f4bf9da215d9d271987f01b8af73
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=calderon/CN=602442/CN=Alicia Calderon Tazon
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(045|052|021|031|0118|0118a|0119|0108|0105).cern.ch
+  timeleft: 504:10:57  (21.0 days)
+
+ error: 
+ retcode : 0
+DEBUG 2016-12-14 15:07:01,802: 	 Myproxy is valid: 1815057
+DEBUG 2016-12-14 15:07:01,802: 	 Command use: status
+DEBUG 2016-12-14 15:07:01,802: 	 Options use: ['crab_HighPU_Neutrino']
+DEBUG 2016-12-14 15:07:02,972: 	 CRABClient version: 3.3.1611
+DEBUG 2016-12-14 15:07:02,972: 	 Instance is prod
+DEBUG 2016-12-14 15:07:02,972: 	 Server base url is cmsweb.cern.ch
+DEBUG 2016-12-14 15:07:02,972: 	 Command url /crabserver/prod/workflow
+DEBUG 2016-12-14 15:07:02,973: 	 Looking up detailed status of task 161213_093819:calderon_crab_HighPU_Neutrino
+DEBUG 2016-12-14 15:07:04,086: 	 {u'status': u'COMPLETED', u'username': u'calderon', u'jobsPerStatus': {u'finished': 4}, u'jobs': {u'1': {u'State': u'finished'}, u'3': {u'State': u'finished'}, u'2': {u'State': u'finished'}, u'4': {u'State': u'finished'}}, u'publication': {}, u'taskWarningMsg': [], u'schedd': u'crab3@vocms0120.cern.ch', u'publicationFailures': {}, u'outdatasets': None, u'statusFailureMsg': u'', u'taskFailureMsg': u'', u'failedJobdefs': 0, u'ASOURL': u'https://cmsweb.cern.ch/couchdb2', u'command': u'SUBMIT', u'totalJobdefs': 0, u'submissionTime': 1481621900, u'jobdefErrors': [], u'collector': u'cmsgwms-collector-global.cern.ch,cmssrv221.fnal.gov', u'jobList': [[u'finished', 1], [u'finished', 3], [u'finished', 2], [u'finished', 4]]}
+INFO 2016-12-14 15:07:04,087: 	 CRAB project directory:		/afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_HighPU_Neutrino
+INFO 2016-12-14 15:07:04,087: 	 Task name:			161213_093819:calderon_crab_HighPU_Neutrino
+INFO 2016-12-14 15:07:04,087: 	 Grid scheduler:			crab3@vocms0120.cern.ch
+INFO 2016-12-14 15:07:04,087: 	 Task status:			COMPLETED
+INFO 2016-12-14 15:07:04,087: 	 Dashboard monitoring URL:	http://dashb-cms-job.cern.ch/dashboard/templates/task-analysis/#user=calderon&table=Mains&pattern=161213_093819%3Acalderon_crab_HighPU_Neutrino
+INFO 2016-12-14 15:07:04,087: 	 
+Jobs status:			finished      100.0% (4/4)
+INFO 2016-12-14 15:07:04,087: 	 
+No publication information available yet
+INFO 2016-12-14 15:07:04,118: 	 Log file is /afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/test/crab/crab_HighPU_Neutrino/crab.log

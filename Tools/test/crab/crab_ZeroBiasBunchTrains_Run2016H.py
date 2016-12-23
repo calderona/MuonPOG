@@ -3,26 +3,26 @@ config = Configuration()
 
 config.section_('General')
 config.General.transferOutputs = True
-config.General.requestName = 'SingleMuonRun2016B_23SepReReco_Run274241'
+config.General.requestName = 'ZeroBiasBunchTrains5_Run2016H'
 
 config.section_('JobType')
 config.JobType.pluginName  = 'Analysis'
 config.JobType.psetName    = '../muonPogNtuples_cfg.py'
 #config.JobType.outputFiles = ['muonNTuple.root']
-config.JobType.pyCfgParams = ['globalTag=80X_dataRun2_2016SeptRepro_v3',
-                              'ntupleName=muonPOGNtuple_SingleMuonRun2016B_23SepReReco.root',
+config.JobType.pyCfgParams = ['globalTag=80X_dataRun2_SPECIALHIGHPUFILL_v0',
+                              'ntupleName=muonPOGNtuple_ZeroBiasBunchTrains5_Run2016H.root',
                               'nEvents=-1',
                               'runOnMC=False',
-                              'hltPathFilter=all',
-                              'minMuPt=10.0',
-                              'minNMu=2'
+                              'hltPathFilter=all'
                ]
 config.JobType.allowUndistributedCMSSW = True  # To fix cmssw releases
 
 config.section_('Data')
-config.Data.inputDataset = '/SingleMuon/Run2016B-23Sep2016-v2/AOD'
+config.Data.inputDataset = '/ZeroBiasBunchTrains5/Run2016H-09Nov2016-v1/AOD'
 
-config.Data.runRange = '274241'
+#config.Data.inputDataset = '/ZeroBiasIsolatedBunch/Run2016H-09Nov2016-v1/AOD'
+
+#config.Data.runRange = '273299'
 #config.Data.allowNonValidInputDataset = True
 
 config.Data.splitting    = 'LumiBased'

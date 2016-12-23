@@ -3,26 +3,27 @@ config = Configuration()
 
 config.section_('General')
 config.General.transferOutputs = True
-config.General.requestName = 'SingleMuonRun2016G_23SepReReco_Run280385'
+config.General.requestName = 'HighPU_DY'
 
 config.section_('JobType')
-config.JobType.pluginName  = 'Analysis'
+config.JobType.pluginName  = 'ANALYSIS'
 config.JobType.psetName    = '../muonPogNtuples_cfg.py'
 #config.JobType.outputFiles = ['muonNTuple.root']
-config.JobType.pyCfgParams = ['globalTag=80X_dataRun2_2016SeptRepro_v3',
-                              'ntupleName=muonPOGNtuple_SingleMuonRun2016G_23SepReReco.root',
+config.JobType.pyCfgParams = ['globalTag=80X_mcRun2_asymptotic_2016_TrancheIV_v6',
+                              'ntupleName=muonPOGNtuple_highPU_DY.root',
                               'nEvents=-1',
-                              'runOnMC=False',
-                              'hltPathFilter=all',
-                              'minMuPt=10.0',
-                              'minNMu=2'
+                              'runOnMC=True',
+                              'hltPathFilter=all'
                ]
+
 config.JobType.allowUndistributedCMSSW = True  # To fix cmssw releases
 
 config.section_('Data')
-config.Data.inputDataset = '/SingleMuon/Run2016G-23Sep2016-v1/AOD'
+#config.Data.inputDataset = '/ZeroBiasBunchTrains5/Run2016H-09Nov2016-v1/AOD'
 
-config.Data.runRange = '280385'
+config.Data.inputDataset = '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIHighPUTrainsDR-HighPUTrains_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM'
+
+#config.Data.runRange = '273299'
 #config.Data.allowNonValidInputDataset = True
 
 config.Data.splitting    = 'LumiBased'
