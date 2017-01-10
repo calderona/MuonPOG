@@ -110,6 +110,7 @@ private:
   edm::EDGetTokenT<edm::View<reco::Track> > adHocTrackToken_;
   std::string adHocTrackLabel_;  
   
+  bool isMINIAOD_;
 
 };
 
@@ -142,7 +143,8 @@ MuonEventDumper::MuonEventDumper( const edm::ParameterSet & cfg )
   tag = cfg.getUntrackedParameter<edm::InputTag>("AdHocTrackTag", edm::InputTag("AdHocTracks"));
   if (tag.label() != "none") adHocTrackToken_ = consumes<edm::View<reco::Track> >(tag);
 
-  adHocTrackLabel_ = tag.encode();
+  isMINIAOD_= cfg.getUntrackedParameter<bool>("isMINIAOD");
+	     //if (tag.label() != "none") isMINIAOD_ = tag;
 
 }
 
@@ -208,10 +210,12 @@ void MuonEventDumper::analyze (const edm::Event & ev, const edm::EventSetup &)
   if (muons.isValid() && vertexes.isValid() && beamSpot.isValid()) 
     printMuons(muons,vertexes,beamSpot);
 
-  auto tracks = conditionalGet<edm::View<reco::Track> >(ev,adHocTrackToken_, "AdHocTracks");
+  if ( !isMINIAOD_) {
 
-  if (tracks.isValid())
-    {
+    auto tracks = conditionalGet<edm::View<reco::Track> >(ev,adHocTrackToken_, "AdHocTracks");
+
+    if (tracks.isValid() )
+      {
       std::cout << "Ad-hoc trackcollection is " + adHocTrackLabel_ + " and has size: " << tracks->size() << std::endl;
 
       edm::View<reco::Track> ::const_iterator trackIt  = tracks->begin();
@@ -221,7 +225,8 @@ void MuonEventDumper::analyze (const edm::Event & ev, const edm::EventSetup &)
 	{
 	  printTrack(&(*trackIt),adHocTrackLabel_);
 	}      
-    }
+      }
+  }
   
 }
 
@@ -453,16 +458,73 @@ void MuonEventDumper::printMuons(const edm::Handle<edm::View<reco::Muon> > & muo
   std::cout << "[MuonEventDumper::printMuons]: " << std::endl;
   std::cout << "[MUON COLLECTION SIZE]: " << muons->size() << std::endl;
 
-  edm::View<reco::Muon> ::const_iterator muonIt  = muons->begin();
+  edm::View<reco::Muon> ::const_iterator muonIt1  = muons->begin();
+  edm::View<reco::Muon> ::const_iterator muonIt2  = muonIt1+1;
+
   edm::View<reco::Muon> ::const_iterator muonEnd = muons->end();
+
+  float minDR = 999;
+   edm::View<reco::Muon> ::const_iterator muA = muonIt1;
+   edm::View<reco::Muon> ::const_iterator muB = muonIt1;
+
+  if (muons->size() > 1) {
+
+    for (; muonIt1 != muonEnd; ++muonIt1) {
+      for (; muonIt2 != muonEnd; ++muonIt2) {
+ 
+	if (muonIt1 == muonIt2) continue;
+
+	const reco::Muon& mu1 = (*(muonIt1));
+	const reco::Muon& mu2 = (*(muonIt2));
+
+	float deta = mu1.eta() - mu2.eta();
+	float dphi = mu1.phi() - mu2.phi();
+	
+	float dR = sqrt(deta*deta + dphi*dphi);
+      
+	if (dR < minDR) {
+	  minDR = dR; 
+	  muA = muonIt1;
+	  muB = muonIt2;
+	} 
+      
+      }
+    }  
+  }
+
+
+  std::cout << " Min DR:: " << minDR << std::endl;
+  
+  if ( minDR < 0.2 ) {
+
+  edm::View<reco::Muon> ::const_iterator muonIt  = muons->begin();
+
+  int idx = 0; 
+
+
+
+  // check overlap between muons 
+
+  // shared segmets 
+  int nSharedSeg = muon::sharedSegments(*muA, *muB);
+
+  std::cout << "Number of segments shared: " << nSharedSeg << std::endl;
+
 
   for (; muonIt != muonEnd; ++muonIt) 
     {
 
+      if ( muonIt != muA && muonIt != muB ) continue;
+
       const reco::Muon& mu = (*muonIt);
       const reco::Vertex & vertex = vertexes->at(0); // CB for now vertex is always valid, but add a protection	    
 
-      std::cout << "[MUON DETAILS]: " << std::endl;
+
+     std::cout << "[MUON DETAILS]: " << idx << std::endl;
+
+
+      //if ( !mu.isPFMuon() ) continue; 
+      //if ( mu.muonBestTrack()->pt() < 100 ) continue;
       
       std::cout << "It is a : "
 		<< (mu.isStandAloneMuon() ? "STANDALONE " : "")
@@ -552,8 +614,11 @@ void MuonEventDumper::printMuons(const edm::Handle<edm::View<reco::Muon> > & muo
       printPFIsolation(isoPF03,"0.3");
       printPFIsolation(isoPF04,"0.4");
 
+     idx++;
+
     }
 
+  }
 }
 
 void MuonEventDumper::printIsolation( const reco::MuonIsolation & iso, const std::string & cone) const
@@ -717,6 +782,7 @@ bool MuonEventDumper::isIsolatedMuon( const reco::Muon& muon ) const
   else return false;
 
 }
+
 
 
 #include "FWCore/Framework/interface/MakerMacros.h"
