@@ -266,7 +266,7 @@ int main(int argc, char* argv[]){
           ev->genInfos[0].genWeight/fabs(ev->genInfos[0].genWeight) : 1.;
 
 	  if(plotter.m_sampleConfig.applyReweighting==true)
-	    weight *= ev->nVtx < 60 ? tnpConfig.pu_weights[ev->nVtx] : 0;
+	    weight *= ev->nVtx < 200 ? tnpConfig.pu_weights[ev->nVtx] : 0;
 	    
 	  plotter.fill(ev->muons, ev->hlt, ev->nVtx, weight, ev->runNumber);
 	}
@@ -631,7 +631,7 @@ void muon_pog::Plotter::book(TFile *outFile)
   
   m_plots[CONT]["01-invMass"] = muon_pog::Observable("invMass", sampleTag ,"mass (GeV)", "# entries", 100,0.,200., false);
   m_plots[CONT]["02-dilepPt"] = muon_pog::Observable("dilepPt", sampleTag ,"p_{T} (GeV)", "# entries", 100,0.,200., false);
-  m_plots[CONT]["03-nVertices"] = muon_pog::Observable("nVertices", sampleTag ,"# vertices", "# entries", 60,0.,60., false);
+  m_plots[CONT]["03-nVertices"] = muon_pog::Observable("nVertices", sampleTag ,"# vertices", "# entries", 180,0.,180., false);
   m_plots[CONT]["04-runNumber"] = muon_pog::Observable("runNumber", sampleTag ,"run number", "# entries", 9000,253000.,262000., false);
 
   m_plots[CONT]["99-invMassInRange"] = muon_pog::Observable("invMassInRange", sampleTag ,"mass (GeV)", "# entries", 100,0.,200., false);
