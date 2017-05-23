@@ -56,10 +56,29 @@ namespace muon_pog
 
   // Returns the charge muon_pog::Muon for a given fit 
   // Valid track fits are: PF, TUNEP, GLB, INNER 
-  Int_t chargeFromTrk(const muon_pog::Muon & muon, 
+  Int_t chargeFromTrk(muon_pog::Muon & muon, 
 		      const std::string & trackType)
   {
 
+
+    if (trackType == "PF")         return muon.fitCharge(muon_pog::MuonFitType::DEFAULT);
+    else if (trackType == "TUNEP") return muon.fitCharge(muon_pog::MuonFitType::TUNEP);
+    else if (trackType == "GLB")   return muon.fitCharge(muon_pog::MuonFitType::GLB);
+    else if (trackType == "INNER") return muon.fitCharge(muon_pog::MuonFitType::INNER);
+    else if (trackType == "PICKY") return muon.fitCharge(muon_pog::MuonFitType::PICKY);
+    else if (trackType == "DYT") return muon.fitCharge(muon_pog::MuonFitType::DYT);
+    else if (trackType == "TPFMS") return muon.fitCharge(muon_pog::MuonFitType::TPFMS);
+
+    else
+      {
+	std::cout << "[Plotter::chargeFromTrk]: Invalid track type: "
+		  << trackType << std::endl;
+	exit(900);
+      }
+
+    return 999;
+
+    /*
     if (trackType == "PF")         return muon.charge;
     else if (trackType == "TUNEP") return muon.charge_tuneP;
     else if (trackType == "GLB")   return muon.charge_global;
@@ -72,7 +91,8 @@ namespace muon_pog
       }
 
     return 999;
-    
+    */
+
   }
 
 
@@ -82,6 +102,35 @@ namespace muon_pog
 			const std::string & trackType)
   {
 
+
+    TLorentzVector result;
+    muon_pog::MuonFit fit;
+    if (trackType == "PF")
+      fit = muon.fits.at(muon_pog::MuonFitType::DEFAULT);
+    else if (trackType == "TUNEP")
+      fit = muon.fits.at(muon_pog::MuonFitType::TUNEP);
+    else if (trackType == "GLB")
+      fit = muon.fits.at(muon_pog::MuonFitType::GLB);
+    else if (trackType == "INNER")
+      fit = muon.fits.at(muon_pog::MuonFitType::INNER);
+    else if (trackType == "PICKY")
+      fit = muon.fits.at(muon_pog::MuonFitType::PICKY);
+    else if (trackType == "DYT")
+      fit = muon.fits.at(muon_pog::MuonFitType::DYT);
+    else if (trackType == "TPFMS")
+      fit = muon.fits.at(muon_pog::MuonFitType::TPFMS);
+    else
+      {
+	std::cout << "[Plotter::muonTk]: Invalid track type: "
+		  << trackType << std::endl;
+	exit(900);
+      }
+
+    result.SetPtEtaPhiM(fit.pt,fit.eta,fit.phi,.10565);
+    return result;
+
+
+    /*
     TLorentzVector result; 
     if (trackType == "PF")
       result.SetPtEtaPhiM(muon.pt,muon.eta,muon.phi,.10565);
@@ -99,7 +148,7 @@ namespace muon_pog
       }
 
     return result;
-    
+    */
   }
 
 
