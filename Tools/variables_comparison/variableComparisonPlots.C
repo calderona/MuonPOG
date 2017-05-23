@@ -145,7 +145,7 @@ namespace muon_pog {
     ~Plotter() {};
     
     void book(TFile *outFile);
-    void fill(const std::vector<muon_pog::Muon> & muons, const muon_pog::HLT & hlt, int nVtx, float weight, int run);
+    void fill(std::vector<muon_pog::Muon> & muons, const muon_pog::HLT & hlt, int nVtx, float weight, int run);
 
     std::map<Plotter::HistoType, std::map<TString, muon_pog::Observable> > m_plots;
     TagAndProbeConfig m_tnpConfig;
@@ -642,7 +642,7 @@ void muon_pog::Plotter::book(TFile *outFile)
 
 }
 
-void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
+void muon_pog::Plotter::fill( std::vector<muon_pog::Muon> & muons,
 			     const muon_pog::HLT & hlt, int nVtx, float weight, Int_t run_)
 {
   
@@ -676,7 +676,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
   if (!muon_pog::pathHasFired(hlt,m_tnpConfig.hlt_path) && !m_sampleConfig.noTrigger) return;
   //if (!muon_pog::pathHasFired(hlt,m_tnpConfig.hlt_path)) return;
 
-  std::vector<const muon_pog::Muon *> tagMuons;
+  std::vector< muon_pog::Muon *> tagMuons;
   
   for (auto & muon : muons)
     {
@@ -692,14 +692,14 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 	tagMuons.push_back(&muon);
     }
   
-  std::vector<const muon_pog::Muon *> probeMuons;
+  std::vector<muon_pog::Muon *> probeMuons;
   
 
   for (auto & muon : muons)
     {
       for (auto tagMuonPointer : tagMuons)
 	{
-	  const muon_pog::Muon & tagMuon = *tagMuonPointer;
+	   muon_pog::Muon & tagMuon = *tagMuonPointer;
 	  
 	  if ( tagMuonPointer != &muon && 
 	       muon_pog::chargeFromTrk(tagMuon,m_tnpConfig.muon_trackType) *
@@ -919,7 +919,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
   
   for (auto probeMuonPointer : probeMuons)
     {
-      const muon_pog::Muon & probeMuon = *probeMuonPointer;
+       muon_pog::Muon & probeMuon = *probeMuonPointer;
       			  
       for (auto etaBin : m_tnpConfig.probe_etaBins)
 	{
@@ -968,9 +968,15 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 
 	      if (probeMuon.isGlobal)
 		{
-		  Float_t qOverPtTrk = probeMuon.charge_tracker / probeMuon.pt_tracker;
-		  Float_t qOverPtSta = probeMuon.charge_standalone / probeMuon.pt_standalone;
-		  Float_t qOverPtGlb = probeMuon.charge_global / probeMuon.pt_global;
+
+		  Float_t qOverPtTrk = probeMuon.fitCharge(muon_pog::MuonFitType::INNER) / probeMuon.fitPt(muon_pog::MuonFitType::INNER);
+		  Float_t qOverPtSta = probeMuon.fitCharge(muon_pog::MuonFitType::STA) / probeMuon.fitPt(muon_pog::MuonFitType::STA);
+		  Float_t qOverPtGlb = probeMuon.fitCharge(muon_pog::MuonFitType::GLB) / probeMuon.fitPt(muon_pog::MuonFitType::GLB);
+
+
+		  //Float_t qOverPtTrk = probeMuon.charge_tracker / probeMuon.pt_tracker;
+		  //Float_t qOverPtSta = probeMuon.charge_standalone / probeMuon.pt_standalone;
+		  //Float_t qOverPtGlb = probeMuon.charge_global / probeMuon.pt_global;
 
 		  m_plots[ID]["qOverPtTrkSta" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
 		  // m_plots[ID]["qOverPtTrkStaOverPt" + etaTag].fill((qOverPtSta - qOverPtTrk)/qOverPtTrk, probeMuTk, weight, nVtx);  
@@ -981,7 +987,8 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
 		  //     m_plots[ID]["qOverPtTrkGlbPlus" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
 		  //     m_plots[ID]["qOverPtTrkStaPlus" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
 		  //   }
-		  if (probeMuon.pt_tracker > 200)
+		  if (probeMuon.fitPt(muon_pog::MuonFitType::INNER) > 200)
+		  //if (probeMuon.pt_tracker > 200)
 		    {
 		      m_plots[ID]["qOverPtTrkSta200" + etaTag].fill(qOverPtSta - qOverPtTrk, probeMuTk, weight, nVtx);  
 		      m_plots[ID]["qOverPtTrkGlb200" + etaTag].fill(qOverPtGlb - qOverPtTrk, probeMuTk, weight, nVtx);  
