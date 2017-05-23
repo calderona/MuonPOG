@@ -99,6 +99,37 @@ namespace muon_pog {
     ClassDef(HitInfo,1)
   };
 
+  enum MuonFitType { DEFAULT=0, INNER, STA, GLB, TUNEP, PICKY, DYT, TPFMS};
+
+ class MuonFit {
+  public:
+    Float_t pt;  // pt [GeV]
+    Float_t eta; // eta
+    Float_t phi; // phi
+
+    Int_t   charge;    // charge
+
+    Float_t ptErr; // fit sigma pT
+
+    MuonFit(){};
+    MuonFit(Float_t in_pt,
+	    Float_t in_eta,
+	    Float_t in_phi,
+	    Int_t   in_charge,
+	    Float_t in_ptErr
+	    ) : pt(in_pt) ,
+                eta(in_eta) ,
+                phi(in_phi) ,
+                charge(in_charge) ,
+                ptErr(in_ptErr) {};
+    virtual ~MuonFit(){};
+
+    ClassDef(MuonFit,1)
+  };
+
+
+
+
   class Muon {
   public:
 
@@ -211,11 +242,37 @@ namespace muon_pog {
 
     std::vector<HitInfo> hits;
     std::vector<ChambMatch> matches;
+    std::vector<MuonFit> fits;
 
     Muon(){};
     virtual ~Muon(){};
 
-    ClassDef(Muon,3)
+    inline Float_t fitPt( const muon_pog::MuonFitType type )
+    {
+      return fits.at(type).pt;
+    };
+
+    inline Float_t fitEta( const muon_pog::MuonFitType type )
+    {
+      return fits.at(type).eta;
+    };
+
+    inline Float_t fitPhi( const muon_pog::MuonFitType type )
+    {
+      return fits.at(type).phi;
+    };
+
+    inline Int_t fitCharge( const muon_pog::MuonFitType type )
+    {
+      return fits.at(type).charge;
+    };
+
+    inline Float_t fitPtErr( const muon_pog::MuonFitType type )
+    {
+      return fits.at(type).ptErr;
+    };
+
+    ClassDef(Muon,4)
   };
 
   class HLTObject {
@@ -316,7 +373,7 @@ namespace muon_pog {
     Event(){};
     virtual ~Event(){};
 
-    ClassDef(Event,5)
+    ClassDef(Event,6)
   };
 
 }
