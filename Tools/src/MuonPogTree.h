@@ -272,7 +272,7 @@ namespace muon_pog {
       return fits.at(type).ptErr;
     };
 
-    ClassDef(Muon,4)
+    ClassDef(Muon,5)
   };
 
   class HLTObject {
