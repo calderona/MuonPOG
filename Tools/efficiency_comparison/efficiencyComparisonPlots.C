@@ -168,7 +168,7 @@ namespace muon_pog {
     ~Plotter() {};
     
     void book(TFile *outFile);
-    void fill(const std::vector<muon_pog::Muon> & muons, const muon_pog::HLT & hlt, const muon_pog::Event & ev, float weight);
+    void fill(std::vector<muon_pog::Muon> & muons, const muon_pog::HLT & hlt, const muon_pog::Event & ev, float weight);
 
     std::map<Plotter::HistoType, std::map<TString, muon_pog::Observable> > m_plots;
     std::map<Plotter::HistoType, std::map<TString, muon_pog::EffObservable> > m_effs;
@@ -611,7 +611,7 @@ void muon_pog::Plotter::book(TFile *outFile)
 
 }
 
-void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
+void muon_pog::Plotter::fill(std::vector<muon_pog::Muon> & muons,
 			     const muon_pog::HLT & hlt, const muon_pog::Event & ev, float weight)
 {
 
@@ -634,7 +634,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
   if (!muon_pog::pathHasFired(hlt,m_tnpConfig.hlt_path) && !m_sampleConfig.noTrigger) return;
   //if (!muon_pog::pathHasFired(hlt,m_tnpConfig.hlt_path)) return;
 
-  std::vector<const muon_pog::Muon *> tagMuons;
+  std::vector<muon_pog::Muon *> tagMuons;
 
   for (auto & muon : muons)
     {
@@ -652,13 +652,13 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
           }
     }
   
-  std::vector<const muon_pog::Muon *> probeMuons;
+  std::vector<muon_pog::Muon *> probeMuons;
   
   for (auto & muon : muons)
     {
       for (auto tagMuonPointer : tagMuons)
 	{
-	  const muon_pog::Muon & tagMuon = *tagMuonPointer;
+	  muon_pog::Muon & tagMuon = *tagMuonPointer;
 	  
 	  if ( tagMuonPointer != &muon && 
 	       muon_pog::chargeFromTrk(tagMuon,m_tnpConfig.muon_trackType) *
@@ -706,7 +706,7 @@ void muon_pog::Plotter::fill(const std::vector<muon_pog::Muon> & muons,
   
   for (auto probeMuonPointer : probeMuons)
     {
-      const muon_pog::Muon & probeMuon = *probeMuonPointer;
+      muon_pog::Muon & probeMuon = *probeMuonPointer;
    
       TLorentzVector probeMuTk(muonTk(probeMuon,m_tnpConfig.muon_trackType));
 	  

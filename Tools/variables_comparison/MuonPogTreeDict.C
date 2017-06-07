@@ -6,7 +6,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <string.h>
 #include <assert.h>
 #define G__DICTIONARY
@@ -43,38 +42,6 @@ namespace std {} using namespace std;
 // Header files passed via #pragma extra_include
 
 namespace ROOT {
-   static void *new_muon_pogcLcLEvent(void *p = 0);
-   static void *newArray_muon_pogcLcLEvent(Long_t size, void *p);
-   static void delete_muon_pogcLcLEvent(void *p);
-   static void deleteArray_muon_pogcLcLEvent(void *p);
-   static void destruct_muon_pogcLcLEvent(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::muon_pog::Event*)
-   {
-      ::muon_pog::Event *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::Event >(0);
-      static ::ROOT::TGenericClassInfo 
-         instance("muon_pog::Event", ::muon_pog::Event::Class_Version(), "MuonPOG/Tools/variables_comparison/../src/MuonPogTree.h", 294,
-                  typeid(::muon_pog::Event), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &::muon_pog::Event::Dictionary, isa_proxy, 4,
-                  sizeof(::muon_pog::Event) );
-      instance.SetNew(&new_muon_pogcLcLEvent);
-      instance.SetNewArray(&newArray_muon_pogcLcLEvent);
-      instance.SetDelete(&delete_muon_pogcLcLEvent);
-      instance.SetDeleteArray(&deleteArray_muon_pogcLcLEvent);
-      instance.SetDestructor(&destruct_muon_pogcLcLEvent);
-      return &instance;
-   }
-   TGenericClassInfo *GenerateInitInstance(const ::muon_pog::Event*)
-   {
-      return GenerateInitInstanceLocal((::muon_pog::Event*)0);
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::muon_pog::Event*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-} // end of namespace ROOT
-
-namespace ROOT {
    static void *new_muon_pogcLcLGenInfo(void *p = 0);
    static void *newArray_muon_pogcLcLGenInfo(Long_t size, void *p);
    static void delete_muon_pogcLcLGenInfo(void *p);
@@ -87,7 +54,7 @@ namespace ROOT {
       ::muon_pog::GenInfo *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::GenInfo >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("muon_pog::GenInfo", ::muon_pog::GenInfo::Class_Version(), "MuonPOG/Tools/variables_comparison/../src/MuonPogTree.h", 12,
+         instance("muon_pog::GenInfo", ::muon_pog::GenInfo::Class_Version(), "../src/MuonPogTree.h", 12,
                   typeid(::muon_pog::GenInfo), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &::muon_pog::GenInfo::Dictionary, isa_proxy, 4,
                   sizeof(::muon_pog::GenInfo) );
@@ -119,7 +86,7 @@ namespace ROOT {
       ::muon_pog::GenParticle *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::GenParticle >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("muon_pog::GenParticle", ::muon_pog::GenParticle::Class_Version(), "MuonPOG/Tools/variables_comparison/../src/MuonPogTree.h", 23,
+         instance("muon_pog::GenParticle", ::muon_pog::GenParticle::Class_Version(), "../src/MuonPogTree.h", 23,
                   typeid(::muon_pog::GenParticle), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &::muon_pog::GenParticle::Dictionary, isa_proxy, 4,
                   sizeof(::muon_pog::GenParticle) );
@@ -151,7 +118,7 @@ namespace ROOT {
       ::muon_pog::METs *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::METs >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("muon_pog::METs", ::muon_pog::METs::Class_Version(), "MuonPOG/Tools/variables_comparison/../src/MuonPogTree.h", 47,
+         instance("muon_pog::METs", ::muon_pog::METs::Class_Version(), "../src/MuonPogTree.h", 47,
                   typeid(::muon_pog::METs), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &::muon_pog::METs::Dictionary, isa_proxy, 4,
                   sizeof(::muon_pog::METs) );
@@ -171,134 +138,6 @@ namespace ROOT {
 } // end of namespace ROOT
 
 namespace ROOT {
-   static void *new_muon_pogcLcLMuon(void *p = 0);
-   static void *newArray_muon_pogcLcLMuon(Long_t size, void *p);
-   static void delete_muon_pogcLcLMuon(void *p);
-   static void deleteArray_muon_pogcLcLMuon(void *p);
-   static void destruct_muon_pogcLcLMuon(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::muon_pog::Muon*)
-   {
-      ::muon_pog::Muon *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::Muon >(0);
-      static ::ROOT::TGenericClassInfo 
-         instance("muon_pog::Muon", ::muon_pog::Muon::Class_Version(), "MuonPOG/Tools/variables_comparison/../src/MuonPogTree.h", 102,
-                  typeid(::muon_pog::Muon), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &::muon_pog::Muon::Dictionary, isa_proxy, 4,
-                  sizeof(::muon_pog::Muon) );
-      instance.SetNew(&new_muon_pogcLcLMuon);
-      instance.SetNewArray(&newArray_muon_pogcLcLMuon);
-      instance.SetDelete(&delete_muon_pogcLcLMuon);
-      instance.SetDeleteArray(&deleteArray_muon_pogcLcLMuon);
-      instance.SetDestructor(&destruct_muon_pogcLcLMuon);
-      return &instance;
-   }
-   TGenericClassInfo *GenerateInitInstance(const ::muon_pog::Muon*)
-   {
-      return GenerateInitInstanceLocal((::muon_pog::Muon*)0);
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::muon_pog::Muon*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-} // end of namespace ROOT
-
-namespace ROOT {
-   static void *new_muon_pogcLcLL1Muon(void *p = 0);
-   static void *newArray_muon_pogcLcLL1Muon(Long_t size, void *p);
-   static void delete_muon_pogcLcLL1Muon(void *p);
-   static void deleteArray_muon_pogcLcLL1Muon(void *p);
-   static void destruct_muon_pogcLcLL1Muon(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::muon_pog::L1Muon*)
-   {
-      ::muon_pog::L1Muon *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::L1Muon >(0);
-      static ::ROOT::TGenericClassInfo 
-         instance("muon_pog::L1Muon", ::muon_pog::L1Muon::Class_Version(), "MuonPOG/Tools/variables_comparison/../src/MuonPogTree.h", 236,
-                  typeid(::muon_pog::L1Muon), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &::muon_pog::L1Muon::Dictionary, isa_proxy, 4,
-                  sizeof(::muon_pog::L1Muon) );
-      instance.SetNew(&new_muon_pogcLcLL1Muon);
-      instance.SetNewArray(&newArray_muon_pogcLcLL1Muon);
-      instance.SetDelete(&delete_muon_pogcLcLL1Muon);
-      instance.SetDeleteArray(&deleteArray_muon_pogcLcLL1Muon);
-      instance.SetDestructor(&destruct_muon_pogcLcLL1Muon);
-      return &instance;
-   }
-   TGenericClassInfo *GenerateInitInstance(const ::muon_pog::L1Muon*)
-   {
-      return GenerateInitInstanceLocal((::muon_pog::L1Muon*)0);
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::muon_pog::L1Muon*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-} // end of namespace ROOT
-
-namespace ROOT {
-   static void *new_muon_pogcLcLHLT(void *p = 0);
-   static void *newArray_muon_pogcLcLHLT(Long_t size, void *p);
-   static void delete_muon_pogcLcLHLT(void *p);
-   static void deleteArray_muon_pogcLcLHLT(void *p);
-   static void destruct_muon_pogcLcLHLT(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::muon_pog::HLT*)
-   {
-      ::muon_pog::HLT *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::HLT >(0);
-      static ::ROOT::TGenericClassInfo 
-         instance("muon_pog::HLT", ::muon_pog::HLT::Class_Version(), "MuonPOG/Tools/variables_comparison/../src/MuonPogTree.h", 256,
-                  typeid(::muon_pog::HLT), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &::muon_pog::HLT::Dictionary, isa_proxy, 4,
-                  sizeof(::muon_pog::HLT) );
-      instance.SetNew(&new_muon_pogcLcLHLT);
-      instance.SetNewArray(&newArray_muon_pogcLcLHLT);
-      instance.SetDelete(&delete_muon_pogcLcLHLT);
-      instance.SetDeleteArray(&deleteArray_muon_pogcLcLHLT);
-      instance.SetDestructor(&destruct_muon_pogcLcLHLT);
-      return &instance;
-   }
-   TGenericClassInfo *GenerateInitInstance(const ::muon_pog::HLT*)
-   {
-      return GenerateInitInstanceLocal((::muon_pog::HLT*)0);
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::muon_pog::HLT*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-} // end of namespace ROOT
-
-namespace ROOT {
-   static void *new_muon_pogcLcLHLTObject(void *p = 0);
-   static void *newArray_muon_pogcLcLHLTObject(Long_t size, void *p);
-   static void delete_muon_pogcLcLHLTObject(void *p);
-   static void deleteArray_muon_pogcLcLHLTObject(void *p);
-   static void destruct_muon_pogcLcLHLTObject(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::muon_pog::HLTObject*)
-   {
-      ::muon_pog::HLTObject *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::HLTObject >(0);
-      static ::ROOT::TGenericClassInfo 
-         instance("muon_pog::HLTObject", ::muon_pog::HLTObject::Class_Version(), "MuonPOG/Tools/variables_comparison/../src/MuonPogTree.h", 221,
-                  typeid(::muon_pog::HLTObject), ::ROOT::Internal::DefineBehavior(ptr, ptr),
-                  &::muon_pog::HLTObject::Dictionary, isa_proxy, 4,
-                  sizeof(::muon_pog::HLTObject) );
-      instance.SetNew(&new_muon_pogcLcLHLTObject);
-      instance.SetNewArray(&newArray_muon_pogcLcLHLTObject);
-      instance.SetDelete(&delete_muon_pogcLcLHLTObject);
-      instance.SetDeleteArray(&deleteArray_muon_pogcLcLHLTObject);
-      instance.SetDestructor(&destruct_muon_pogcLcLHLTObject);
-      return &instance;
-   }
-   TGenericClassInfo *GenerateInitInstance(const ::muon_pog::HLTObject*)
-   {
-      return GenerateInitInstanceLocal((::muon_pog::HLTObject*)0);
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::muon_pog::HLTObject*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-} // end of namespace ROOT
-
-namespace ROOT {
    static void *new_muon_pogcLcLChambMatch(void *p = 0);
    static void *newArray_muon_pogcLcLChambMatch(Long_t size, void *p);
    static void delete_muon_pogcLcLChambMatch(void *p);
@@ -311,7 +150,7 @@ namespace ROOT {
       ::muon_pog::ChambMatch *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::ChambMatch >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("muon_pog::ChambMatch", ::muon_pog::ChambMatch::Class_Version(), "MuonPOG/Tools/variables_comparison/../src/MuonPogTree.h", 61,
+         instance("muon_pog::ChambMatch", ::muon_pog::ChambMatch::Class_Version(), "../src/MuonPogTree.h", 61,
                   typeid(::muon_pog::ChambMatch), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &::muon_pog::ChambMatch::Dictionary, isa_proxy, 4,
                   sizeof(::muon_pog::ChambMatch) );
@@ -343,7 +182,7 @@ namespace ROOT {
       ::muon_pog::HitInfo *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::HitInfo >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("muon_pog::HitInfo", ::muon_pog::HitInfo::Class_Version(), "MuonPOG/Tools/variables_comparison/../src/MuonPogTree.h", 84,
+         instance("muon_pog::HitInfo", ::muon_pog::HitInfo::Class_Version(), "../src/MuonPogTree.h", 84,
                   typeid(::muon_pog::HitInfo), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &::muon_pog::HitInfo::Dictionary, isa_proxy, 4,
                   sizeof(::muon_pog::HitInfo) );
@@ -363,6 +202,166 @@ namespace ROOT {
 } // end of namespace ROOT
 
 namespace ROOT {
+   static void *new_muon_pogcLcLMuonFit(void *p = 0);
+   static void *newArray_muon_pogcLcLMuonFit(Long_t size, void *p);
+   static void delete_muon_pogcLcLMuonFit(void *p);
+   static void deleteArray_muon_pogcLcLMuonFit(void *p);
+   static void destruct_muon_pogcLcLMuonFit(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::muon_pog::MuonFit*)
+   {
+      ::muon_pog::MuonFit *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::MuonFit >(0);
+      static ::ROOT::TGenericClassInfo 
+         instance("muon_pog::MuonFit", ::muon_pog::MuonFit::Class_Version(), "../src/MuonPogTree.h", 104,
+                  typeid(::muon_pog::MuonFit), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &::muon_pog::MuonFit::Dictionary, isa_proxy, 4,
+                  sizeof(::muon_pog::MuonFit) );
+      instance.SetNew(&new_muon_pogcLcLMuonFit);
+      instance.SetNewArray(&newArray_muon_pogcLcLMuonFit);
+      instance.SetDelete(&delete_muon_pogcLcLMuonFit);
+      instance.SetDeleteArray(&deleteArray_muon_pogcLcLMuonFit);
+      instance.SetDestructor(&destruct_muon_pogcLcLMuonFit);
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::muon_pog::MuonFit*)
+   {
+      return GenerateInitInstanceLocal((::muon_pog::MuonFit*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::muon_pog::MuonFit*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+} // end of namespace ROOT
+
+namespace ROOT {
+   static void *new_muon_pogcLcLMuon(void *p = 0);
+   static void *newArray_muon_pogcLcLMuon(Long_t size, void *p);
+   static void delete_muon_pogcLcLMuon(void *p);
+   static void deleteArray_muon_pogcLcLMuon(void *p);
+   static void destruct_muon_pogcLcLMuon(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::muon_pog::Muon*)
+   {
+      ::muon_pog::Muon *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::Muon >(0);
+      static ::ROOT::TGenericClassInfo 
+         instance("muon_pog::Muon", ::muon_pog::Muon::Class_Version(), "../src/MuonPogTree.h", 133,
+                  typeid(::muon_pog::Muon), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &::muon_pog::Muon::Dictionary, isa_proxy, 4,
+                  sizeof(::muon_pog::Muon) );
+      instance.SetNew(&new_muon_pogcLcLMuon);
+      instance.SetNewArray(&newArray_muon_pogcLcLMuon);
+      instance.SetDelete(&delete_muon_pogcLcLMuon);
+      instance.SetDeleteArray(&deleteArray_muon_pogcLcLMuon);
+      instance.SetDestructor(&destruct_muon_pogcLcLMuon);
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::muon_pog::Muon*)
+   {
+      return GenerateInitInstanceLocal((::muon_pog::Muon*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::muon_pog::Muon*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+} // end of namespace ROOT
+
+namespace ROOT {
+   static void *new_muon_pogcLcLHLTObject(void *p = 0);
+   static void *newArray_muon_pogcLcLHLTObject(Long_t size, void *p);
+   static void delete_muon_pogcLcLHLTObject(void *p);
+   static void deleteArray_muon_pogcLcLHLTObject(void *p);
+   static void destruct_muon_pogcLcLHLTObject(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::muon_pog::HLTObject*)
+   {
+      ::muon_pog::HLTObject *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::HLTObject >(0);
+      static ::ROOT::TGenericClassInfo 
+         instance("muon_pog::HLTObject", ::muon_pog::HLTObject::Class_Version(), "../src/MuonPogTree.h", 278,
+                  typeid(::muon_pog::HLTObject), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &::muon_pog::HLTObject::Dictionary, isa_proxy, 4,
+                  sizeof(::muon_pog::HLTObject) );
+      instance.SetNew(&new_muon_pogcLcLHLTObject);
+      instance.SetNewArray(&newArray_muon_pogcLcLHLTObject);
+      instance.SetDelete(&delete_muon_pogcLcLHLTObject);
+      instance.SetDeleteArray(&deleteArray_muon_pogcLcLHLTObject);
+      instance.SetDestructor(&destruct_muon_pogcLcLHLTObject);
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::muon_pog::HLTObject*)
+   {
+      return GenerateInitInstanceLocal((::muon_pog::HLTObject*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::muon_pog::HLTObject*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+} // end of namespace ROOT
+
+namespace ROOT {
+   static void *new_muon_pogcLcLL1Muon(void *p = 0);
+   static void *newArray_muon_pogcLcLL1Muon(Long_t size, void *p);
+   static void delete_muon_pogcLcLL1Muon(void *p);
+   static void deleteArray_muon_pogcLcLL1Muon(void *p);
+   static void destruct_muon_pogcLcLL1Muon(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::muon_pog::L1Muon*)
+   {
+      ::muon_pog::L1Muon *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::L1Muon >(0);
+      static ::ROOT::TGenericClassInfo 
+         instance("muon_pog::L1Muon", ::muon_pog::L1Muon::Class_Version(), "../src/MuonPogTree.h", 293,
+                  typeid(::muon_pog::L1Muon), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &::muon_pog::L1Muon::Dictionary, isa_proxy, 4,
+                  sizeof(::muon_pog::L1Muon) );
+      instance.SetNew(&new_muon_pogcLcLL1Muon);
+      instance.SetNewArray(&newArray_muon_pogcLcLL1Muon);
+      instance.SetDelete(&delete_muon_pogcLcLL1Muon);
+      instance.SetDeleteArray(&deleteArray_muon_pogcLcLL1Muon);
+      instance.SetDestructor(&destruct_muon_pogcLcLL1Muon);
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::muon_pog::L1Muon*)
+   {
+      return GenerateInitInstanceLocal((::muon_pog::L1Muon*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::muon_pog::L1Muon*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+} // end of namespace ROOT
+
+namespace ROOT {
+   static void *new_muon_pogcLcLHLT(void *p = 0);
+   static void *newArray_muon_pogcLcLHLT(Long_t size, void *p);
+   static void delete_muon_pogcLcLHLT(void *p);
+   static void deleteArray_muon_pogcLcLHLT(void *p);
+   static void destruct_muon_pogcLcLHLT(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::muon_pog::HLT*)
+   {
+      ::muon_pog::HLT *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::HLT >(0);
+      static ::ROOT::TGenericClassInfo 
+         instance("muon_pog::HLT", ::muon_pog::HLT::Class_Version(), "../src/MuonPogTree.h", 313,
+                  typeid(::muon_pog::HLT), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &::muon_pog::HLT::Dictionary, isa_proxy, 4,
+                  sizeof(::muon_pog::HLT) );
+      instance.SetNew(&new_muon_pogcLcLHLT);
+      instance.SetNewArray(&newArray_muon_pogcLcLHLT);
+      instance.SetDelete(&delete_muon_pogcLcLHLT);
+      instance.SetDeleteArray(&deleteArray_muon_pogcLcLHLT);
+      instance.SetDestructor(&destruct_muon_pogcLcLHLT);
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::muon_pog::HLT*)
+   {
+      return GenerateInitInstanceLocal((::muon_pog::HLT*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::muon_pog::HLT*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+} // end of namespace ROOT
+
+namespace ROOT {
    static void *new_muon_pogcLcLEventId(void *p = 0);
    static void *newArray_muon_pogcLcLEventId(Long_t size, void *p);
    static void delete_muon_pogcLcLEventId(void *p);
@@ -375,7 +374,7 @@ namespace ROOT {
       ::muon_pog::EventId *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::EventId >(0);
       static ::ROOT::TGenericClassInfo 
-         instance("muon_pog::EventId", ::muon_pog::EventId::Class_Version(), "MuonPOG/Tools/variables_comparison/../src/MuonPogTree.h", 281,
+         instance("muon_pog::EventId", ::muon_pog::EventId::Class_Version(), "../src/MuonPogTree.h", 338,
                   typeid(::muon_pog::EventId), ::ROOT::Internal::DefineBehavior(ptr, ptr),
                   &::muon_pog::EventId::Dictionary, isa_proxy, 4,
                   sizeof(::muon_pog::EventId) );
@@ -394,43 +393,38 @@ namespace ROOT {
    static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::muon_pog::EventId*)0x0); R__UseDummy(_R__UNIQUE_(Init));
 } // end of namespace ROOT
 
-namespace muon_pog {
-//______________________________________________________________________________
-atomic_TClass_ptr Event::fgIsA(0);  // static to hold class pointer
+namespace ROOT {
+   static void *new_muon_pogcLcLEvent(void *p = 0);
+   static void *newArray_muon_pogcLcLEvent(Long_t size, void *p);
+   static void delete_muon_pogcLcLEvent(void *p);
+   static void deleteArray_muon_pogcLcLEvent(void *p);
+   static void destruct_muon_pogcLcLEvent(void *p);
 
-//______________________________________________________________________________
-const char *Event::Class_Name()
-{
-   return "muon_pog::Event";
-}
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::muon_pog::Event*)
+   {
+      ::muon_pog::Event *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TInstrumentedIsAProxy< ::muon_pog::Event >(0);
+      static ::ROOT::TGenericClassInfo 
+         instance("muon_pog::Event", ::muon_pog::Event::Class_Version(), "../src/MuonPogTree.h", 351,
+                  typeid(::muon_pog::Event), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &::muon_pog::Event::Dictionary, isa_proxy, 4,
+                  sizeof(::muon_pog::Event) );
+      instance.SetNew(&new_muon_pogcLcLEvent);
+      instance.SetNewArray(&newArray_muon_pogcLcLEvent);
+      instance.SetDelete(&delete_muon_pogcLcLEvent);
+      instance.SetDeleteArray(&deleteArray_muon_pogcLcLEvent);
+      instance.SetDestructor(&destruct_muon_pogcLcLEvent);
+      return &instance;
+   }
+   TGenericClassInfo *GenerateInitInstance(const ::muon_pog::Event*)
+   {
+      return GenerateInitInstanceLocal((::muon_pog::Event*)0);
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::muon_pog::Event*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+} // end of namespace ROOT
 
-//______________________________________________________________________________
-const char *Event::ImplFileName()
-{
-   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::Event*)0x0)->GetImplFileName();
-}
-
-//______________________________________________________________________________
-int Event::ImplFileLine()
-{
-   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::Event*)0x0)->GetImplFileLine();
-}
-
-//______________________________________________________________________________
-TClass *Event::Dictionary()
-{
-   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::Event*)0x0)->GetClass();
-   return fgIsA;
-}
-
-//______________________________________________________________________________
-TClass *Event::Class()
-{
-   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::Event*)0x0)->GetClass(); }
-   return fgIsA;
-}
-
-} // namespace muon_pog
 namespace muon_pog {
 //______________________________________________________________________________
 atomic_TClass_ptr GenInfo::fgIsA(0);  // static to hold class pointer
@@ -544,6 +538,117 @@ TClass *METs::Class()
 } // namespace muon_pog
 namespace muon_pog {
 //______________________________________________________________________________
+atomic_TClass_ptr ChambMatch::fgIsA(0);  // static to hold class pointer
+
+//______________________________________________________________________________
+const char *ChambMatch::Class_Name()
+{
+   return "muon_pog::ChambMatch";
+}
+
+//______________________________________________________________________________
+const char *ChambMatch::ImplFileName()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::ChambMatch*)0x0)->GetImplFileName();
+}
+
+//______________________________________________________________________________
+int ChambMatch::ImplFileLine()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::ChambMatch*)0x0)->GetImplFileLine();
+}
+
+//______________________________________________________________________________
+TClass *ChambMatch::Dictionary()
+{
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::ChambMatch*)0x0)->GetClass();
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+TClass *ChambMatch::Class()
+{
+   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::ChambMatch*)0x0)->GetClass(); }
+   return fgIsA;
+}
+
+} // namespace muon_pog
+namespace muon_pog {
+//______________________________________________________________________________
+atomic_TClass_ptr HitInfo::fgIsA(0);  // static to hold class pointer
+
+//______________________________________________________________________________
+const char *HitInfo::Class_Name()
+{
+   return "muon_pog::HitInfo";
+}
+
+//______________________________________________________________________________
+const char *HitInfo::ImplFileName()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HitInfo*)0x0)->GetImplFileName();
+}
+
+//______________________________________________________________________________
+int HitInfo::ImplFileLine()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HitInfo*)0x0)->GetImplFileLine();
+}
+
+//______________________________________________________________________________
+TClass *HitInfo::Dictionary()
+{
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HitInfo*)0x0)->GetClass();
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+TClass *HitInfo::Class()
+{
+   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HitInfo*)0x0)->GetClass(); }
+   return fgIsA;
+}
+
+} // namespace muon_pog
+namespace muon_pog {
+//______________________________________________________________________________
+atomic_TClass_ptr MuonFit::fgIsA(0);  // static to hold class pointer
+
+//______________________________________________________________________________
+const char *MuonFit::Class_Name()
+{
+   return "muon_pog::MuonFit";
+}
+
+//______________________________________________________________________________
+const char *MuonFit::ImplFileName()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::MuonFit*)0x0)->GetImplFileName();
+}
+
+//______________________________________________________________________________
+int MuonFit::ImplFileLine()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::MuonFit*)0x0)->GetImplFileLine();
+}
+
+//______________________________________________________________________________
+TClass *MuonFit::Dictionary()
+{
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::MuonFit*)0x0)->GetClass();
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+TClass *MuonFit::Class()
+{
+   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::MuonFit*)0x0)->GetClass(); }
+   return fgIsA;
+}
+
+} // namespace muon_pog
+namespace muon_pog {
+//______________________________________________________________________________
 atomic_TClass_ptr Muon::fgIsA(0);  // static to hold class pointer
 
 //______________________________________________________________________________
@@ -575,6 +680,43 @@ TClass *Muon::Dictionary()
 TClass *Muon::Class()
 {
    if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::Muon*)0x0)->GetClass(); }
+   return fgIsA;
+}
+
+} // namespace muon_pog
+namespace muon_pog {
+//______________________________________________________________________________
+atomic_TClass_ptr HLTObject::fgIsA(0);  // static to hold class pointer
+
+//______________________________________________________________________________
+const char *HLTObject::Class_Name()
+{
+   return "muon_pog::HLTObject";
+}
+
+//______________________________________________________________________________
+const char *HLTObject::ImplFileName()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HLTObject*)0x0)->GetImplFileName();
+}
+
+//______________________________________________________________________________
+int HLTObject::ImplFileLine()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HLTObject*)0x0)->GetImplFileLine();
+}
+
+//______________________________________________________________________________
+TClass *HLTObject::Dictionary()
+{
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HLTObject*)0x0)->GetClass();
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+TClass *HLTObject::Class()
+{
+   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HLTObject*)0x0)->GetClass(); }
    return fgIsA;
 }
 
@@ -655,117 +797,6 @@ TClass *HLT::Class()
 } // namespace muon_pog
 namespace muon_pog {
 //______________________________________________________________________________
-atomic_TClass_ptr HLTObject::fgIsA(0);  // static to hold class pointer
-
-//______________________________________________________________________________
-const char *HLTObject::Class_Name()
-{
-   return "muon_pog::HLTObject";
-}
-
-//______________________________________________________________________________
-const char *HLTObject::ImplFileName()
-{
-   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HLTObject*)0x0)->GetImplFileName();
-}
-
-//______________________________________________________________________________
-int HLTObject::ImplFileLine()
-{
-   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HLTObject*)0x0)->GetImplFileLine();
-}
-
-//______________________________________________________________________________
-TClass *HLTObject::Dictionary()
-{
-   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HLTObject*)0x0)->GetClass();
-   return fgIsA;
-}
-
-//______________________________________________________________________________
-TClass *HLTObject::Class()
-{
-   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HLTObject*)0x0)->GetClass(); }
-   return fgIsA;
-}
-
-} // namespace muon_pog
-namespace muon_pog {
-//______________________________________________________________________________
-atomic_TClass_ptr ChambMatch::fgIsA(0);  // static to hold class pointer
-
-//______________________________________________________________________________
-const char *ChambMatch::Class_Name()
-{
-   return "muon_pog::ChambMatch";
-}
-
-//______________________________________________________________________________
-const char *ChambMatch::ImplFileName()
-{
-   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::ChambMatch*)0x0)->GetImplFileName();
-}
-
-//______________________________________________________________________________
-int ChambMatch::ImplFileLine()
-{
-   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::ChambMatch*)0x0)->GetImplFileLine();
-}
-
-//______________________________________________________________________________
-TClass *ChambMatch::Dictionary()
-{
-   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::ChambMatch*)0x0)->GetClass();
-   return fgIsA;
-}
-
-//______________________________________________________________________________
-TClass *ChambMatch::Class()
-{
-   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::ChambMatch*)0x0)->GetClass(); }
-   return fgIsA;
-}
-
-} // namespace muon_pog
-namespace muon_pog {
-//______________________________________________________________________________
-atomic_TClass_ptr HitInfo::fgIsA(0);  // static to hold class pointer
-
-//______________________________________________________________________________
-const char *HitInfo::Class_Name()
-{
-   return "muon_pog::HitInfo";
-}
-
-//______________________________________________________________________________
-const char *HitInfo::ImplFileName()
-{
-   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HitInfo*)0x0)->GetImplFileName();
-}
-
-//______________________________________________________________________________
-int HitInfo::ImplFileLine()
-{
-   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HitInfo*)0x0)->GetImplFileLine();
-}
-
-//______________________________________________________________________________
-TClass *HitInfo::Dictionary()
-{
-   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HitInfo*)0x0)->GetClass();
-   return fgIsA;
-}
-
-//______________________________________________________________________________
-TClass *HitInfo::Class()
-{
-   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::HitInfo*)0x0)->GetClass(); }
-   return fgIsA;
-}
-
-} // namespace muon_pog
-namespace muon_pog {
-//______________________________________________________________________________
 atomic_TClass_ptr EventId::fgIsA(0);  // static to hold class pointer
 
 //______________________________________________________________________________
@@ -803,39 +834,41 @@ TClass *EventId::Class()
 } // namespace muon_pog
 namespace muon_pog {
 //______________________________________________________________________________
-void Event::Streamer(TBuffer &R__b)
-{
-   // Stream an object of class muon_pog::Event.
+atomic_TClass_ptr Event::fgIsA(0);  // static to hold class pointer
 
-   if (R__b.IsReading()) {
-      R__b.ReadClassBuffer(muon_pog::Event::Class(),this);
-   } else {
-      R__b.WriteClassBuffer(muon_pog::Event::Class(),this);
-   }
+//______________________________________________________________________________
+const char *Event::Class_Name()
+{
+   return "muon_pog::Event";
+}
+
+//______________________________________________________________________________
+const char *Event::ImplFileName()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::Event*)0x0)->GetImplFileName();
+}
+
+//______________________________________________________________________________
+int Event::ImplFileLine()
+{
+   return ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::Event*)0x0)->GetImplFileLine();
+}
+
+//______________________________________________________________________________
+TClass *Event::Dictionary()
+{
+   fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::Event*)0x0)->GetClass();
+   return fgIsA;
+}
+
+//______________________________________________________________________________
+TClass *Event::Class()
+{
+   if (!fgIsA.load()) { R__LOCKGUARD2(gInterpreterMutex); fgIsA = ::ROOT::GenerateInitInstanceLocal((const ::muon_pog::Event*)0x0)->GetClass(); }
+   return fgIsA;
 }
 
 } // namespace muon_pog
-namespace ROOT {
-   // Wrappers around operator new
-   static void *new_muon_pogcLcLEvent(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::Event : new ::muon_pog::Event;
-   }
-   static void *newArray_muon_pogcLcLEvent(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::Event[nElements] : new ::muon_pog::Event[nElements];
-   }
-   // Wrapper around operator delete
-   static void delete_muon_pogcLcLEvent(void *p) {
-      delete ((::muon_pog::Event*)p);
-   }
-   static void deleteArray_muon_pogcLcLEvent(void *p) {
-      delete [] ((::muon_pog::Event*)p);
-   }
-   static void destruct_muon_pogcLcLEvent(void *p) {
-      typedef ::muon_pog::Event current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class ::muon_pog::Event
-
 namespace muon_pog {
 //______________________________________________________________________________
 void GenInfo::Streamer(TBuffer &R__b)
@@ -943,6 +976,111 @@ namespace ROOT {
 
 namespace muon_pog {
 //______________________________________________________________________________
+void ChambMatch::Streamer(TBuffer &R__b)
+{
+   // Stream an object of class muon_pog::ChambMatch.
+
+   if (R__b.IsReading()) {
+      R__b.ReadClassBuffer(muon_pog::ChambMatch::Class(),this);
+   } else {
+      R__b.WriteClassBuffer(muon_pog::ChambMatch::Class(),this);
+   }
+}
+
+} // namespace muon_pog
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_muon_pogcLcLChambMatch(void *p) {
+      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::ChambMatch : new ::muon_pog::ChambMatch;
+   }
+   static void *newArray_muon_pogcLcLChambMatch(Long_t nElements, void *p) {
+      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::ChambMatch[nElements] : new ::muon_pog::ChambMatch[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_muon_pogcLcLChambMatch(void *p) {
+      delete ((::muon_pog::ChambMatch*)p);
+   }
+   static void deleteArray_muon_pogcLcLChambMatch(void *p) {
+      delete [] ((::muon_pog::ChambMatch*)p);
+   }
+   static void destruct_muon_pogcLcLChambMatch(void *p) {
+      typedef ::muon_pog::ChambMatch current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::muon_pog::ChambMatch
+
+namespace muon_pog {
+//______________________________________________________________________________
+void HitInfo::Streamer(TBuffer &R__b)
+{
+   // Stream an object of class muon_pog::HitInfo.
+
+   if (R__b.IsReading()) {
+      R__b.ReadClassBuffer(muon_pog::HitInfo::Class(),this);
+   } else {
+      R__b.WriteClassBuffer(muon_pog::HitInfo::Class(),this);
+   }
+}
+
+} // namespace muon_pog
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_muon_pogcLcLHitInfo(void *p) {
+      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::HitInfo : new ::muon_pog::HitInfo;
+   }
+   static void *newArray_muon_pogcLcLHitInfo(Long_t nElements, void *p) {
+      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::HitInfo[nElements] : new ::muon_pog::HitInfo[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_muon_pogcLcLHitInfo(void *p) {
+      delete ((::muon_pog::HitInfo*)p);
+   }
+   static void deleteArray_muon_pogcLcLHitInfo(void *p) {
+      delete [] ((::muon_pog::HitInfo*)p);
+   }
+   static void destruct_muon_pogcLcLHitInfo(void *p) {
+      typedef ::muon_pog::HitInfo current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::muon_pog::HitInfo
+
+namespace muon_pog {
+//______________________________________________________________________________
+void MuonFit::Streamer(TBuffer &R__b)
+{
+   // Stream an object of class muon_pog::MuonFit.
+
+   if (R__b.IsReading()) {
+      R__b.ReadClassBuffer(muon_pog::MuonFit::Class(),this);
+   } else {
+      R__b.WriteClassBuffer(muon_pog::MuonFit::Class(),this);
+   }
+}
+
+} // namespace muon_pog
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_muon_pogcLcLMuonFit(void *p) {
+      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::MuonFit : new ::muon_pog::MuonFit;
+   }
+   static void *newArray_muon_pogcLcLMuonFit(Long_t nElements, void *p) {
+      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::MuonFit[nElements] : new ::muon_pog::MuonFit[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_muon_pogcLcLMuonFit(void *p) {
+      delete ((::muon_pog::MuonFit*)p);
+   }
+   static void deleteArray_muon_pogcLcLMuonFit(void *p) {
+      delete [] ((::muon_pog::MuonFit*)p);
+   }
+   static void destruct_muon_pogcLcLMuonFit(void *p) {
+      typedef ::muon_pog::MuonFit current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::muon_pog::MuonFit
+
+namespace muon_pog {
+//______________________________________________________________________________
 void Muon::Streamer(TBuffer &R__b)
 {
    // Stream an object of class muon_pog::Muon.
@@ -975,6 +1113,41 @@ namespace ROOT {
       ((current_t*)p)->~current_t();
    }
 } // end of namespace ROOT for class ::muon_pog::Muon
+
+namespace muon_pog {
+//______________________________________________________________________________
+void HLTObject::Streamer(TBuffer &R__b)
+{
+   // Stream an object of class muon_pog::HLTObject.
+
+   if (R__b.IsReading()) {
+      R__b.ReadClassBuffer(muon_pog::HLTObject::Class(),this);
+   } else {
+      R__b.WriteClassBuffer(muon_pog::HLTObject::Class(),this);
+   }
+}
+
+} // namespace muon_pog
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_muon_pogcLcLHLTObject(void *p) {
+      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::HLTObject : new ::muon_pog::HLTObject;
+   }
+   static void *newArray_muon_pogcLcLHLTObject(Long_t nElements, void *p) {
+      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::HLTObject[nElements] : new ::muon_pog::HLTObject[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_muon_pogcLcLHLTObject(void *p) {
+      delete ((::muon_pog::HLTObject*)p);
+   }
+   static void deleteArray_muon_pogcLcLHLTObject(void *p) {
+      delete [] ((::muon_pog::HLTObject*)p);
+   }
+   static void destruct_muon_pogcLcLHLTObject(void *p) {
+      typedef ::muon_pog::HLTObject current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::muon_pog::HLTObject
 
 namespace muon_pog {
 //______________________________________________________________________________
@@ -1048,111 +1221,6 @@ namespace ROOT {
 
 namespace muon_pog {
 //______________________________________________________________________________
-void HLTObject::Streamer(TBuffer &R__b)
-{
-   // Stream an object of class muon_pog::HLTObject.
-
-   if (R__b.IsReading()) {
-      R__b.ReadClassBuffer(muon_pog::HLTObject::Class(),this);
-   } else {
-      R__b.WriteClassBuffer(muon_pog::HLTObject::Class(),this);
-   }
-}
-
-} // namespace muon_pog
-namespace ROOT {
-   // Wrappers around operator new
-   static void *new_muon_pogcLcLHLTObject(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::HLTObject : new ::muon_pog::HLTObject;
-   }
-   static void *newArray_muon_pogcLcLHLTObject(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::HLTObject[nElements] : new ::muon_pog::HLTObject[nElements];
-   }
-   // Wrapper around operator delete
-   static void delete_muon_pogcLcLHLTObject(void *p) {
-      delete ((::muon_pog::HLTObject*)p);
-   }
-   static void deleteArray_muon_pogcLcLHLTObject(void *p) {
-      delete [] ((::muon_pog::HLTObject*)p);
-   }
-   static void destruct_muon_pogcLcLHLTObject(void *p) {
-      typedef ::muon_pog::HLTObject current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class ::muon_pog::HLTObject
-
-namespace muon_pog {
-//______________________________________________________________________________
-void ChambMatch::Streamer(TBuffer &R__b)
-{
-   // Stream an object of class muon_pog::ChambMatch.
-
-   if (R__b.IsReading()) {
-      R__b.ReadClassBuffer(muon_pog::ChambMatch::Class(),this);
-   } else {
-      R__b.WriteClassBuffer(muon_pog::ChambMatch::Class(),this);
-   }
-}
-
-} // namespace muon_pog
-namespace ROOT {
-   // Wrappers around operator new
-   static void *new_muon_pogcLcLChambMatch(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::ChambMatch : new ::muon_pog::ChambMatch;
-   }
-   static void *newArray_muon_pogcLcLChambMatch(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::ChambMatch[nElements] : new ::muon_pog::ChambMatch[nElements];
-   }
-   // Wrapper around operator delete
-   static void delete_muon_pogcLcLChambMatch(void *p) {
-      delete ((::muon_pog::ChambMatch*)p);
-   }
-   static void deleteArray_muon_pogcLcLChambMatch(void *p) {
-      delete [] ((::muon_pog::ChambMatch*)p);
-   }
-   static void destruct_muon_pogcLcLChambMatch(void *p) {
-      typedef ::muon_pog::ChambMatch current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class ::muon_pog::ChambMatch
-
-namespace muon_pog {
-//______________________________________________________________________________
-void HitInfo::Streamer(TBuffer &R__b)
-{
-   // Stream an object of class muon_pog::HitInfo.
-
-   if (R__b.IsReading()) {
-      R__b.ReadClassBuffer(muon_pog::HitInfo::Class(),this);
-   } else {
-      R__b.WriteClassBuffer(muon_pog::HitInfo::Class(),this);
-   }
-}
-
-} // namespace muon_pog
-namespace ROOT {
-   // Wrappers around operator new
-   static void *new_muon_pogcLcLHitInfo(void *p) {
-      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::HitInfo : new ::muon_pog::HitInfo;
-   }
-   static void *newArray_muon_pogcLcLHitInfo(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::HitInfo[nElements] : new ::muon_pog::HitInfo[nElements];
-   }
-   // Wrapper around operator delete
-   static void delete_muon_pogcLcLHitInfo(void *p) {
-      delete ((::muon_pog::HitInfo*)p);
-   }
-   static void deleteArray_muon_pogcLcLHitInfo(void *p) {
-      delete [] ((::muon_pog::HitInfo*)p);
-   }
-   static void destruct_muon_pogcLcLHitInfo(void *p) {
-      typedef ::muon_pog::HitInfo current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class ::muon_pog::HitInfo
-
-namespace muon_pog {
-//______________________________________________________________________________
 void EventId::Streamer(TBuffer &R__b)
 {
    // Stream an object of class muon_pog::EventId.
@@ -1185,6 +1253,41 @@ namespace ROOT {
       ((current_t*)p)->~current_t();
    }
 } // end of namespace ROOT for class ::muon_pog::EventId
+
+namespace muon_pog {
+//______________________________________________________________________________
+void Event::Streamer(TBuffer &R__b)
+{
+   // Stream an object of class muon_pog::Event.
+
+   if (R__b.IsReading()) {
+      R__b.ReadClassBuffer(muon_pog::Event::Class(),this);
+   } else {
+      R__b.WriteClassBuffer(muon_pog::Event::Class(),this);
+   }
+}
+
+} // namespace muon_pog
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_muon_pogcLcLEvent(void *p) {
+      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::Event : new ::muon_pog::Event;
+   }
+   static void *newArray_muon_pogcLcLEvent(Long_t nElements, void *p) {
+      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) ::muon_pog::Event[nElements] : new ::muon_pog::Event[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_muon_pogcLcLEvent(void *p) {
+      delete ((::muon_pog::Event*)p);
+   }
+   static void deleteArray_muon_pogcLcLEvent(void *p) {
+      delete [] ((::muon_pog::Event*)p);
+   }
+   static void destruct_muon_pogcLcLEvent(void *p) {
+      typedef ::muon_pog::Event current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::muon_pog::Event
 
 namespace ROOT {
    static TClass *vectorlEstringgR_Dictionary();
@@ -1248,6 +1351,69 @@ namespace ROOT {
       ((current_t*)p)->~current_t();
    }
 } // end of namespace ROOT for class vector<string>
+
+namespace ROOT {
+   static TClass *vectorlEmuon_pogcLcLMuonFitgR_Dictionary();
+   static void vectorlEmuon_pogcLcLMuonFitgR_TClassManip(TClass*);
+   static void *new_vectorlEmuon_pogcLcLMuonFitgR(void *p = 0);
+   static void *newArray_vectorlEmuon_pogcLcLMuonFitgR(Long_t size, void *p);
+   static void delete_vectorlEmuon_pogcLcLMuonFitgR(void *p);
+   static void deleteArray_vectorlEmuon_pogcLcLMuonFitgR(void *p);
+   static void destruct_vectorlEmuon_pogcLcLMuonFitgR(void *p);
+
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const vector<muon_pog::MuonFit>*)
+   {
+      vector<muon_pog::MuonFit> *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(vector<muon_pog::MuonFit>));
+      static ::ROOT::TGenericClassInfo 
+         instance("vector<muon_pog::MuonFit>", -2, "vector", 214,
+                  typeid(vector<muon_pog::MuonFit>), ::ROOT::Internal::DefineBehavior(ptr, ptr),
+                  &vectorlEmuon_pogcLcLMuonFitgR_Dictionary, isa_proxy, 0,
+                  sizeof(vector<muon_pog::MuonFit>) );
+      instance.SetNew(&new_vectorlEmuon_pogcLcLMuonFitgR);
+      instance.SetNewArray(&newArray_vectorlEmuon_pogcLcLMuonFitgR);
+      instance.SetDelete(&delete_vectorlEmuon_pogcLcLMuonFitgR);
+      instance.SetDeleteArray(&deleteArray_vectorlEmuon_pogcLcLMuonFitgR);
+      instance.SetDestructor(&destruct_vectorlEmuon_pogcLcLMuonFitgR);
+      instance.AdoptCollectionProxyInfo(TCollectionProxyInfo::Generate(TCollectionProxyInfo::Pushback< vector<muon_pog::MuonFit> >()));
+      return &instance;
+   }
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const vector<muon_pog::MuonFit>*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+
+   // Dictionary for non-ClassDef classes
+   static TClass *vectorlEmuon_pogcLcLMuonFitgR_Dictionary() {
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const vector<muon_pog::MuonFit>*)0x0)->GetClass();
+      vectorlEmuon_pogcLcLMuonFitgR_TClassManip(theClass);
+   return theClass;
+   }
+
+   static void vectorlEmuon_pogcLcLMuonFitgR_TClassManip(TClass* ){
+   }
+
+} // end of namespace ROOT
+
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_vectorlEmuon_pogcLcLMuonFitgR(void *p) {
+      return  p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<muon_pog::MuonFit> : new vector<muon_pog::MuonFit>;
+   }
+   static void *newArray_vectorlEmuon_pogcLcLMuonFitgR(Long_t nElements, void *p) {
+      return p ? ::new((::ROOT::Internal::TOperatorNewHelper*)p) vector<muon_pog::MuonFit>[nElements] : new vector<muon_pog::MuonFit>[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_vectorlEmuon_pogcLcLMuonFitgR(void *p) {
+      delete ((vector<muon_pog::MuonFit>*)p);
+   }
+   static void deleteArray_vectorlEmuon_pogcLcLMuonFitgR(void *p) {
+      delete [] ((vector<muon_pog::MuonFit>*)p);
+   }
+   static void destruct_vectorlEmuon_pogcLcLMuonFitgR(void *p) {
+      typedef vector<muon_pog::MuonFit> current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class vector<muon_pog::MuonFit>
 
 namespace ROOT {
    static TClass *vectorlEmuon_pogcLcLMuongR_Dictionary();
@@ -1823,8 +1989,8 @@ namespace {
 0
     };
     static const char* includePaths[] = {
-"/cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed4/include",
-"/afs/cern.ch/work/c/calderon/private/CMSSW_8_0_20/src/MuonPOG/Tools/variables_comparison/",
+"/cvmfs/cms.cern.ch/slc6_amd64_gcc530/lcg/root/6.08.07/include",
+"/afs/cern.ch/work/c/calderon/private/CMSSW_9_2_1/src/MuonPOG/Tools/variables_comparison/",
 0
     };
     static const char* fwdDeclCode = R"DICTFWDDCLS(
@@ -1833,19 +1999,20 @@ namespace {
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern int __Cling_Autoloading_Map;
-namespace muon_pog{class __attribute__((annotate("$clingAutoload$../src/MuonPogTreeLinkDef.h")))  Event;}
-namespace muon_pog{class __attribute__((annotate("$clingAutoload$../src/MuonPogTreeLinkDef.h")))  GenInfo;}
-namespace muon_pog{class __attribute__((annotate("$clingAutoload$../src/MuonPogTreeLinkDef.h")))  GenParticle;}
-namespace muon_pog{class __attribute__((annotate("$clingAutoload$../src/MuonPogTreeLinkDef.h")))  METs;}
-namespace muon_pog{class __attribute__((annotate("$clingAutoload$../src/MuonPogTreeLinkDef.h")))  Muon;}
-namespace muon_pog{class __attribute__((annotate("$clingAutoload$../src/MuonPogTreeLinkDef.h")))  L1Muon;}
-namespace muon_pog{class __attribute__((annotate("$clingAutoload$../src/MuonPogTreeLinkDef.h")))  HLT;}
-namespace muon_pog{class __attribute__((annotate("$clingAutoload$../src/MuonPogTreeLinkDef.h")))  HLTObject;}
-namespace muon_pog{class __attribute__((annotate("$clingAutoload$../src/MuonPogTreeLinkDef.h")))  ChambMatch;}
-namespace muon_pog{class __attribute__((annotate("$clingAutoload$../src/MuonPogTreeLinkDef.h")))  HitInfo;}
-namespace std{template <typename _Tp> class __attribute__((annotate("$clingAutoload$string")))  allocator;
+namespace muon_pog{class __attribute__((annotate("$clingAutoload$MuonPogTree.h")))  HitInfo;}
+namespace std{template <typename _Tp> class __attribute__((annotate("$clingAutoload$bits/allocator.h")))  __attribute__((annotate("$clingAutoload$string")))  allocator;
 }
-namespace muon_pog{class __attribute__((annotate("$clingAutoload$../src/MuonPogTreeLinkDef.h")))  EventId;}
+namespace muon_pog{class __attribute__((annotate("$clingAutoload$MuonPogTree.h")))  ChambMatch;}
+namespace muon_pog{class __attribute__((annotate("$clingAutoload$MuonPogTree.h")))  HLTObject;}
+namespace muon_pog{class __attribute__((annotate("$clingAutoload$MuonPogTree.h")))  GenInfo;}
+namespace muon_pog{class __attribute__((annotate("$clingAutoload$MuonPogTree.h")))  GenParticle;}
+namespace muon_pog{class __attribute__((annotate("$clingAutoload$MuonPogTree.h")))  Muon;}
+namespace muon_pog{class __attribute__((annotate("$clingAutoload$MuonPogTree.h")))  METs;}
+namespace muon_pog{class __attribute__((annotate("$clingAutoload$MuonPogTree.h")))  MuonFit;}
+namespace muon_pog{class __attribute__((annotate("$clingAutoload$MuonPogTree.h")))  L1Muon;}
+namespace muon_pog{class __attribute__((annotate("$clingAutoload$MuonPogTree.h")))  HLT;}
+namespace muon_pog{class __attribute__((annotate("$clingAutoload$MuonPogTree.h")))  EventId;}
+namespace muon_pog{class __attribute__((annotate("$clingAutoload$MuonPogTree.h")))  Event;}
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
 #line 1 "MuonPogTreeDict dictionary payload"
@@ -1871,6 +2038,7 @@ namespace muon_pog{class __attribute__((annotate("$clingAutoload$../src/MuonPogT
 "muon_pog::L1Muon", payloadCode, "@",
 "muon_pog::METs", payloadCode, "@",
 "muon_pog::Muon", payloadCode, "@",
+"muon_pog::MuonFit", payloadCode, "@",
 nullptr};
 
     static bool isInitialized = false;

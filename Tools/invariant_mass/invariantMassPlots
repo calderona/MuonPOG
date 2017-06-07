@@ -13,7 +13,7 @@ BASETREEDIR="../src"
 echo "[$0]: Compiling"
 rootcling -f MuonPogTreeDict.C -c ${BASETREEDIR}/MuonPogTree.h ${BASETREEDIR}/MuonPogTreeLinkDef.h
 
-g++ -std=gnu++11 -I${ROOTINCDIR} ${fileC} MuonPogTreeDict.C ${ROOTLIBS} -lX11 -o ${fileEXE}
+g++ -std=gnu++1y -I${ROOTINCDIR} ${fileC} MuonPogTreeDict.C ${ROOTLIBS} -lX11 -o ${fileEXE}
 
 echo "[$0]: Running with parameters $@" 
 ${fileEXE} $@
